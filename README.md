@@ -1,12 +1,68 @@
-# ground-server-spring
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [gs-backend](#gs-backend)
+  - [Requirements](#requirements)
+  - [Installation](#installation)
+    - [Mac OS](#mac-os)
+      - [Gradle](#gradle)
+      - [Java 13/JDK 13](#java-13jdk-13)
+      - [Postgres](#postgres)
+  - [Setup](#setup)
+  - [Running](#running)
+  - [Development guide](#development-guide)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+# gs-backend
 Ground Server for the Platform infrastructure, Spring-ified
 
 ## Requirements
-You will need `gradle`. On Mac OSX, you can run `brew install gradle` if you do not already have it.
+- Java 13
+- `gradle`
+- Python 3 for `pre-commit`
+- PostgresSQL
+
+## Installation
+### Mac OS
+#### Gradle
+  - `brew install gradle`
+
+#### Java 13/JDK 13
+This assumes you already have some version of Java installed.
+  - Go to [OpenJDK](https://jdk.java.net/13/) to download JDK 13.
+  - Navigate to where you downloaded the JDK tar, and then run:
+      -  `tar -xf <file>.tar.gz`
+  - then move the JDK into your JDK folder:
+      -  `sudo mv jdk-<...>.jdk/ /Library/Java/JavaVirtualMachines/`
+  - run `java --version` to confirm that it is openJDK 13 running
+
+
+#### Postgres
+  - `brew install postgres`
+
+## Setup
+1. To install `pre-commit`, run
+  - `pip install pre-commit`
+  - `pre-commit install` to run `pre-commit` hooks to ensure your commits are nice
+1. Setup the database
+  - Begin the postgres server:
+      * `postgres -D <path-to-postgres-installation>`
+  - Create a user
+      * `createuser --createdb --pwprompt --superuser --createrole postgres`
+  - Enter the Postgres terminal
+      * `psql -U postgres`
+  - Create the database
+      * ```
+        CREATE DATABASE groundserver
+        WITH ENCODING='UTF8'
+        OWNER=postgres
+        CONNECTION LIMIT=-1;
+        ```
+1. Run `./setup` in order to create the dependencies.
 
 ## Running
-In order to run `gs-backend`, you need some one-time setup. Run `./setup` in order to create the dependencies.
-
 Then run `./run` in order to start up the server on port `9000`!
 
 ## Development guide
