@@ -1,0 +1,3 @@
+entity-packages: org.cuair.ground.models
+transactional-packages: org.cuair.ground
+querybean-packages: org.cuair.ground
