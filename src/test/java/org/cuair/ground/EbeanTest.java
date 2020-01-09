@@ -20,7 +20,7 @@ import java.util.Properties;
 import java.util.List;
 
 @SpringBootTest
-public class TestEbeanTest {
+public class EbeanTest {
 
     private EbeanServer server;
 
