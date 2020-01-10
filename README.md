@@ -63,12 +63,31 @@ This assumes you already have some version of Java installed.
 3. Run `./setup` in order to create the dependencies.
 
 ## Running
+Ensure that the following four files have the following four lines changed to below:
+  - `application.properties`
+      * `spring.datasource.url=jdbc:postgresql:groundserver`
+  - `ebean.properties`
+      * `datasource.db.databaseUrl=jdbc:postgresql:groundserver`
+  - `test-application.properties`
+      * `spring.datasource.url=jdbc:postgresql:groundservertest`
+  - `test-ebean.properties`
+      * `datasource.db.databaseUrl=jdbc:postgresql:groundservertest`
+
 Then run `./run` in order to start up the server on port `9000`!
 
 ## Docker
-1. If you have never built the ground server image before, or if you have changed the Dockerfile, from the root directory of the project run
+1. Ensure that the following four files have the following four lines changed to below:
+  - `application.properties`
+      * `spring.datasource.url=jdbc:postgresql://db:5432/groundserver`
+  - `ebean.properties`
+      * `datasource.db.databaseUrl=jdbc:postgresql://db:5432/groundserver`
+  - `test-application.properties`
+      * `spring.datasource.url=jdbc:postgresql://db:5432/groundservertest`
+  - `test-ebean.properties`
+      * `datasource.db.databaseUrl=jdbc:postgresql://db:5432/groundservertest`
+2. If you have never built the ground server image before, or if you have changed the Dockerfile, from the root directory of the project run
   - `docker-compose build`
-2. To create a Docker container, then from the root directory of the project run
+3. To create a Docker container, then from the root directory of the project run
   -  `docker-compose up`
 
 ## Development guide
