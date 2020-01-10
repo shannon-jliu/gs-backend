@@ -24,8 +24,6 @@ services:
             - db
         volumes:
             - ./:/home/gs-backend
-        expose:
-            - 9000
         ports:
             - 9000:9000
         restart: always
