@@ -2,6 +2,7 @@
 *.iml
 .gradle
 /build/
+/pgdata/
 
 # Ignore Gradle GUI config
 gradle-app.setting
