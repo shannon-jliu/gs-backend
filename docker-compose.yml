@@ -17,6 +17,8 @@ services:
   
     groundserver:
         image: groundserver:latest
+        build:
+            context: .
         working_dir: "/home/gs-backend"
         depends_on:
             - db

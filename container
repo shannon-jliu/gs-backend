@@ -1,3 +1,0 @@
-./gradlew clean build
-docker build -t groundserver .
-docker-compose up

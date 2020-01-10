@@ -29,14 +29,6 @@ public class EbeanTest {
     /** Before each test, initialize Ebean server */
     @Before
     public void createEbeanServer() {
-        // Properties props = new Properties();
-        // props.put("ebean.db.ddl.generate", "true");
-        // props.put("ebean.db.ddl.run", "true");
-        // props.put("datasource.db.username", "postgres");
-        // props.put("datasource.db.password", "admin");
-        // props.put("datasource.db.databaseUrl", "jdbc:postgresql://postgres_db:5432/groundserver");
-        // props.put("datasource.db.databaseDriver", "org.postgresql.Driver");
-
         ServerConfig config = new ServerConfig();
         config.setName("db");
         config.loadFromProperties();
