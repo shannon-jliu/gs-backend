@@ -67,7 +67,7 @@ Then run `./run` in order to start up the server on port `9000`!
 
 ## Docker
 1. If you have never built the ground server image before, or if you have changed the Dockerfile, from the root directory of the project run
-  - `docker build -t groundserver .`
+  - `docker-compose build`
 2. To create a Docker container, then from the root directory of the project run
   -  `docker-compose up`
 
