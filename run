@@ -1,2 +1,2 @@
-#!/usr/bin/env bash
+#!/bin/bash
 ./gradlew build && java -jar build/libs/ground-server-0.0.1-SNAPSHOT.jar
