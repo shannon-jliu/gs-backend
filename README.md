@@ -46,7 +46,7 @@ This assumes you already have some version of Java installed.
 1. To install `pre-commit`, run
   - `pip install pre-commit`
   - `pre-commit install` to run `pre-commit` hooks to ensure your commits are nice
-1. Setup the database
+2. Setup the database
   - Begin the postgres server:
       * `postgres -D <path-to-postgres-installation>`
   - Create a user
@@ -60,10 +60,16 @@ This assumes you already have some version of Java installed.
         OWNER=postgres
         CONNECTION LIMIT=-1;
         ```
-1. Run `./setup` in order to create the dependencies.
+3. Run `./setup` in order to create the dependencies.
 
 ## Running
 Then run `./run` in order to start up the server on port `9000`!
+
+## Docker
+1. If you have never built the ground server image before, or if you have changed the Dockerfile, from the root directory of the project run
+  - `docker build -t groundserver .`
+2. To create a Docker container, then from the root directory of the project run
+  -  `docker-compose up`
 
 ## Development guide
 
