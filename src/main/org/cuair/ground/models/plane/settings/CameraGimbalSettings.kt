@@ -1,6 +1,5 @@
 package org.cuair.ground.models.plane.settings
 
-import java.util.*
 import javax.persistence.Entity
 import javax.validation.constraints.NotNull
 
