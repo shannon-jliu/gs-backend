@@ -18,7 +18,7 @@ import org.apache.commons.io.FileUtils;
 import org.cuair.ground.daos.DAOFactory;
 import org.cuair.ground.daos.TimestampDatabaseAccessor;
 import org.cuair.ground.models.Image;
-// import org.cuair.ground.util.SpringConfig;
+import org.cuair.ground.util.SpringConfig;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
