@@ -5,13 +5,13 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Nonnull;
+import javax.validation.constraints.NotNull;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 // import org.cuair.ground.daos.AssignmentDatabaseAccessor;
 // import org.cuair.ground.daos.ClientCreatableDatabaseAccessor;
 import org.cuair.ground.daos.DAOFactory;
-import org.cuair.ground.daos.TargetSightingsDatabaseAccessor;
+// import org.cuair.ground.daos.TargetSightingsDatabaseAccessor;
 // import org.cuair.ground.models.Assignment;
 import org.cuair.ground.models.CUAirModel;
 import org.cuair.ground.models.Image;
@@ -20,9 +20,9 @@ import org.cuair.ground.models.Image;
 // import org.cuair.ground.models.plane.target.AlphanumTargetSighting;
 // import org.cuair.ground.models.plane.target.EmergentTarget;
 // import org.cuair.ground.models.plane.target.EmergentTargetSighting;
-// import org.cuair.ground.models.plane.target.Target;
-// import org.cuair.ground.models.plane.target.TargetSighting;
-import org.cuair.ground.util.PlayConfig;
+import org.cuair.ground.models.plane.target.Target;
+import org.cuair.ground.models.plane.target.TargetSighting;
+// import org.cuair.ground.util.PlayConfig;
 // import play.Logger;
 
 /** Represents the position and orientation of an object on the ground */
@@ -405,7 +405,7 @@ public class Geotag extends CUAirModel {
    * @return True if the object equals this Geotag
    */
   @Override
-  public boolean equals(@Nonnull Object o) {
+  public boolean equals(@NotNull Object o) {
     Geotag other = (Geotag) o;
 
     // unsure if deepEquals will handle Radian.equals
