@@ -20,6 +20,7 @@ import org.apache.commons.io.FileUtils;
 import org.cuair.ground.daos.DAOFactory;
 import org.cuair.ground.daos.TimestampDatabaseAccessor;
 import org.cuair.ground.models.Image;
+import org.cuair.ground.util.SpringConfig;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -38,9 +39,9 @@ public class ImageController {
     private TimestampDatabaseAccessor imageDao = (TimestampDatabaseAccessor) DAOFactory.getDAO(DAOFactory.ModelDAOType.TIMESTAMP_DATABASE_ACCESSOR, Image.class);
 
     /** String path to the folder where all the images are stored  */
-    private String imgDirectory = "SOME_IMAGE_DIR";
+    private String imgDirectory = SpringConfig.PLANE_IMAGE_DIR;
 
-    private String backupImgDirectory = "SOME_BACKUP_IMAGE_DIR";
+    private String backupImgDirectory = SpringConfig.BACKUP_IMAGE_DIR;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -425,24 +426,18 @@ public class ImageController {
         try {
             json = getJSON(req);
         } catch (IOException e) {
-            return CompletableFuture.completedFuture(
-                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e)
-            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e);
         }
         
         Image i = null;
         try {
             i = mapper.treeToValue(json, Image.class);
         } catch (JsonProcessingException e) {
-            return CompletableFuture.completedFuture(
-                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when convert json to Image instance: \n" + e)
-            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when convert json to Image instance: \n" + e);
         }
 
         if (i.getId() != null) {
-            return CompletableFuture.completedFuture(
-                ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Don't put id in json of image POST request")
-            );
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Don't put id in json of image POST request");
         }
         imageDao.create(i);
         return ResponseEntity.ok(i);
