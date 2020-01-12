@@ -20,7 +20,7 @@ import org.apache.commons.io.FileUtils;
 import org.cuair.ground.daos.DAOFactory;
 import org.cuair.ground.daos.TimestampDatabaseAccessor;
 import org.cuair.ground.models.Image;
-import org.cuair.ground.util.SpringConfig;
+// import org.cuair.ground.util.SpringConfig;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -39,9 +39,9 @@ public class ImageController {
     private TimestampDatabaseAccessor imageDao = (TimestampDatabaseAccessor) DAOFactory.getDAO(DAOFactory.ModelDAOType.TIMESTAMP_DATABASE_ACCESSOR, Image.class);
 
     /** String path to the folder where all the images are stored  */
-    private String imgDirectory = SpringConfig.PLANE_IMAGE_DIR;
+    private String imgDirectory = "SpringConfig.PLANE_IMAGE_DIR";
 
-    private String backupImgDirectory = SpringConfig.BACKUP_IMAGE_DIR;
+    private String backupImgDirectory = "SpringConfig.BACKUP_IMAGE_DIR";
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -50,6 +50,7 @@ public class ImageController {
      *
      * @return HTTP response
      */
+    @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<Image>> getAll() {
         return ResponseEntity.ok(imageDao.getAll());
     }
@@ -59,6 +60,7 @@ public class ImageController {
      *
      * @return HTTP response
      */
+    @RequestMapping(value = "/id", method = RequestMethod.GET)
     public ResponseEntity<List<Long>> getAllIds() {
         return ResponseEntity.ok(imageDao.getAllIds());
     }
@@ -68,6 +70,7 @@ public class ImageController {
      *
      * @return HTTP response
      */
+    @RequestMapping(value = "/recent", method = RequestMethod.GET)
     public ResponseEntity<Image> getRecent() {
         Image recent = (Image) imageDao.getRecent();
         return (recent != null) ? ResponseEntity.ok(recent) : ResponseEntity.noContent().build();
@@ -79,6 +82,7 @@ public class ImageController {
      * @param id Long id for Image
      * @return HTTP response
      */
+    @RequestMapping(value = "/recent", method = RequestMethod.GET)
     public ResponseEntity<Image> get(long id) {
         Image image = (Image) imageDao.get(id);
         return (image != null) ? ResponseEntity.ok(image) : ResponseEntity.noContent().build();
@@ -90,6 +94,7 @@ public class ImageController {
      * @param file String image url for the File we are extracting
      * @return HTTP response
      */
+    @RequestMapping(value = "/file/*file", method = RequestMethod.GET)
     public ResponseEntity<File> getFile(String file) {
         // TODO: Figure this out
         // Controller.response().setHeader("Content-disposition", "inline")
@@ -384,6 +389,7 @@ public class ImageController {
      *
      * @return an HTTP response
      */
+    @RequestMapping(value = "/geotag/:id", method = RequestMethod.GET)
     public ResponseEntity getGeotagCoordinates(Long imageId) {
         if (imageId == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Image ID is null");
         Image i = (Image) imageDao.get(imageId);
@@ -399,6 +405,7 @@ public class ImageController {
      *
      * @return an HTTP response
      */
+    @RequestMapping(value = "/geotag", method = RequestMethod.GET)
     public ResponseEntity getAllGeotagCoordinates() {
         List<Long> ids = imageDao.getAllIds();
         ObjectNode imageGeotags = mapper.createObjectNode();
@@ -421,6 +428,7 @@ public class ImageController {
      * @param req the request
      * @return an HTTP response
      */
+    @RequestMapping(value = "/dummy", method = RequestMethod.POST)
     public ResponseEntity dummyCreate(MultipartHttpServletRequest req) {
         ObjectNode json = null;
         try {
