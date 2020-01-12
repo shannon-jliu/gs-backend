@@ -15,22 +15,6 @@ abstract class TimestampModel : CUAirModel(), Comparable<Any> {
     var timestamp: Timestamp? = null
 
     /**
-     * Retrieves the timestamp
-     *
-     * @return Timestamp timestamp
-     */
-    // fun getTimestamp(): Timestamp? = timestamp
-    
-    /**
-     * Sets the timestamp
-     *
-     * @param timestamp new timestamp
-     */
-    // fun setTimestamp(timestamp: Timestamp): Unit {
-    //     this.timestamp = timestamp
-    // }
-
-    /**
      * Compares two TimestampModel instances using their timestamp. Used only for testing. this
      * comparable does not mean that all timeseries are ordered by timestamps in the table.
      *
