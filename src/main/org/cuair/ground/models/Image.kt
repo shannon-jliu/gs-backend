@@ -53,26 +53,30 @@ class Image(
         // val imageGPS = imagePosition.location
         // val imageGPS = null
         // val centerLatitude = imageGPS.latitude!!
-        val centerLatitude = 0.0
+        // val centerLatitude = 0.0
         // val centerLongitude = imageGPS.longitude!!
-        val centerLongitude = 0.0
+        // val centerLongitude = 0.0
         // val planeYaw = imageTelemetry.headingFromNorth!! * Math.PI / 180
         val planeYaw = 0.0
         // val altitude = imagePosition.altitude!!
-        val altitude = 0.0
+        // val altitude = 0.0
         
-        val topLeft = Geotag.getPixelCoordinates(centerLatitude, centerLongitude, altitude, 0.0, 0.0, planeYaw)
-        val topRight = Geotag.getPixelCoordinates(
-            centerLatitude, centerLongitude, altitude, Geotag.IMAGE_WIDTH, 0.0, planeYaw)
-        val bottomLeft = Geotag.getPixelCoordinates(
-            centerLatitude, centerLongitude, altitude, 0.0, Geotag.IMAGE_HEIGHT, planeYaw)
-        val bottomRight = Geotag.getPixelCoordinates(
-            centerLatitude,
-            centerLongitude,
-            altitude,
-            Geotag.IMAGE_WIDTH,
-            Geotag.IMAGE_HEIGHT,
-            planeYaw)
+        // val topLeft = Geotag.getPixelCoordinates(centerLatitude, centerLongitude, altitude, 0.0, 0.0, planeYaw)
+        // val topRight = Geotag.getPixelCoordinates(
+        //     centerLatitude, centerLongitude, altitude, Geotag.IMAGE_WIDTH, 0.0, planeYaw)
+        // val bottomLeft = Geotag.getPixelCoordinates(
+        //     centerLatitude, centerLongitude, altitude, 0.0, Geotag.IMAGE_HEIGHT, planeYaw)
+        // val bottomRight = Geotag.getPixelCoordinates(
+        //     centerLatitude,
+        //     centerLongitude,
+        //     altitude,
+        //     Geotag.IMAGE_WIDTH,
+        //     Geotag.IMAGE_HEIGHT,
+        //     planeYaw)
+        val topLeft = null
+        val topRight = null
+        val bottomLeft = null
+        val bottomRight = null
         
 
         val mapper = ObjectMapper()

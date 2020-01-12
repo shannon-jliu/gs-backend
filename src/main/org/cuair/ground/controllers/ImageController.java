@@ -1,7 +1,5 @@
 package org.cuair.ground.controllers;
 
-import org.springframework.web.bind.annotation.RestController;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -22,10 +20,12 @@ import org.cuair.ground.daos.TimestampDatabaseAccessor;
 import org.cuair.ground.models.Image;
 // import org.cuair.ground.util.SpringConfig;
 
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.*;
 import javax.servlet.*;
 
@@ -82,8 +82,8 @@ public class ImageController {
      * @param id Long id for Image
      * @return HTTP response
      */
-    @RequestMapping(value = "/recent", method = RequestMethod.GET)
-    public ResponseEntity<Image> get(long id) {
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    public ResponseEntity<Image> get(@PathVariable Long id) {
         Image image = (Image) imageDao.get(id);
         return (image != null) ? ResponseEntity.ok(image) : ResponseEntity.noContent().build();
     }
@@ -94,8 +94,8 @@ public class ImageController {
      * @param file String image url for the File we are extracting
      * @return HTTP response
      */
-    @RequestMapping(value = "/file/*file", method = RequestMethod.GET)
-    public ResponseEntity<File> getFile(String file) {
+    @RequestMapping(value = "/file/{file}", method = RequestMethod.GET)
+    public ResponseEntity<File> getFile(@PathVariable String file) {
         // TODO: Figure this out
         // Controller.response().setHeader("Content-disposition", "inline")
         File image = new File(imgDirectory + file);
@@ -389,8 +389,8 @@ public class ImageController {
      *
      * @return an HTTP response
      */
-    @RequestMapping(value = "/geotag/:id", method = RequestMethod.GET)
-    public ResponseEntity getGeotagCoordinates(Long imageId) {
+    @RequestMapping(value = "/geotag/{id}", method = RequestMethod.GET)
+    public ResponseEntity getGeotagCoordinates(@PathVariable Long imageId) {
         if (imageId == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Image ID is null");
         Image i = (Image) imageDao.get(imageId);
         if (i != null) {
