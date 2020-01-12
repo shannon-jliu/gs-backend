@@ -7,9 +7,10 @@ import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Embeddable;
 import javax.validation.constraints.NotNull;
-// import org.cuair.ground.util.PlayConfig;
+import org.cuair.ground.util.SpringConfig;
 import org.jetbrains.annotations.Nullable;
-// import play.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Represents a GPS location in the world */
 // TODO: Figure out if this annotation is necessary
@@ -26,6 +27,9 @@ public class GpsLocation {
 
   /** The weight of the automatically created geotags for weighted average */
   private static final double AUTO_GEOTAG_WEIGHT = 1 - 0.0;
+
+  /** A logger */
+  private static final Logger logger = LoggerFactory.getLogger(GpsLocation.class);
 
   /** The latitude of the GPS location */
   @Basic(optional = true)
@@ -200,7 +204,7 @@ public class GpsLocation {
     try {
       average = new GpsLocation(avgLat, avgLon);
     } catch (InvalidGpsLocationException e) {
-      // Logger.error("Invalid GPS Location. Average lat: " + avgLat + " and Average lon: " + avgLon);
+        logger.error("Invalid GPS Location. Average lat: " + avgLat + " and Average lon: " + avgLon);
     }
     return average;
   }
