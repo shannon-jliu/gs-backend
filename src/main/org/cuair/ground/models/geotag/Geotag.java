@@ -21,7 +21,6 @@ import org.cuair.ground.models.Image;
 // import org.cuair.ground.models.plane.target.EmergentTargetSighting;
 import org.cuair.ground.models.plane.target.Target;
 import org.cuair.ground.models.plane.target.TargetSighting;
-import org.cuair.ground.util.SpringConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

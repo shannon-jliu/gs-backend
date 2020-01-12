@@ -18,7 +18,6 @@ import org.apache.commons.io.FileUtils;
 import org.cuair.ground.daos.DAOFactory;
 import org.cuair.ground.daos.TimestampDatabaseAccessor;
 import org.cuair.ground.models.Image;
-import org.cuair.ground.util.SpringConfig;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -116,12 +115,12 @@ public class ImageController {
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Request should provide multipart/form-data")
             );
         }
-        
+
         Map<String, MultipartFile> files = req.getFileMap();
         String[] jsonParts = req.getParameterValues("json");
 
         String reqType = isPost ? "POST" : "PUT";
-    
+
         if (files.isEmpty()) {
             return CompletableFuture.completedFuture(
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing image file in image " + reqType + " request")
@@ -137,10 +136,10 @@ public class ImageController {
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing json in image " + reqType + " request")
             );
         }
-    
+
         String jsonString = jsonParts[0];
         ObjectNode json = null;
-    
+
         try {
             json = (ObjectNode) mapper.readTree(jsonString);
         } catch (Exception e) {
@@ -148,7 +147,7 @@ public class ImageController {
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Json part invalid: " + e + " \nReceived: " + jsonString)
             );
         }
-    
+
         // POST-specific requirements, maybe better way to do this than just nested if statement?
         if (isPost) {
             if (jsonParts.length != 1) {
@@ -156,19 +155,19 @@ public class ImageController {
                     ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Should have only one json part in image POST request")
                 );
             }
-            
+
             if (json.get("id") != null) {
                 return CompletableFuture.completedFuture(
                     ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Don't put id in json of image POST request")
                 );
             }
-            
+
             if (json.get("timestamp") == null) {
                 return CompletableFuture.completedFuture(
                     ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Json part must include timestamp field")
                 );
             }
-            
+
             if (json.size() > 1) {
                 return CompletableFuture.completedFuture(
                     ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Json part contains invalid field")
@@ -225,7 +224,7 @@ public class ImageController {
      * @return an HTTP response
      */
     @RequestMapping(method = RequestMethod.POST)
-    public CompletableFuture<ResponseEntity> create(MultipartHttpServletRequest req) {    
+    public CompletableFuture<ResponseEntity> create(MultipartHttpServletRequest req) {
         // check if request is valid
         CompletableFuture<ResponseEntity> validate = validateRequestBody(req, true);
         if (validate != null) {
@@ -240,7 +239,7 @@ public class ImageController {
                 ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e)
             );
         }
-        
+
         Image i = null;
         try {
             i = mapper.treeToValue(json, Image.class);
@@ -249,12 +248,12 @@ public class ImageController {
                 ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when convert json to Image instance: \n" + e)
             );
         }
-        
+
         String name = null;
         if (json.get("name") != null) {
             name = json.remove("name").asText();
         }
-        
+
         // set image file name
         String imageFileName;
         if (name != null) {
@@ -262,7 +261,7 @@ public class ImageController {
         } else {
             imageFileName = String.format("%d", i.getTimestamp().getTime());
         }
-    
+
         File imageFile = null;
         try {
             imageFile = getImageFile(req);
@@ -271,7 +270,7 @@ public class ImageController {
                 ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when extracting image from request: \n" + e)
             );
         }
-        
+
         String contentType;
         try {
             contentType = Files.probeContentType(imageFile.toPath());
@@ -280,7 +279,7 @@ public class ImageController {
                 ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing contentType for image file: \n" + e)
             );
         }
-        
+
         // this is necessary because the Files.probeContentType method above
         // does not recognize the file type for files sent from Linux systems
         if (contentType == null) contentType = "image/jpeg"; // default image content type
@@ -292,7 +291,7 @@ public class ImageController {
         String imageExtension = contentType.split("\\/")[1];
         imageFileName += "." + imageExtension;
         i.setLocalImageUrl(imgDirectory + imageFileName);
-        
+
         // store the image locally
         try {
             FileUtils.moveFile(imageFile, FileUtils.getFile(imgDirectory + imageFileName));
@@ -305,9 +304,9 @@ public class ImageController {
                 ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when moving image file: \n" + e)
             );
         }
-        
+
         i.setImageUrl("/api/v1/image/file/" + imageFileName);
-        
+
         imageDao.create(i);
         // imageClient.process(i)
         return CompletableFuture.completedFuture(ResponseEntity.ok(i));
@@ -327,7 +326,7 @@ public class ImageController {
         if (validate != null) {
           return validate;
         }
-        
+
         ObjectNode json = null;
         try {
             json = getJSON(req);
@@ -336,9 +335,9 @@ public class ImageController {
                 ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e)
             );
         }
-        
+
         Image i = (Image) imageDao.get(json.get("id").asLong());
-        
+
         // if the image was not corrected, then update accordingly and halt the process.
         if (!json.get("corrected").asBoolean()) {
             if (i != null) {
@@ -346,14 +345,14 @@ public class ImageController {
             }
             return CompletableFuture.completedFuture(ResponseEntity.ok(i));
         }
-        
+
         // hopefully vision never sends an image id that wasn't sent to them
         if (i == null) {
             return CompletableFuture.completedFuture(
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Image doesn't exist!")
             );
         }
-        
+
         // make sure that img name = the old img name
         String oldImgFilepath = i.getLocalImageUrl();
         String oldImageName = oldImgFilepath.substring(imgDirectory.length());
@@ -365,21 +364,21 @@ public class ImageController {
                 ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when extracting image from request: \n" + e)
             );
         }
-        
+
         try {
             // move old file to backup folder
             FileUtils.moveFile(
                 FileUtils.getFile(oldImgFilepath),
                 new File(backupImgDirectory + File.separator + oldImageName));
-        
+
             // update the image in directory
             imageFile.renameTo(new File(oldImgFilepath));
         } catch (IOException e) {
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when moving image file: \n" + e);
         }
-        
+
         imageDao.update(i);
-        
+
         return CompletableFuture.completedFuture(ResponseEntity.ok(i));
     }
 
@@ -410,7 +409,7 @@ public class ImageController {
         List<Long> ids = imageDao.getAllIds();
         ObjectNode imageGeotags = mapper.createObjectNode();
         for (Long id : ids) {
-            ObjectNode locs = null; 
+            ObjectNode locs = null;
             Image i = (Image) imageDao.get(id);
             if (i != null) {
                 locs = i.getLocations();
@@ -436,7 +435,7 @@ public class ImageController {
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e);
         }
-        
+
         Image i = null;
         try {
             i = mapper.treeToValue(json, Image.class);
