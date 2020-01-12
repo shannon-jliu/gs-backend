@@ -29,58 +29,58 @@ import org.slf4j.LoggerFactory;
 // TODO: Figure out if this annotation is necessary
 // @Entity
 public class Geotag extends CUAirModel {
-    
+
     /** Field of view of camera horizontally and vertically */
     private static final double FOV_HORIZONTAL_RADIANS = 0.0;
-    
+
     private static final double FOV_VERTICAL_RADIANS = 0.0;
-    
+
     /** Width of height and image in pixels */
     public static final double IMAGE_WIDTH = 0.0;
-    
+
     public static final double IMAGE_HEIGHT = 0.0;
 
     /** A logger */
     private static final Logger logger = LoggerFactory.getLogger(GpsLocation.class);
-    
+
     /** The database access object for the assignment table */
     private static final AssignmentDatabaseAccessor assignmentDao =
         (AssignmentDatabaseAccessor)
             DAOFactory.getDAO(DAOFactory.ModellessDAOType.ASSIGNMENT_DATABASE_ACCESSOR);
-    
+
     // private static final TargetSightingsDatabaseAccessor<AlphanumTargetSighting>
     //     alphaTargetSightingDao =
     //         (TargetSightingsDatabaseAccessor<AlphanumTargetSighting>)
     //             DAOFactory.getDAO(
     //                 DAOFactory.ModelDAOType.TARGET_SIGHTINGS_DATABASE_ACCESSOR,
     //                 AlphanumTargetSighting.class);
-    
+
     // private static final TargetSightingsDatabaseAccessor<EmergentTargetSighting>
     //     emergentTargetSightingDao =
     //         (TargetSightingsDatabaseAccessor<EmergentTargetSighting>)
     //             DAOFactory.getDAO(
     //                 DAOFactory.ModelDAOType.TARGET_SIGHTINGS_DATABASE_ACCESSOR,
     //                 EmergentTargetSighting.class);
-    
+
     // private static final ClientCreatableDatabaseAccessor<AlphanumTarget> alphanumTargetDao =
     //     (ClientCreatableDatabaseAccessor<AlphanumTarget>)
     //         DAOFactory.getDAO(
     //             DAOFactory.ModelDAOType.CLIENT_CREATABLE_DATABASE_ACCESSOR, AlphanumTarget.class);
-    
+
     // private static final ClientCreatableDatabaseAccessor<EmergentTarget> emergentTargetDao =
     //     (ClientCreatableDatabaseAccessor<EmergentTarget>)
     //         DAOFactory.getDAO(
     //             DAOFactory.ModelDAOType.CLIENT_CREATABLE_DATABASE_ACCESSOR, EmergentTarget.class);
-    
+
     /** The GPS coordinates of this geotag */
     @Embedded private GpsLocation gpsLocation;
-    
+
     /** The orientation of this geotag represented as radians from north */
     private Double radiansFromNorth;
-    
+
     /** True if the geotag was created from manual geotagging, false otherwise */
     private boolean isManualGeotag;
-    
+
     /**
      * Creates a new geotag with the given GPS coordinates and orientation
      *
@@ -92,7 +92,7 @@ public class Geotag extends CUAirModel {
         this(gpsLocation, radiansFromNorth);
         this.isManualGeotag = isManualGeotag;
     }
-    
+
     /**
      * Creates a new geotag with the given GPS coordinates and orientation
      *
@@ -103,7 +103,7 @@ public class Geotag extends CUAirModel {
         this.gpsLocation = gpsLocation;
         this.radiansFromNorth = radiansFromNorth;
     }
-    
+
     public Geotag(TargetSighting sighting) {
         Assignment assignment = sighting.getAssignment();
         if (assignment == null) {
@@ -126,7 +126,7 @@ public class Geotag extends CUAirModel {
         if (telemetry.getAltitude() != null) {
             altitude = telemetry.getAltitude();
         }
-        
+
         double pixelX = sighting.getPixelX();
         double pixelY = sighting.getPixelY();
         double planeYaw = telemetry.getPlaneYaw() * Math.PI / 180;
@@ -135,7 +135,7 @@ public class Geotag extends CUAirModel {
         this.gpsLocation = getPixelCoordinates(centerLatitude, centerLongitude, altitude, pixelX, pixelY, planeYaw);
         this.radiansFromNorth = getRadiansFromNorth(planeYaw, sighting.getRadiansFromTop());
     }
-    
+
     public static GpsLocation getPixelCoordinates(
         double latitude,
         double longitude,
@@ -156,41 +156,41 @@ public class Geotag extends CUAirModel {
                 * Math.tan(
                     FOV_VERTICAL_RADIANS
                         / 2); // telemetryData.getAerialPosition().getAltitudeGroundFt()
-    
+
         // distance covered per pixel in feet/pixel
         double dpphoriz = hdi / IMAGE_WIDTH;
         double dppvert = vdi / IMAGE_HEIGHT;
-    
+
         // finding distance from the center
         double deltaPixelX = pixelX - (IMAGE_WIDTH / 2);
         double deltaPixelY = (IMAGE_HEIGHT / 2) - pixelY;
-    
+
         double dppH = deltaPixelX * dpphoriz;
         double dppV = deltaPixelY * dppvert;
-    
+
         // matrix rotation to account for the yaw - (clockwise)
         double target_reference_x_feet =
             dppH * Math.cos(planeYawRadians) + dppV * Math.sin(planeYawRadians);
         double target_reference_y_feet =
             dppH * -1 * Math.sin(planeYawRadians) + dppV * Math.cos(planeYawRadians);
-    
+
         // actual:
         double latitudeFeetPerDegree = 364441.32;
         double longitudeFeetPerDegree = 269909.63;
-    
+
         // adding the distance from the center to the plane's center position
         double longitude_of_target_x = longitude + target_reference_x_feet / longitudeFeetPerDegree;
         double latitude_of_target_y = latitude + target_reference_y_feet / latitudeFeetPerDegree;
-    
+
         GpsLocation gps = null;
-        try {
-            gps = new GpsLocation(latitude_of_target_y, longitude_of_target_x);
-        } catch (InvalidGpsLocationException e) {
-            logger.error(e.getMessage());
-        }
+        // try {
+        //     gps = new GpsLocation(latitude_of_target_y, longitude_of_target_x);
+        // } catch (InvalidGpsLocationException e) {
+        //     logger.error(e.getMessage());
+        // }
         return gps;
     }
-    
+
     /**
      * Get the orientation of this geotag as radians from north
      *
@@ -199,7 +199,7 @@ public class Geotag extends CUAirModel {
     public static Double getRadiansFromNorth(double planeYaw, double radiansFromTop) {
         return (planeYaw + radiansFromTop) % (2 * Math.PI);
     }
-    
+
     /**
      * Get the GPS coordinates of this geotag
      *
@@ -208,7 +208,7 @@ public class Geotag extends CUAirModel {
     public GpsLocation getGpsLocation() {
         return gpsLocation;
     }
-    
+
     /**
      * Get the orientation of this geotag as radians from north
      *
@@ -217,7 +217,7 @@ public class Geotag extends CUAirModel {
     public Double getRadiansFromNorth() {
         return radiansFromNorth;
     }
-    
+
     /**
      * Get the boolean that represents if this geotag was created manually or not
      *
@@ -226,7 +226,7 @@ public class Geotag extends CUAirModel {
     public Boolean getIsManualGeotag() {
         return isManualGeotag;
     }
-    
+
     /**
      * Change the GPS coordinates of this geotag
      *
@@ -235,7 +235,7 @@ public class Geotag extends CUAirModel {
     public void setGpsLocation(GpsLocation gps) {
         this.gpsLocation = gps;
     }
-    
+
     /**
      * Change the orientation of this geotag
      *
@@ -244,11 +244,11 @@ public class Geotag extends CUAirModel {
     public void setRadiansFromNorth(Double radiansFromNorth) {
         this.radiansFromNorth = radiansFromNorth;
     }
-    
+
     public void setIsManualGeotag(boolean isManualGeotag) {
         this.isManualGeotag = isManualGeotag;
     }
-    
+
     /**
      * Average a variable number of geotags
      *
@@ -271,9 +271,10 @@ public class Geotag extends CUAirModel {
             Arrays.stream(geotags).map(Geotag::getRadiansFromNorth).toArray(Double[]::new);
         Boolean[] manualGeotags =
             Arrays.stream(geotags).map(Geotag::getIsManualGeotag).toArray(Boolean[]::new);
-        return new Geotag(GpsLocation.average(manualGeotags, locations), Radian.average(radians));
+        // return new Geotag(GpsLocation.average(manualGeotags, locations), Radian.average(radians));
+        return null;
     }
-    
+
     /**
      * Checks to see if geotag can be set for target sighting
      *
@@ -305,7 +306,7 @@ public class Geotag extends CUAirModel {
         }
         return true;
     }
-    
+
     public static void updateGeotagForTargetSightings(Image img) {
         // List<Assignment> assignments = assignmentDao.getAllForImageId(img.getId());
         // List<TargetSighting> tsList = new ArrayList<>();
@@ -329,7 +330,7 @@ public class Geotag extends CUAirModel {
         //   updateGeotag(target, null);
         // }
     }
-    
+
     /**
      * Updates the Geotag of a target based on the Geotag of its corresponding TargetSightings
      *
@@ -338,7 +339,7 @@ public class Geotag extends CUAirModel {
      */
     public static void updateGeotag(Target targ, TargetSighting ts) {
         // List<TargetSighting> sights = new ArrayList<TargetSighting>();
-        
+
         // if (targ.fetchAssociatedTargetSightingClass() == AlphanumTargetSighting.class) {
         //   sights.addAll(alphaTargetSightingDao.getAllTargetSightingsForTarget(targ.getId()));
         // } else if (targ.fetchAssociatedTargetSightingClass() == EmergentTargetSighting.class) {
@@ -356,7 +357,7 @@ public class Geotag extends CUAirModel {
         // targ.setGeotag(Geotag.average(geotags));
         // updateTargetInDao(targ);
     }
-    
+
     /**
      * Checks if geotag from TargetSighting's assignment is valid. If so, sets target sighting's
      * geotag to it.
@@ -371,7 +372,7 @@ public class Geotag extends CUAirModel {
         ts.setGeotag(new Geotag(ts));
         return true;
     }
-    
+
     /**
      * Update target sighting's dao
      *
@@ -386,7 +387,7 @@ public class Geotag extends CUAirModel {
             // logger.warn("Target class is not Alphanum or Emergent");
         // }
     }
-    
+
     /**
      * Update target's dao
      *
@@ -402,7 +403,7 @@ public class Geotag extends CUAirModel {
                 // logger.warn("Target class is not Alphanum or Emergent");
         // }
     }
-    
+
     /**
      * Determines if the given object is logically equal to this Geotag
      *
@@ -412,17 +413,17 @@ public class Geotag extends CUAirModel {
     @Override
     public boolean equals(@NotNull Object o) {
         Geotag other = (Geotag) o;
-        
+
         // unsure if deepEquals will handle Radian.equals
         if (!(((this.radiansFromNorth == null) && (other.getRadiansFromNorth() == null))
             || Radian.equals(this.radiansFromNorth, other.getRadiansFromNorth()))) {
             return false;
         }
-        
+
         if (!Objects.deepEquals(this.gpsLocation, other.getGpsLocation())) {
             return false;
         }
-        
+
         return true;
     }
 }

@@ -20,8 +20,10 @@ class GpsLocation
      */
     @Throws(InvalidGpsLocationException::class)
     constructor(
-        @field:Basic(optional = true) private var latitude:Double?,
-        @field:Basic(optional = true) private var longitude:Double?
+        @field:Basic(optional = true)
+        private var latitude: Double?,
+        @field:Basic(optional = true)
+        private var longitude: Double?
     ) {
         init {
             if (latitude != null && abs(latitude!!) > ABS_LATITUDE_BOUND) {
@@ -44,7 +46,7 @@ class GpsLocation
     fun getLatitude(): Double? {
         return latitude
     }
-    
+
     /**
      * Get the longitude of this GPS location
      *
