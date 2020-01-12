@@ -9,6 +9,16 @@ create table assignment (
   constraint pk_assignment primary key (id)
 );
 
+create table auth_token (
+  id                            bigserial not null,
+  token                         varchar(255) not null,
+  username                      varchar(255) not null,
+  admin                         boolean default false not null,
+  constraint uq_auth_token_token unique (token),
+  constraint uq_auth_token_username unique (username),
+  constraint pk_auth_token primary key (id)
+);
+
 create table camera_gimbal_settings (
   id                            bigserial not null,
   timestamp                     timestamptz,

@@ -1,42 +1,42 @@
 package org.cuair.ground.daos
 
-// import org.cuair.ground.models.ClientCreatable
+import org.cuair.ground.models.ClientCreatable
 import org.cuair.ground.models.CUAirModel
-// import org.cuair.ground.models.PlaneModel
-// import org.cuair.ground.models.PlaneSettingsModel
+import org.cuair.ground.models.PlaneModel
+import org.cuair.ground.models.PlaneSettingsModel
 import org.cuair.ground.models.TimestampModel
 // import org.cuair.ground.models.plane.target.AlphanumTarget
 // import org.cuair.ground.models.plane.target.AlphanumTargetSighting
-// import org.cuair.ground.models.plane.target.TargetSighting
+import org.cuair.ground.models.plane.target.TargetSighting
 
 /** Factory for creating an managing DAO instances */
 class DAOFactory {
 
   /** Enumeration of all database accessor types that are not parametrized on a model */
-  // enum class ModellessDAOType {
-  //   ASSIGNMENT_DATABASE_ACCESSOR {
-  //     override fun createInstance(): DatabaseAccessor<*> {
-  //       return AssignmentDatabaseAccessor()
-  //     }
-  //   },
-  //   AUTH_TOKEN_DATABASE_ACCESSOR {
-  //     override fun createInstance(): DatabaseAccessor<*> {
-  //       return AuthTokenDatabaseAccessor()
-  //     }
-  //   },
-  //   MGT_IMAGE_DATABASE_ACCESSOR {
-  //     override fun createInstance(): DatabaseAccessor<*> {
-  //       return MGTImageDatabaseAccessor()
-  //     }
-  //   };
+  enum class ModellessDAOType {
+    ASSIGNMENT_DATABASE_ACCESSOR {
+        override fun createInstance(): DatabaseAccessor<*> {
+            return AssignmentDatabaseAccessor()
+        }
+    },
+    AUTH_TOKEN_DATABASE_ACCESSOR {
+        override fun createInstance(): DatabaseAccessor<*> {
+            return AuthTokenDatabaseAccessor()
+        }
+    },
+    MGT_IMAGE_DATABASE_ACCESSOR {
+        override fun createInstance(): DatabaseAccessor<*> {
+            return MGTImageDatabaseAccessor()
+        }
+    };
 
-  //   /**
-  //    * Creates an instance of the database accessor
-  //    *
-  //    * @return the DAO instance
-  //    */
-  //   abstract fun createInstance() : DatabaseAccessor<*>
-  // }
+    /**
+     * Creates an instance of the database accessor
+     *
+     * @return the DAO instance
+     */
+    abstract fun createInstance() : DatabaseAccessor<*>
+  }
 
   /** Enumeration of all database accessor types that are parametrized on a model */
   enum class ModelDAOType {
@@ -81,9 +81,9 @@ class DAOFactory {
     //   }
     // },
     TIMESTAMP_DATABASE_ACCESSOR {
-      override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
-        return TimestampDatabaseAccessor(clazz.asSubclass(TimestampModel::class.java))
-      }
+        override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
+            return TimestampDatabaseAccessor(clazz.asSubclass(TimestampModel::class.java))
+        }
     };
 
     /**
@@ -108,7 +108,7 @@ class DAOFactory {
      * Mapping from ModellessDAOType to DAO to keep track of which DAO instancess already exist for
      * DAOs that are not parametrized on models
      */
-    // private val daoWithoutModelMap = hashMapOf<ModellessDAOType, DatabaseAccessor<*>>()
+    private val daoWithoutModelMap = hashMapOf<ModellessDAOType, DatabaseAccessor<*>>()
 
     /**
      * Gets a DAO instance given a ModellessDAOType
@@ -116,17 +116,17 @@ class DAOFactory {
      * @param daoType the ModellessDAOType
      * @return the DAO instance
      */
-    // @JvmStatic
-    // fun getDAO(daoType: ModellessDAOType): DatabaseAccessor<*> {
-    //   synchronized(daoType) {
-    //     var dao: DatabaseAccessor<*>? = daoWithoutModelMap[daoType]
-    //     if (dao === null) {
-    //       dao = daoType.createInstance()
-    //       daoWithoutModelMap.put(daoType, dao)
-    //     }
-    //     return dao
-    //   }
-    // }
+    @JvmStatic
+    fun getDAO(daoType: ModellessDAOType): DatabaseAccessor<*> {
+        synchronized(daoType) {
+            var dao: DatabaseAccessor<*>? = daoWithoutModelMap[daoType]
+            if (dao === null) {
+                dao = daoType.createInstance()
+                daoWithoutModelMap.put(daoType, dao)
+            }
+            return dao
+        }
+    }
 
     /**
      * Gets a DAO instance given a ModelDAOType and the model class
@@ -137,25 +137,25 @@ class DAOFactory {
      */
     @JvmStatic
     fun <M : CUAirModel> getDAO(daoType: ModelDAOType, modelClass: Class<M>): DatabaseAccessor<M> {
-      synchronized(daoType) {
-        var daoMap = daoWithModelMap[daoType]
-        if (daoMap === null) {
-          daoMap = hashMapOf<Class<CUAirModel>, DatabaseAccessor<*>>()
-          daoWithModelMap.put(daoType, daoMap)
+        synchronized(daoType) {
+            var daoMap = daoWithModelMap[daoType]
+            if (daoMap === null) {
+                daoMap = hashMapOf<Class<CUAirModel>, DatabaseAccessor<*>>()
+                daoWithModelMap.put(daoType, daoMap)
+            }
+        
+            @Suppress("UNCHECKED_CAST")
+            modelClass as Class<CUAirModel>
+        
+            var dao = daoMap[modelClass]
+            if (dao === null) {
+                dao = daoType.createInstance<M>(modelClass)
+                daoMap.put(modelClass, dao)
+            }
+        
+            @Suppress("UNCHECKED_CAST")
+            return dao as DatabaseAccessor<M>
         }
-
-        @Suppress("UNCHECKED_CAST")
-        modelClass as Class<CUAirModel>
-
-        var dao = daoMap[modelClass]
-        if (dao === null) {
-          dao = daoType.createInstance<M>(modelClass)
-          daoMap.put(modelClass, dao)
-        }
-
-        @Suppress("UNCHECKED_CAST")
-        return dao as DatabaseAccessor<M>
-      }
     }
 
     /**
@@ -167,7 +167,7 @@ class DAOFactory {
      * @return the DAO instance
      */
     inline fun <reified M : CUAirModel> getDAO(daoType: ModelDAOType): DatabaseAccessor<M> {
-      return getDAO(daoType, M::class.java)
+        return getDAO(daoType, M::class.java)
     }
   }
 }

@@ -6,11 +6,11 @@ import java.util.Objects
 import javax.persistence.Entity
 import javax.persistence.OneToOne
 import javax.persistence.CascadeType
-import javax.persistence.Enumerated;
+import javax.persistence.Enumerated
 import javax.validation.constraints.NotNull
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode
+import com.fasterxml.jackson.databind.ObjectMapper
 
 /** Represents an image and its corresponding metadata as sent down from the plane */
 @Entity
@@ -49,13 +49,13 @@ class Image(
     @JsonIgnore fun getLocations(): ObjectNode? {
         val imageTelemetry = this.telemetry ?: return null
         val imageGPS = imageTelemetry.getGps()
-        val centerLatitude = imageGPS!!.getLatitude()
-        val centerLongitude = imageGPS.getLongitude()
-        val planeYaw = imageTelemetry.getPlaneYaw()!! * Math.PI / 180
+        val centerLatitude = imageGPS?.getLatitude()
+        val centerLongitude = imageGPS?.getLongitude()
+        val planeYaw = imageTelemetry.getPlaneYaw()?.times(Math.PI/180)
         val altitude = imageTelemetry.getAltitude()
         
         // TOOD: !! vs ?. --> And should this be done in the declarations above?
-        val topLeft = Geotag.getPixelCoordinates(centerLatitude!!, centerLongitude!!, altitude!!, 0.0, 0.0, planeYaw)
+        val topLeft = Geotag.getPixelCoordinates(centerLatitude!!, centerLongitude!!, altitude!!, 0.0, 0.0, planeYaw!!)
         val topRight = Geotag.getPixelCoordinates(centerLatitude, centerLongitude, altitude, Geotag.IMAGE_WIDTH, 0.0, planeYaw)
         val bottomLeft = Geotag.getPixelCoordinates(centerLatitude, centerLongitude, altitude, 0.0, Geotag.IMAGE_HEIGHT, planeYaw)
         val bottomRight = Geotag.getPixelCoordinates(centerLatitude, centerLongitude, altitude, Geotag.IMAGE_WIDTH, Geotag.IMAGE_HEIGHT, planeYaw)
