@@ -1,12 +1,16 @@
 package org.cuair.ground.models
 
 import org.cuair.ground.models.geotag.Telemetry
+import org.cuair.ground.models.geotag.Geotag
 import java.util.Objects
 import javax.persistence.Entity
 import javax.persistence.OneToOne
 import javax.persistence.CascadeType
 import javax.persistence.Enumerated;
 import javax.validation.constraints.NotNull
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /** Represents an image and its corresponding metadata as sent down from the plane */
 @Entity
@@ -34,6 +38,52 @@ class Image(
         FIXED("fixed"),
         TRACKING("tracking"),
         OFFAXIS("off-axis")
+    }
+
+    /**
+     * Internal method for finding geotags for a given image id
+     *
+     * @return ObjectNode
+     */
+    @Suppress("DEPRECATION")
+    @JsonIgnore fun getLocations(): ObjectNode? {
+        // val imageTelemetry = this.telemetry ?: return null
+        // val imagePosition = imageTelemetry.aerialPosition ?: return null
+        // val imagePosition = null
+        // val imageGPS = imagePosition.location
+        // val imageGPS = null
+        // val centerLatitude = imageGPS.latitude!!
+        val centerLatitude = 0.0
+        // val centerLongitude = imageGPS.longitude!!
+        val centerLongitude = 0.0
+        // val planeYaw = imageTelemetry.headingFromNorth!! * Math.PI / 180
+        val planeYaw = 0.0
+        // val altitude = imagePosition.altitude!!
+        val altitude = 0.0
+        
+        val topLeft = Geotag.getPixelCoordinates(centerLatitude, centerLongitude, altitude, 0.0, 0.0, planeYaw)
+        val topRight = Geotag.getPixelCoordinates(
+            centerLatitude, centerLongitude, altitude, Geotag.IMAGE_WIDTH, 0.0, planeYaw)
+        val bottomLeft = Geotag.getPixelCoordinates(
+            centerLatitude, centerLongitude, altitude, 0.0, Geotag.IMAGE_HEIGHT, planeYaw)
+        val bottomRight = Geotag.getPixelCoordinates(
+            centerLatitude,
+            centerLongitude,
+            altitude,
+            Geotag.IMAGE_WIDTH,
+            Geotag.IMAGE_HEIGHT,
+            planeYaw)
+        
+
+        val mapper = ObjectMapper()
+        val locs = mapper.createObjectNode() as ObjectNode
+        locs.put("topLeft", mapper.writeValueAsString(topLeft))
+        locs.put("topRight", mapper.writeValueAsString(topRight))
+        locs.put("bottomLeft", mapper.writeValueAsString(bottomLeft))
+        locs.put("bottomRight", mapper.writeValueAsString(bottomRight))
+        locs.put("orientation", mapper.writeValueAsString(planeYaw))
+        locs.put("url", this.imageUrl)
+        return locs
     }
 
     /**
