@@ -10,23 +10,23 @@ import org.cuair.ground.models.TimestampModel;
  */
 public class TimestampDatabaseAccessor<T extends TimestampModel> extends DatabaseAccessor<T> {
 
-  /**
-   * Creates a TimestampDatabaseAccessor
-   *
-   *
-   * @param modelClass
-   */
-  TimestampDatabaseAccessor(Class<T> modelClass) {
-    super(modelClass);
-  }
+    /**
+     * Creates a TimestampDatabaseAccessor
+     *
+     *
+     * @param modelClass
+     */
+    TimestampDatabaseAccessor(Class<T> modelClass) {
+        super(modelClass);
+    }
 
-  /**
-   * Retrieves the most recent settings instance of Model T. Returns null if no settings exist in
-   * the database
-   *
-   * @return T the most recent settings model
-   */
-  public T getRecent() {
-    return Ebean.find(getModelClass()).orderBy().desc("timestamp").setMaxRows(1).findOne();
-  }
+    /**
+     * Retrieves the most recent settings instance of Model T. Returns null if no settings exist in
+     * the database
+     *
+     * @return T the most recent settings model
+     */
+    public T getRecent() {
+        return Ebean.find(getModelClass()).orderBy().desc("timestamp").setMaxRows(1).findOne();
+    }
 }
