@@ -5,8 +5,8 @@ import org.cuair.ground.models.CUAirModel
 import org.cuair.ground.models.PlaneModel
 import org.cuair.ground.models.PlaneSettingsModel
 import org.cuair.ground.models.TimestampModel
-// import org.cuair.ground.models.plane.target.AlphanumTarget
-// import org.cuair.ground.models.plane.target.AlphanumTargetSighting
+import org.cuair.ground.models.plane.target.AlphanumTarget
+import org.cuair.ground.models.plane.target.AlphanumTargetSighting
 import org.cuair.ground.models.plane.target.TargetSighting
 
 /** Factory for creating an managing DAO instances */
@@ -45,41 +45,41 @@ class DAOFactory {
         return DatabaseAccessor(clazz)
       }
     },
-    // ALPHANUM_TARGET_DATABASE_ACCESSOR {
-    //   override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
-    //     return AlphanumTargetDatabaseAccessor(clazz.asSubclass(AlphanumTarget::class.java))
-    //   }
-    // },
-    // ALPHANUM_TARGET_SIGHTINGS_DATABASE_ACCESSOR {
-    //   override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
-    //     return AlphanumTargetSightingsDatabaseAccessor(clazz.asSubclass(AlphanumTargetSighting::class.java))
-    //   }
-    // },
-    // CLIENT_CREATABLE_DATABASE_ACCESSOR {
-    //   override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
-    //     return ClientCreatableDatabaseAccessor(clazz.asSubclass(ClientCreatable::class.java))
-    //   }
-    // },
-    // PLANE_MODEL_DATABASE_ACCESSOR {
-    //   override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
-    //     return PlaneModelDatabaseAccessor(clazz.asSubclass(PlaneModel::class.java))
-    //   }
-    // },
-    // PLANE_SETTINGS_MODEL_DATABASE_ACCESSOR {
-    //   override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
-    //     return PlaneSettingsModelDatabaseAccessor(clazz.asSubclass(PlaneSettingsModel::class.java))
-    //   }
-    // },
-    // TARGET_DATABASE_ACCESSOR {
-    //   override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
-    //     return TargetDatabaseAccessor(clazz.asSubclass(org.cuair.ground.models.plane.target.Target::class.java))
-    //   }
-    // },
-    // TARGET_SIGHTINGS_DATABASE_ACCESSOR {
-    //   override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
-    //     return TargetSightingsDatabaseAccessor(clazz.asSubclass(TargetSighting::class.java))
-    //   }
-    // },
+    ALPHANUM_TARGET_DATABASE_ACCESSOR {
+      override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
+        return AlphanumTargetDatabaseAccessor(clazz.asSubclass(AlphanumTarget::class.java))
+      }
+    },
+    ALPHANUM_TARGET_SIGHTINGS_DATABASE_ACCESSOR {
+      override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
+        return AlphanumTargetSightingsDatabaseAccessor(clazz.asSubclass(AlphanumTargetSighting::class.java))
+      }
+    },
+    CLIENT_CREATABLE_DATABASE_ACCESSOR {
+      override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
+        return ClientCreatableDatabaseAccessor(clazz.asSubclass(ClientCreatable::class.java))
+      }
+    },
+    PLANE_MODEL_DATABASE_ACCESSOR {
+      override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
+        return PlaneModelDatabaseAccessor(clazz.asSubclass(PlaneModel::class.java))
+      }
+    },
+    PLANE_SETTINGS_MODEL_DATABASE_ACCESSOR {
+      override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
+        return PlaneSettingsModelDatabaseAccessor(clazz.asSubclass(PlaneSettingsModel::class.java))
+      }
+    },
+    TARGET_DATABASE_ACCESSOR {
+      override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
+        return TargetDatabaseAccessor(clazz.asSubclass(org.cuair.ground.models.plane.target.Target::class.java))
+      }
+    },
+    TARGET_SIGHTINGS_DATABASE_ACCESSOR {
+      override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
+        return TargetSightingsDatabaseAccessor(clazz.asSubclass(TargetSighting::class.java))
+      }
+    },
     TIMESTAMP_DATABASE_ACCESSOR {
         override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
             return TimestampDatabaseAccessor(clazz.asSubclass(TimestampModel::class.java))
@@ -143,16 +143,16 @@ class DAOFactory {
                 daoMap = hashMapOf<Class<CUAirModel>, DatabaseAccessor<*>>()
                 daoWithModelMap.put(daoType, daoMap)
             }
-        
+
             @Suppress("UNCHECKED_CAST")
             modelClass as Class<CUAirModel>
-        
+
             var dao = daoMap[modelClass]
             if (dao === null) {
                 dao = daoType.createInstance<M>(modelClass)
                 daoMap.put(modelClass, dao)
             }
-        
+
             @Suppress("UNCHECKED_CAST")
             return dao as DatabaseAccessor<M>
         }

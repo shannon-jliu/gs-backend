@@ -9,16 +9,16 @@ import javax.validation.constraints.NotNull;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import org.cuair.ground.daos.AssignmentDatabaseAccessor;
-// import org.cuair.ground.daos.ClientCreatableDatabaseAccessor;
+import org.cuair.ground.daos.ClientCreatableDatabaseAccessor;
 import org.cuair.ground.daos.DAOFactory;
-// import org.cuair.ground.daos.TargetSightingsDatabaseAccessor;
+import org.cuair.ground.daos.TargetSightingsDatabaseAccessor;
 import org.cuair.ground.models.Assignment;
 import org.cuair.ground.models.CUAirModel;
 import org.cuair.ground.models.Image;
-// import org.cuair.ground.models.plane.target.AlphanumTarget;
-// import org.cuair.ground.models.plane.target.AlphanumTargetSighting;
-// import org.cuair.ground.models.plane.target.EmergentTarget;
-// import org.cuair.ground.models.plane.target.EmergentTargetSighting;
+import org.cuair.ground.models.plane.target.AlphanumTarget;
+import org.cuair.ground.models.plane.target.AlphanumTargetSighting;
+import org.cuair.ground.models.plane.target.EmergentTarget;
+import org.cuair.ground.models.plane.target.EmergentTargetSighting;
 import org.cuair.ground.models.plane.target.Target;
 import org.cuair.ground.models.plane.target.TargetSighting;
 import org.slf4j.Logger;
@@ -47,29 +47,29 @@ public class Geotag extends CUAirModel {
         (AssignmentDatabaseAccessor)
             DAOFactory.getDAO(DAOFactory.ModellessDAOType.ASSIGNMENT_DATABASE_ACCESSOR);
 
-    // private static final TargetSightingsDatabaseAccessor<AlphanumTargetSighting>
-    //     alphaTargetSightingDao =
-    //         (TargetSightingsDatabaseAccessor<AlphanumTargetSighting>)
-    //             DAOFactory.getDAO(
-    //                 DAOFactory.ModelDAOType.TARGET_SIGHTINGS_DATABASE_ACCESSOR,
-    //                 AlphanumTargetSighting.class);
+    private static final TargetSightingsDatabaseAccessor<AlphanumTargetSighting>
+        alphaTargetSightingDao =
+            (TargetSightingsDatabaseAccessor<AlphanumTargetSighting>)
+                DAOFactory.getDAO(
+                    DAOFactory.ModelDAOType.TARGET_SIGHTINGS_DATABASE_ACCESSOR,
+                    AlphanumTargetSighting.class);
 
-    // private static final TargetSightingsDatabaseAccessor<EmergentTargetSighting>
-    //     emergentTargetSightingDao =
-    //         (TargetSightingsDatabaseAccessor<EmergentTargetSighting>)
-    //             DAOFactory.getDAO(
-    //                 DAOFactory.ModelDAOType.TARGET_SIGHTINGS_DATABASE_ACCESSOR,
-    //                 EmergentTargetSighting.class);
+    private static final TargetSightingsDatabaseAccessor<EmergentTargetSighting>
+        emergentTargetSightingDao =
+            (TargetSightingsDatabaseAccessor<EmergentTargetSighting>)
+                DAOFactory.getDAO(
+                    DAOFactory.ModelDAOType.TARGET_SIGHTINGS_DATABASE_ACCESSOR,
+                    EmergentTargetSighting.class);
 
-    // private static final ClientCreatableDatabaseAccessor<AlphanumTarget> alphanumTargetDao =
-    //     (ClientCreatableDatabaseAccessor<AlphanumTarget>)
-    //         DAOFactory.getDAO(
-    //             DAOFactory.ModelDAOType.CLIENT_CREATABLE_DATABASE_ACCESSOR, AlphanumTarget.class);
+    private static final ClientCreatableDatabaseAccessor<AlphanumTarget> alphanumTargetDao =
+        (ClientCreatableDatabaseAccessor<AlphanumTarget>)
+            DAOFactory.getDAO(
+                DAOFactory.ModelDAOType.CLIENT_CREATABLE_DATABASE_ACCESSOR, AlphanumTarget.class);
 
-    // private static final ClientCreatableDatabaseAccessor<EmergentTarget> emergentTargetDao =
-    //     (ClientCreatableDatabaseAccessor<EmergentTarget>)
-    //         DAOFactory.getDAO(
-    //             DAOFactory.ModelDAOType.CLIENT_CREATABLE_DATABASE_ACCESSOR, EmergentTarget.class);
+    private static final ClientCreatableDatabaseAccessor<EmergentTarget> emergentTargetDao =
+        (ClientCreatableDatabaseAccessor<EmergentTarget>)
+            DAOFactory.getDAO(
+                DAOFactory.ModelDAOType.CLIENT_CREATABLE_DATABASE_ACCESSOR, EmergentTarget.class);
 
     /** The GPS coordinates of this geotag */
     @Embedded private GpsLocation gpsLocation;
@@ -182,6 +182,7 @@ public class Geotag extends CUAirModel {
         double latitude_of_target_y = latitude + target_reference_y_feet / latitudeFeetPerDegree;
 
         GpsLocation gps = null;
+        // TODO: Fix this. For some reason when uncommented, it thinks there is an uncaught exception
         // try {
         //     gps = new GpsLocation(latitude_of_target_y, longitude_of_target_x);
         // } catch (InvalidGpsLocationException e) {
@@ -280,11 +281,11 @@ public class Geotag extends CUAirModel {
      * @param sighting the target sighting
      */
     private static boolean canSetGeotag(TargetSighting sighting) {
-        // if (sighting instanceof AlphanumTargetSighting) {
-        //   if (((AlphanumTargetSighting) sighting).isOffaxis()) {
-        //     return false;
-        //   }
-        // }
+        if (sighting instanceof AlphanumTargetSighting) {
+          if (((AlphanumTargetSighting) sighting).isOffaxis()) {
+            return false;
+          }
+        }
         Assignment assignment = sighting.getAssignment();
         if (assignment == null) {
             return false;
@@ -307,27 +308,27 @@ public class Geotag extends CUAirModel {
     }
 
     public static void updateGeotagForTargetSightings(Image img) {
-        // List<Assignment> assignments = assignmentDao.getAllForImageId(img.getId());
-        // List<TargetSighting> tsList = new ArrayList<>();
-        // for (Assignment a : assignments) {
-        //   List<AlphanumTargetSighting> tsalpha =
-        //       alphaTargetSightingDao.getAllTargetSightingsForAssignment(a.getId());
-        //   List<EmergentTargetSighting> tsemergent =
-        //       emergentTargetSightingDao.getAllTargetSightingsForAssignment(a.getId());
-        //   tsList.addAll(tsalpha);
-        //   tsList.addAll(tsemergent);
-        // }
-        // HashSet<Target> uniqueTargets = new HashSet<>();
-        // for (TargetSighting ts : tsList) {
-        //   ts.setGeotag(new Geotag(ts));
-        //   updateTargetSightingInDao(ts);
-        //   if (ts.getTarget() != null) {
-        //     uniqueTargets.add(ts.getTarget());
-        //   }
-        // }
-        // for (Target target : uniqueTargets) {
-        //   updateGeotag(target, null);
-        // }
+        List<Assignment> assignments = assignmentDao.getAllForImageId(img.getId());
+        List<TargetSighting> tsList = new ArrayList<>();
+        for (Assignment a : assignments) {
+            List<AlphanumTargetSighting> tsalpha =
+                alphaTargetSightingDao.getAllTargetSightingsForAssignment(a.getId());
+            List<EmergentTargetSighting> tsemergent =
+                emergentTargetSightingDao.getAllTargetSightingsForAssignment(a.getId());
+            tsList.addAll(tsalpha);
+            tsList.addAll(tsemergent);
+        }
+        HashSet<Target> uniqueTargets = new HashSet<>();
+        for (TargetSighting ts : tsList) {
+            ts.setGeotag(new Geotag(ts));
+            updateTargetSightingInDao(ts);
+            if (ts.getTarget() != null) {
+                uniqueTargets.add(ts.getTarget());
+            }
+        }
+        for (Target target : uniqueTargets) {
+            updateGeotag(target, null);
+        }
     }
 
     /**
@@ -337,24 +338,24 @@ public class Geotag extends CUAirModel {
      * @param ts the target sighting
      */
     public static void updateGeotag(Target targ, TargetSighting ts) {
-        // List<TargetSighting> sights = new ArrayList<TargetSighting>();
+        List<TargetSighting> sights = new ArrayList<TargetSighting>();
 
-        // if (targ.fetchAssociatedTargetSightingClass() == AlphanumTargetSighting.class) {
-        //   sights.addAll(alphaTargetSightingDao.getAllTargetSightingsForTarget(targ.getId()));
-        // } else if (targ.fetchAssociatedTargetSightingClass() == EmergentTargetSighting.class) {
-        //   sights.addAll(emergentTargetSightingDao.getAllTargetSightingsForTarget(targ.getId()));
-        // } else {
-            // logger.warn("Target class is not Alphanum or Emergent");
-        // }
-        // if (ts != null && !sights.contains(ts)) sights.add(ts);
-        // TargetSighting[] sightsArr = sights.toArray(new TargetSighting[sights.size()]);
-        // Geotag[] geotags =
-        //     Arrays.stream(sightsArr)
-        //         .map(TargetSighting::getGeotag)
-        //         .filter(g -> g != null)
-        //         .toArray(Geotag[]::new);
-        // targ.setGeotag(Geotag.average(geotags));
-        // updateTargetInDao(targ);
+        if (targ.fetchAssociatedTargetSightingClass() == AlphanumTargetSighting.class) {
+            sights.addAll(alphaTargetSightingDao.getAllTargetSightingsForTarget(targ.getId()));
+        } else if (targ.fetchAssociatedTargetSightingClass() == EmergentTargetSighting.class) {
+            sights.addAll(emergentTargetSightingDao.getAllTargetSightingsForTarget(targ.getId()));
+        } else {
+            logger.warn("Target class is not Alphanum or Emergent");
+        }
+        if (ts != null && !sights.contains(ts)) sights.add(ts);
+        TargetSighting[] sightsArr = sights.toArray(new TargetSighting[sights.size()]);
+        Geotag[] geotags =
+            Arrays.stream(sightsArr)
+                .map(TargetSighting::getGeotag)
+                .filter(g -> g != null)
+                .toArray(Geotag[]::new);
+        targ.setGeotag(Geotag.average(geotags));
+        updateTargetInDao(targ);
     }
 
     /**
@@ -378,13 +379,13 @@ public class Geotag extends CUAirModel {
      * @param ts
      */
     private static void updateTargetSightingInDao(TargetSighting ts) {
-        // if (ts instanceof AlphanumTargetSighting) {
-        //   alphaTargetSightingDao.update((AlphanumTargetSighting) ts);
-        // } else if (ts instanceof EmergentTargetSighting) {
-        //   emergentTargetSightingDao.update((EmergentTargetSighting) ts);
-        // } else {
-            // logger.warn("Target class is not Alphanum or Emergent");
-        // }
+        if (ts instanceof AlphanumTargetSighting) {
+            alphaTargetSightingDao.update((AlphanumTargetSighting) ts);
+        } else if (ts instanceof EmergentTargetSighting) {
+            emergentTargetSightingDao.update((EmergentTargetSighting) ts);
+        } else {
+            logger.warn("Target class is not Alphanum or Emergent");
+        }
     }
 
     /**
@@ -393,14 +394,14 @@ public class Geotag extends CUAirModel {
      * @param targ the target
      */
     private static void updateTargetInDao(Target targ) {
-        // if (targ.fetchAssociatedTargetSightingClass() == AlphanumTargetSighting.class) {
-        //   if (!alphanumTargetDao.create((AlphanumTarget) targ))
-        //     alphanumTargetDao.update((AlphanumTarget) targ);
-        // } else if (targ.fetchAssociatedTargetSightingClass() == EmergentTargetSighting.class) {
-        //   emergentTargetDao.update((EmergentTarget) targ);
-        // } else {
-                // logger.warn("Target class is not Alphanum or Emergent");
-        // }
+        if (targ.fetchAssociatedTargetSightingClass() == AlphanumTargetSighting.class) {
+            if (!alphanumTargetDao.create((AlphanumTarget) targ))
+                alphanumTargetDao.update((AlphanumTarget) targ);
+        } else if (targ.fetchAssociatedTargetSightingClass() == EmergentTargetSighting.class) {
+            emergentTargetDao.update((EmergentTarget) targ);
+        } else {
+            logger.warn("Target class is not Alphanum or Emergent");
+        }
     }
 
     /**

@@ -63,6 +63,9 @@ public class ImageControllerTest {
         assertThat(controller).isNotNull();
     }
 
+    // TODO: Get full coverage
+
+
     @Test
     public void getAll() throws Exception {
         ArrayList<Image> list = new ArrayList();
