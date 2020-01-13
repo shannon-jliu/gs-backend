@@ -3,7 +3,7 @@
 .gradle
 /build/
 /pgdata/
-/images/*
+
 
 # Ignore Gradle GUI config
 gradle-app.setting
