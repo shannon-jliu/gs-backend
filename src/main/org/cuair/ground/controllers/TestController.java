@@ -8,7 +8,7 @@ public class TestController {
 
     @RequestMapping(value = "/")
     public String index() {
-      return "test";
+        return "test";
     }
 
 }
