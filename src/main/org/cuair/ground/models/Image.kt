@@ -11,6 +11,9 @@ import javax.validation.constraints.NotNull
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.ebean.annotation.EnumValue
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /** Represents an image and its corresponding metadata as sent down from the plane */
 @Entity
@@ -35,9 +38,11 @@ class Image(
 
     /** The possible image modes: fixed, tracking, and off-axis */
     enum class ImgMode (val mode: String) {
-        FIXED("fixed"),
-        TRACKING("tracking"),
-        OFFAXIS("off-axis")
+        // @EnumValue("retract") FIXED("retract"),
+        // @JsonValue @EnumValue("retract") FIXED("retract"),
+        @JsonProperty("retract") @EnumValue("0") FIXED("retract"),
+        @JsonProperty("tracking") @EnumValue("1") TRACKING("tracking"),
+        @JsonProperty("off-axis") @EnumValue("2") OFFAXIS("off-axis")
     }
 
     /**
@@ -53,7 +58,7 @@ class Image(
         val centerLongitude = imageGPS?.getLongitude()
         val planeYaw = imageTelemetry.getPlaneYaw()?.times(Math.PI/180)
         val altitude = imageTelemetry.getAltitude()
-        
+
         // TOOD: !! vs ?. --> And should this be done in the declarations above?
         val topLeft = Geotag.getPixelCoordinates(centerLatitude!!, centerLongitude!!, altitude!!, 0.0, 0.0, planeYaw!!)
         val topRight = Geotag.getPixelCoordinates(centerLatitude, centerLongitude, altitude, Geotag.IMAGE_WIDTH, 0.0, planeYaw)

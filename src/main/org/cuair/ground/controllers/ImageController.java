@@ -23,24 +23,30 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.multipart.*;
 import javax.servlet.*;
+import javax.servlet.http.*;
+
+import org.springframework.web.multipart.support.*;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 
 /** Contains all the callbacks for all the public api endpoints for the Image  */
 @RestController
+@RequestMapping(value = "/image")
 public class ImageController {
     /** Database accessor object for image database */
     private TimestampDatabaseAccessor imageDao = (TimestampDatabaseAccessor) DAOFactory.getDAO(DAOFactory.ModelDAOType.TIMESTAMP_DATABASE_ACCESSOR, Image.class);
 
     /** String path to the folder where all the images are stored  */
-    private String imgDirectory = "SpringConfig.PLANE_IMAGE_DIR";
+    private String imgDirectory = "images/";
 
-    private String backupImgDirectory = "SpringConfig.BACKUP_IMAGE_DIR";
+    private String backupImgDirectory = "backup_images/";
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -109,35 +115,31 @@ public class ImageController {
      * @param isPost true if it is a POST (create) action, false if it is a PUT (update) action
      * @return null if the body is valid, otherwise a badRequest
      */
-    private CompletableFuture<ResponseEntity> validateRequestBody(MultipartHttpServletRequest req, boolean isPost) {
-        if (req == null) {
+    private CompletableFuture<ResponseEntity> validateRequestBody(MultipartFile[] files, String jsonString, boolean isPost) {
+        if (files == null && jsonString == null) {
             return CompletableFuture.completedFuture(
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Request should provide multipart/form-data")
             );
         }
 
-        Map<String, MultipartFile> files = req.getFileMap();
-        String[] jsonParts = req.getParameterValues("json");
-
         String reqType = isPost ? "POST" : "PUT";
 
-        if (files.isEmpty()) {
+        if (files.length == 0) {
             return CompletableFuture.completedFuture(
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing image file in image " + reqType + " request")
             );
         }
-        if (files.size() != 1) {
+        if (files.length != 1) {
             return CompletableFuture.completedFuture(
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Should have only one file in image " + reqType + " request")
             );
         }
-        if (jsonParts == null) {
+        if (jsonString == null) {
             return CompletableFuture.completedFuture(
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing json in image " + reqType + " request")
             );
         }
 
-        String jsonString = jsonParts[0];
         ObjectNode json = null;
 
         try {
@@ -150,12 +152,6 @@ public class ImageController {
 
         // POST-specific requirements, maybe better way to do this than just nested if statement?
         if (isPost) {
-            if (jsonParts.length != 1) {
-                return CompletableFuture.completedFuture(
-                    ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Should have only one json part in image POST request")
-                );
-            }
-
             if (json.get("id") != null) {
                 return CompletableFuture.completedFuture(
                     ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Don't put id in json of image POST request")
@@ -168,11 +164,12 @@ public class ImageController {
                 );
             }
 
-            if (json.size() > 1) {
-                return CompletableFuture.completedFuture(
-                    ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Json part contains invalid field")
-                );
-            }
+            // TODO: But we have timestamp and imgMode in the json part
+            // if (json.size() > 1) {
+            //     return CompletableFuture.completedFuture(
+            //         ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Json part contains invalid field")
+            //     );
+            // }
         }
         return null;
     }
@@ -183,9 +180,7 @@ public class ImageController {
      * @param req the valid request
      * @return the ObjectNode representing the JSON of the body
      */
-    private ObjectNode getJSON(MultipartHttpServletRequest req) throws IOException {
-        String[] jsonParts = req.getParameterValues("json");
-        String jsonString = jsonParts[0];
+    private ObjectNode getJSON(String jsonString) throws IOException {
         return (ObjectNode) mapper.readTree(jsonString);
     }
 
@@ -210,10 +205,8 @@ public class ImageController {
      * @param req the valid request
      * @return the image file
      */
-    private File getImageFile(MultipartHttpServletRequest req) throws IOException {
-        Map<String, MultipartFile> fileMap = req.getFileMap();
-        List<MultipartFile> files = new ArrayList(fileMap.values());
-        return convert(files.get(0));
+    private File getImageFile(MultipartFile[] files) throws IOException {
+        return convert(files[0]);
     }
 
     /**
@@ -224,16 +217,17 @@ public class ImageController {
      * @return an HTTP response
      */
     @RequestMapping(method = RequestMethod.POST)
-    public CompletableFuture<ResponseEntity> create(MultipartHttpServletRequest req) {
+    // public CompletableFuture<ResponseEntity> create(@ModelAttribute StandardMultipartHttpServletRequest req) {
+    public CompletableFuture<ResponseEntity> create(@RequestParam("files") MultipartFile[] files, @RequestParam("jsonString") String jsonString) {
         // check if request is valid
-        CompletableFuture<ResponseEntity> validate = validateRequestBody(req, true);
+        CompletableFuture<ResponseEntity> validate = validateRequestBody(files, jsonString, true);
         if (validate != null) {
-          return validate;
+            return validate;
         }
 
         ObjectNode json = null;
         try {
-            json = getJSON(req);
+            json = getJSON(jsonString);
         } catch (IOException e) {
             return CompletableFuture.completedFuture(
                 ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e)
@@ -264,7 +258,7 @@ public class ImageController {
 
         File imageFile = null;
         try {
-            imageFile = getImageFile(req);
+            imageFile = getImageFile(files);
         } catch (IOException e) {
             return CompletableFuture.completedFuture(
                 ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when extracting image from request: \n" + e)
@@ -308,7 +302,7 @@ public class ImageController {
         i.setImageUrl("/api/v1/image/file/" + imageFileName);
 
         imageDao.create(i);
-        // imageClient.process(i)
+        // imageClient.process(i);
         return CompletableFuture.completedFuture(ResponseEntity.ok(i));
     }
 
@@ -320,16 +314,16 @@ public class ImageController {
      * @return an HTTP response
      */
     @RequestMapping(method = RequestMethod.PUT)
-    public CompletableFuture<ResponseEntity> update(MultipartHttpServletRequest req) {
+    public CompletableFuture<ResponseEntity> update(@RequestParam("files") MultipartFile[] files, @RequestParam("jsonString") String jsonString) {
         // check if request is valid
-        CompletableFuture<ResponseEntity> validate = validateRequestBody(req, false);
+        CompletableFuture<ResponseEntity> validate = validateRequestBody(files, jsonString, false);
         if (validate != null) {
           return validate;
         }
 
         ObjectNode json = null;
         try {
-            json = getJSON(req);
+            json = getJSON(jsonString);
         } catch (IOException e) {
             return CompletableFuture.completedFuture(
                 ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e)
@@ -358,7 +352,7 @@ public class ImageController {
         String oldImageName = oldImgFilepath.substring(imgDirectory.length());
         File imageFile = null;
         try {
-            imageFile = getImageFile(req);
+            imageFile = getImageFile(files);
         } catch (IOException e) {
             return CompletableFuture.completedFuture(
                 ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when extracting image from request: \n" + e)
@@ -428,10 +422,10 @@ public class ImageController {
      * @return an HTTP response
      */
     @RequestMapping(value = "/dummy", method = RequestMethod.POST)
-    public ResponseEntity dummyCreate(MultipartHttpServletRequest req) {
+    public ResponseEntity dummyCreate(@RequestParam("files") MultipartFile[] files, @RequestParam("jsonString") String jsonString) {
         ObjectNode json = null;
         try {
-            json = getJSON(req);
+            json = getJSON(jsonString);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e);
         }
