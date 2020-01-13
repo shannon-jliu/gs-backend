@@ -217,7 +217,6 @@ public class ImageController {
      * @return an HTTP response
      */
     @RequestMapping(method = RequestMethod.POST)
-    // public CompletableFuture<ResponseEntity> create(@ModelAttribute StandardMultipartHttpServletRequest req) {
     public CompletableFuture<ResponseEntity> create(@RequestParam("files") MultipartFile[] files, @RequestParam("jsonString") String jsonString) {
         // check if request is valid
         CompletableFuture<ResponseEntity> validate = validateRequestBody(files, jsonString, true);
