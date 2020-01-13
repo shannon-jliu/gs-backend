@@ -302,6 +302,7 @@ public class ImageController {
 
         imageDao.create(i);
         // imageClient.process(i);
+        System.out.println("ASDF A;SLDKJFA;LSDKJF;ALSKDJFAL;SD F");
         return CompletableFuture.completedFuture(ResponseEntity.ok(i));
     }
 
