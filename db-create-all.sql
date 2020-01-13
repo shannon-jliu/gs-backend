@@ -30,7 +30,7 @@ create table camera_gimbal_settings (
 create table image (
   id                            bigserial not null,
   timestamp                     timestamptz,
-  image_url                     varchar(255) not null,
+  image_url                     varchar(255),
   telemetry_id                  bigint,
   img_mode                      integer not null,
   constraint ck_image_img_mode check ( img_mode in (0,1,2)),
@@ -49,4 +49,3 @@ create index ix_assignment_image_id on assignment (image_id);
 alter table assignment add constraint fk_assignment_image_id foreign key (image_id) references image (id) on delete restrict on update restrict;
 
 alter table image add constraint fk_image_telemetry_id foreign key (telemetry_id) references telemetry (id) on delete restrict on update restrict;
-

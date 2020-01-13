@@ -1,13 +1,13 @@
 package org.cuair.ground.controllers;
 
 import static org.hamcrest.Matchers.equalTo;
-// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -15,8 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-// import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.request.*;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.mock.web.MockMultipartFile;
 
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -30,8 +30,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import io.ebean.Ebean;
 import org.apache.commons.io.FileUtils;
-// import org.springframework.http.ResponseEntity;
 import org.springframework.http.*;
+import java.sql.Timestamp;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = ImageController.class)
@@ -44,21 +44,22 @@ public class ImageControllerTest {
     @Autowired
     private ImageController controller;
 
-    private void clearDB(String timestamp) {
+    @Before
+    public void clearDB() {
         List<Image> images = Ebean.find(Image.class).findList();
         Ebean.beginTransaction();
         Ebean.deleteAll(images);
         Ebean.commitTransaction();
 
         try {
-            FileUtils.forceDelete(FileUtils.getFile("images/" + timestamp + ".jpeg"));
+            FileUtils.cleanDirectory(FileUtils.getFile("images/"));
         } catch (IOException e) {
-            System.out.println("File " + timestamp + ".jpeg could not be deleted.");
+            System.out.println("images/ could not be cleared.");
         }
     }
 
     @Test
-    public void loads() throws Exception {
+    public void loads() {
         assertThat(controller).isNotNull();
     }
 
@@ -87,14 +88,14 @@ public class ImageControllerTest {
 
     @Test
     public void get() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/image/0").accept(MediaType.APPLICATION_JSON))
+        mvc.perform(MockMvcRequestBuilders.get("/image/-1").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string(equalTo("")));
     }
 
     @Test
     public void getFile() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/image/file/1.jpeg").accept(MediaType.APPLICATION_JSON))
+        mvc.perform(MockMvcRequestBuilders.get("/image/file/-1.jpeg").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string(equalTo("")));
     }
@@ -107,10 +108,14 @@ public class ImageControllerTest {
         String timestamp = "100000000000006";
         String imgMode = "retract";
 
-        MvcResult result = mvc.perform(MockMvcRequestBuilders.multipart("/image")
+        ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
                             .file(firstFile)
                             .param("jsonString", "{\"timestamp\":"+timestamp+",\"imgMode\":\""+imgMode+"\"}")
-                        ).andReturn();
+                        ).andExpect(status().isOk());
+        MvcResult result = resultAction.andReturn();
+
+        Image recent = (Image) controller.getRecent().getBody();
+        Long expectedId = recent.getId();
 
         ResponseEntity asyncedResponseEntity = (ResponseEntity) result.getAsyncResult();
         Image i = (Image) asyncedResponseEntity.getBody();
@@ -119,9 +124,50 @@ public class ImageControllerTest {
         String imageAsString = mapper.writeValueAsString(i);
 
         assertEquals(imageAsString,
-                "{\"id\":1,\"timestamp\":"+timestamp+",\"localImageUrl\":\"images/"+timestamp+".jpeg\",\"imageUrl\":\"/api/v1/image/file/"+timestamp+".jpeg\",\"telemetry\":null,\"imgMode\":\""+imgMode+"\"}"
+                "{\"id\":"+expectedId+",\"timestamp\":"+timestamp+",\"localImageUrl\":\"images/"+timestamp+".jpeg\",\"imageUrl\":\"/api/v1/image/file/"+timestamp+".jpeg\",\"telemetry\":null,\"imgMode\":\""+imgMode+"\"}"
             );
+    }
 
-        clearDB(timestamp);
+    @Test
+    public void getGeotagCoordinates() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.get("/image/geotag/-1").accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(equalTo("")));
+    }
+
+    @Test
+    public void getAllGeotagCoordinates() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.get("/image/geotag").accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().string(equalTo("{}")));
+    }
+
+    @Test
+    public void dummyCreate() throws Exception {
+        InputStream is = new BufferedInputStream(new FileInputStream("src/test/java/org/cuair/ground/controllers/test_images/test_0.jpg"));
+        MockMultipartFile firstFile = new MockMultipartFile("files", "test_0.jpg", "image", is);
+
+        String timestamp = "100000000000006";
+        String imgMode = "retract";
+
+        ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.multipart("/image/dummy")
+                            .file(firstFile)
+                            .param("jsonString", "{\"timestamp\":"+timestamp+",\"imgMode\":\""+imgMode+"\"}")
+                        ).andExpect(status().isOk());
+
+        Image recent = (Image) controller.getRecent().getBody();
+        Long expectedId = recent.getId();
+        // TODO: Fix this. For some reason, ResponseEntity.ok(i) in the image controller changes the formatting in an odd way.
+        String[] timestampParts = recent.getTimestamp().toString().split(" ", 2);
+        String expectedTimestamp = timestampParts[0] + "T09" + timestampParts[1].substring(2, timestampParts[1].length()) + "+0000";
+
+        System.out.println("a;lsdfkj;asdfjk: " + expectedTimestamp);
+
+        MvcResult result = resultActions.andReturn();
+        String contentAsString = result.getResponse().getContentAsString();
+
+        assertEquals(contentAsString,
+                "{\"id\":"+expectedId+",\"timestamp\":\""+expectedTimestamp+"\",\"localImageUrl\":null,\"imageUrl\":null,\"telemetry\":null,\"imgMode\":\""+imgMode+"\"}"
+            );
     }
 }

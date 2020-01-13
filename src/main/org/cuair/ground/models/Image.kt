@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Entity
 class Image(
         /** The URL where clients can retrieve the image file  */
-        var imageUrl: String,
+        var imageUrl: String?,
         /** Closest Telemetry for when this Image was taken  */
         @OneToOne(cascade = [CascadeType.ALL])
         var telemetry: Telemetry?,

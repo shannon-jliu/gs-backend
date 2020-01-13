@@ -312,9 +312,9 @@ public class ImageController {
      * @return an HTTP response
      */
     @RequestMapping(value = "/geotag/{id}", method = RequestMethod.GET)
-    public ResponseEntity getGeotagCoordinates(@PathVariable Long imageId) {
-        if (imageId == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Image ID is null");
-        Image i = (Image) imageDao.get(imageId);
+    public ResponseEntity getGeotagCoordinates(@PathVariable Long id) {
+        if (id == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Image ID is null");
+        Image i = (Image) imageDao.get(id);
         if (i != null) {
             return ResponseEntity.ok(i.getLocations());
         }
