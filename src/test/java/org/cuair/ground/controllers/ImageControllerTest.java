@@ -1,8 +1,9 @@
 package org.cuair.ground.controllers;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
@@ -21,6 +22,12 @@ import java.util.List;
 import java.util.ArrayList;
 import java.io.*;
 import org.cuair.ground.models.Image;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+
+
+import io.ebean.Ebean;
+import org.apache.commons.io.FileUtils;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = ImageController.class)
@@ -32,6 +39,19 @@ public class ImageControllerTest {
 
     @Autowired
     private ImageController controller;
+
+    private void clearDB(String timestamp) {
+        List<Image> images = Ebean.find(Image.class).findList();
+        Ebean.beginTransaction();
+        Ebean.deleteAll(images);
+        Ebean.commitTransaction();
+
+        try {
+            FileUtils.forceDelete(FileUtils.getFile("images/" + timestamp + ".jpeg"));
+        } catch (IOException e) {
+            System.out.println("File " + timestamp + ".jpeg could not be deleted.");
+        }
+    }
 
     @Test
     public void loads() throws Exception {
@@ -78,13 +98,17 @@ public class ImageControllerTest {
     @Test
     public void create() throws Exception {
         InputStream is = new BufferedInputStream(new FileInputStream("src/test/java/org/cuair/ground/controllers/test_images/test_0.jpg"));
-        MockMultipartFile firstFile = new MockMultipartFile("data", "test_0.jpg", "image", is);
+        MockMultipartFile firstFile = new MockMultipartFile("files", "test_0.jpg", "image", is);
+
+        String timestamp = "10006";
 
         mvc.perform(MockMvcRequestBuilders.multipart("/image")
                 .file(firstFile)
-                .param("jsonString", "{\"timestamp\":10006,\"imgMode\":\"retract\"}")
+                .param("jsonString", "{\"timestamp\":"+timestamp+",\"imgMode\":\"retract\"}")
             )
-                .andExpect(status().isOk());
-                // .andExpect(content().string(equalTo(list.toString())));
+                .andExpect(status().isOk())
+                .andExpect(content().string(equalTo("")));
+
+        clearDB(timestamp);
     }
 }

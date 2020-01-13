@@ -317,7 +317,7 @@ public class ImageController {
         // check if request is valid
         CompletableFuture<ResponseEntity> validate = validateRequestBody(files, jsonString, false);
         if (validate != null) {
-          return validate;
+            return validate;
         }
 
         ObjectNode json = null;
@@ -369,6 +369,7 @@ public class ImageController {
         } catch (IOException e) {
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when moving image file: \n" + e);
         }
+
 
         imageDao.update(i);
 

@@ -94,5 +94,6 @@ ebean {
 }
 
 test {
+    testLogging.showStandardStreams = true
     useJUnitPlatform()
 }
