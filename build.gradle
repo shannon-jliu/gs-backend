@@ -64,6 +64,10 @@ dependencies {
     // protobuf
     compile("com.google.protobuf:protobuf-java:3.9.1")
 
+    // non-blocking HTTP
+    compile("org.springframework.boot:spring-boot-starter-webflux")
+    compile("org.projectreactor:reactor-spring:1.0.1.RELEASE")
+
     // Ebean
     compile("io.ebean:ebean:12.1.8")
     compile("io.ebean:ebean-querybean:12.1.8")

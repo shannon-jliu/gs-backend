@@ -2,6 +2,8 @@ package org.cuair.ground.clients;
 
 import java.io.IOException;
 import org.springframework.web.client.RestTemplate;
+import org.cuair.ground.util.Flags;
+import org.springframework.web.reactive.function.client.WebClient;
 
 /** A factory class that contains all client objects */
 public class ClientFactory {
@@ -13,16 +15,44 @@ public class ClientFactory {
   private static boolean interopClientStarted;
 
   /** The web service client to perform requests */
-  //private static WSClient ws;
+  private static WebClient airdropWebClient;
+
+  /** The web service client to perform requests */
+  private static WebClient autopilotWebClient;
+
+  private static WebClient cgsWebClient;
+
+  private static WebClient interopWebClient;
 
   /**
-   * Initialize the WSClient used by all ground server clients
+   * Initialize the RestTemplate used by all ground server clients
    *
-   * @param ws the WSClient object
+   * @param rt the RestTemplate object
    */
-  // public static void initializeClient(WSClient ws) {
-  //   ClientFactory.ws = ws;
-  // }
+  public static void initializeAirdropClient(WebClient airdropClient) {
+    ClientFactory.airdropWebClient = airdropClient;
+  }
+
+  public static void initializeAutopilotClient(WebClient autopilotClient) {
+    ClientFactory.autopilotWebClient = autopilotClient;
+  }
+
+  public static void initializeCGSClient(WebClient cgsClient) {
+    ClientFactory.cgsWebClient = cgsClient;
+  }
+
+  public static void initializeInteropClient(WebClient interopClient) {
+    ClientFactory.interopWebClient = interopClient;
+    ClientFactory.interopClient = new InteropClient(interopClient);
+    try {
+      ClientFactory.interopClient.findUser();
+
+    } catch (Exception e) {
+      ;//
+    }
+    System.out.println("DONE");
+
+  }
 
   /**
    * Returns the interop client object
@@ -30,11 +60,7 @@ public class ClientFactory {
    * @return the interop client object
    */
   public static InteropClient getInteropClient() {
-    if (interopClient == null) {
-      //interopClient = new InteropClient(ws);
-    }
-
-    if (/*PlayConfig.CUAIR_INTEROP_REQUESTS && */!interopClientStarted) {
+    if (!interopClientStarted) {
       interopClient.start();
       interopClientStarted = true;
     }
@@ -47,7 +73,7 @@ public class ClientFactory {
       interopClient.stop();
     }
     /*try {
-      ;//ws.close();
+      ;//rt.close();
     } catch (IOException e) {
       e.printStackTrace();
     }*/
