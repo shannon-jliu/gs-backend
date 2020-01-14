@@ -1,3 +1,22 @@
+create table alphanum_target (
+  id                            bigserial not null,
+  creator                       varchar(4),
+  geotag_id                     bigint,
+  judge_target_id               bigint,
+  thumbnail_tsid                bigint,
+  shape                         integer,
+  shape_color                   integer,
+  alpha                         varchar(255),
+  alpha_color                   integer,
+  offaxis                       boolean,
+  constraint ck_alphanum_target_creator check ( creator in ('mdlc','adlc')),
+  constraint ck_alphanum_target_shape check ( shape in (0,1,2,3,4,5,6,7,8,9,10,11,12)),
+  constraint ck_alphanum_target_shape_color check ( shape_color in (0,1,2,3,4,5,6,7,8,9)),
+  constraint ck_alphanum_target_alpha_color check ( alpha_color in (0,1,2,3,4,5,6,7,8,9)),
+  constraint uq_alphanum_target_geotag_id unique (geotag_id),
+  constraint pk_alphanum_target primary key (id)
+);
+
 create table assignment (
   id                            bigserial not null,
   timestamp                     timestamptz,
@@ -27,6 +46,38 @@ create table camera_gimbal_settings (
   constraint pk_camera_gimbal_settings primary key (id)
 );
 
+create table emergent_target (
+  id                            bigserial not null,
+  creator                       varchar(4),
+  geotag_id                     bigint,
+  judge_target_id               bigint,
+  thumbnail_tsid                bigint,
+  description                   varchar(255),
+  constraint ck_emergent_target_creator check ( creator in ('mdlc','adlc')),
+  constraint uq_emergent_target_geotag_id unique (geotag_id),
+  constraint pk_emergent_target primary key (id)
+);
+
+create table emergent_target_sighting (
+  id                            bigserial not null,
+  creator                       varchar(4),
+  assignment_id                 bigint,
+  geotag_id                     bigint,
+  pixel_x                       integer,
+  pixel_y                       integer,
+  width                         integer,
+  height                        integer,
+  mdlc_class_conf               varchar(6),
+  radians_from_top              float,
+  orientation_confidence        float,
+  target_id                     bigint,
+  description                   varchar(255),
+  constraint ck_emergent_target_sighting_creator check ( creator in ('mdlc','adlc')),
+  constraint ck_emergent_target_sighting_mdlc_class_conf check ( mdlc_class_conf in ('high','medium','low')),
+  constraint uq_emergent_target_sighting_geotag_id unique (geotag_id),
+  constraint pk_emergent_target_sighting primary key (id)
+);
+
 create table geotag (
   id                            bigserial not null,
   latitude                      float,
@@ -47,6 +98,16 @@ create table image (
   constraint pk_image primary key (id)
 );
 
+create table mgtimage (
+  id                            bigserial not null,
+  image_id                      bigint,
+  is_sent                       boolean,
+  has_telemetry                 boolean,
+  has_target                    boolean,
+  constraint uq_mgtimage_image_id unique (image_id),
+  constraint pk_mgtimage primary key (id)
+);
+
 create table telemetry (
   id                            bigserial not null,
   altitude                      float,
@@ -54,7 +115,21 @@ create table telemetry (
   constraint pk_telemetry primary key (id)
 );
 
+alter table alphanum_target add constraint fk_alphanum_target_geotag_id foreign key (geotag_id) references geotag (id) on delete restrict on update restrict;
+
 create index ix_assignment_image_id on assignment (image_id);
 alter table assignment add constraint fk_assignment_image_id foreign key (image_id) references image (id) on delete restrict on update restrict;
 
+alter table emergent_target add constraint fk_emergent_target_geotag_id foreign key (geotag_id) references geotag (id) on delete restrict on update restrict;
+
+create index ix_emergent_target_sighting_assignment_id on emergent_target_sighting (assignment_id);
+alter table emergent_target_sighting add constraint fk_emergent_target_sighting_assignment_id foreign key (assignment_id) references assignment (id) on delete restrict on update restrict;
+
+alter table emergent_target_sighting add constraint fk_emergent_target_sighting_geotag_id foreign key (geotag_id) references geotag (id) on delete restrict on update restrict;
+
+create index ix_emergent_target_sighting_target_id on emergent_target_sighting (target_id);
+alter table emergent_target_sighting add constraint fk_emergent_target_sighting_target_id foreign key (target_id) references emergent_target (id) on delete restrict on update restrict;
+
 alter table image add constraint fk_image_telemetry_id foreign key (telemetry_id) references telemetry (id) on delete restrict on update restrict;
+
+alter table mgtimage add constraint fk_mgtimage_image_id foreign key (image_id) references image (id) on delete restrict on update restrict;

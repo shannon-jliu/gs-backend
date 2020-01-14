@@ -14,8 +14,7 @@ import org.cuair.ground.models.geotag.CardinalDirection;
 import org.cuair.ground.models.geotag.Geotag;
 
 /** Alphanum Target is target that is associated with Alphanumeric Target Sightings. */
-// TODO: Figure out if this annotation is necessary
-// @Entity
+@Entity
 public class AlphanumTarget extends Target {
 
     /** A description of the shape of the target */

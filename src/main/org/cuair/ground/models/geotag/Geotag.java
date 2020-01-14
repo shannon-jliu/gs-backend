@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** Represents the position and orientation of an object on the ground */
-// TODO: Figure out if this annotation is necessary
 @Entity
 public class Geotag extends CUAirModel {
 

@@ -10,8 +10,7 @@ import org.cuair.ground.models.Confidence;
 import org.cuair.ground.models.geotag.Geotag;
 
 /** Emergent TargetSighting that has a description */
-// TODO: Figure out if this annotation is necessary
-// @Entity
+@Entity
 public class EmergentTargetSighting extends TargetSighting {
 
     /** The target of this target sighting */

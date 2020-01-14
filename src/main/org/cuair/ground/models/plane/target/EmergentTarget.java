@@ -11,8 +11,7 @@ import org.cuair.ground.models.ClientType;
 import org.cuair.ground.models.geotag.Geotag;
 
 /** Emergent Target that is associated with an Emergent Target Sighting. Has a description. */
-// TODO: Figure out if this annotation is necessary
-// @Entity
+@Entity
 public class EmergentTarget extends Target {
 
     /** Description of the emergent target sighting */
