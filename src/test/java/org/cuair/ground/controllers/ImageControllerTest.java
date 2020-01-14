@@ -75,14 +75,6 @@ public class ImageControllerTest {
     }
 
     @Test
-    public void getAllIds() throws Exception {
-        ArrayList<Image> list = new ArrayList();
-        mvc.perform(MockMvcRequestBuilders.get("/image/id").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().string(equalTo(list.toString())));
-    }
-
-    @Test
     public void getRecent() throws Exception {
         mvc.perform(MockMvcRequestBuilders.get("/image/recent").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
@@ -92,13 +84,6 @@ public class ImageControllerTest {
     @Test
     public void get() throws Exception {
         mvc.perform(MockMvcRequestBuilders.get("/image/-1").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent())
-                .andExpect(content().string(equalTo("")));
-    }
-
-    @Test
-    public void getFile() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/image/file/-1.jpeg").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string(equalTo("")));
     }
@@ -136,13 +121,6 @@ public class ImageControllerTest {
         mvc.perform(MockMvcRequestBuilders.get("/image/geotag/-1").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string(equalTo("")));
-    }
-
-    @Test
-    public void getAllGeotagCoordinates() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/image/geotag").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().string(equalTo("{}")));
     }
 
     @Test

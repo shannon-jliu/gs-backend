@@ -61,16 +61,6 @@ public class ImageController {
     }
 
     /**
-     * Constructs an HTTP response with the ids of all the images.
-     *
-     * @return HTTP response
-     */
-    @RequestMapping(value = "/id", method = RequestMethod.GET)
-    public ResponseEntity<List<Long>> getAllIds() {
-        return ResponseEntity.ok(imageDao.getAllIds());
-    }
-
-    /**
      * Constructs an HTTP response with the most recent image that was captured by the plane.
      *
      * @return HTTP response
@@ -91,20 +81,6 @@ public class ImageController {
     public ResponseEntity<Image> get(@PathVariable Long id) {
         Image image = (Image) imageDao.get(id);
         return (image != null) ? ResponseEntity.ok(image) : ResponseEntity.noContent().build();
-    }
-
-    /**
-     * Constructs a HTTP response with the image file with url 'file'.
-     *
-     * @param file String image url for the File we are extracting
-     * @return HTTP response
-     */
-    @RequestMapping(value = "/file/{file}", method = RequestMethod.GET)
-    public ResponseEntity<File> getFile(@PathVariable String file) {
-        // TODO: Figure this out
-        // Controller.response().setHeader("Content-disposition", "inline")
-        File image = new File(imgDirectory + file);
-        return image.exists() ? ResponseEntity.ok(image) : ResponseEntity.noContent().build();
     }
 
     /**
@@ -319,27 +295,6 @@ public class ImageController {
             return ResponseEntity.ok(i.getLocations());
         }
         return ResponseEntity.noContent().build();
-    }
-
-    /**
-     * Returns JSON of all gps locations of the four corners of an image based on Geotag index 0 - top
-     * left; index 1 - top right; index 2 - bottom left; index 3 - bottom right;
-     *
-     * @return an HTTP response
-     */
-    @RequestMapping(value = "/geotag", method = RequestMethod.GET)
-    public ResponseEntity getAllGeotagCoordinates() {
-        List<Long> ids = imageDao.getAllIds();
-        ObjectNode imageGeotags = mapper.createObjectNode();
-        for (Long id : ids) {
-            ObjectNode locs = null;
-            Image i = (Image) imageDao.get(id);
-            if (i != null) {
-                locs = i.getLocations();
-                if (locs != null) imageGeotags.put(id.toString(), locs);
-            }
-        }
-        return ResponseEntity.ok(imageGeotags);
     }
 
     /**
