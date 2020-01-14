@@ -15,4 +15,5 @@ public class Flags {
 	@Value("${cuair.plane.autopilot}") public static String CUAIR_PLANE_AUTOPILOT;
 
 	@Value("${cuair.interop.destination}") public static String CUAIR_INTEROP_DESTINATION;
+	
 }
