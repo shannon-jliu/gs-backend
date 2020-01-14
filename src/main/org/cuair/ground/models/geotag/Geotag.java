@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 /** Represents the position and orientation of an object on the ground */
 // TODO: Figure out if this annotation is necessary
-// @Entity
+@Entity
 public class Geotag extends CUAirModel {
 
     /** Field of view of camera horizontally and vertically */

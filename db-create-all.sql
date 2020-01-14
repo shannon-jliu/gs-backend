@@ -27,6 +27,15 @@ create table camera_gimbal_settings (
   constraint pk_camera_gimbal_settings primary key (id)
 );
 
+create table geotag (
+  id                            bigserial not null,
+  latitude                      float,
+  longitude                     float,
+  radians_from_north            float,
+  is_manual_geotag              boolean default false not null,
+  constraint pk_geotag primary key (id)
+);
+
 create table image (
   id                            bigserial not null,
   timestamp                     timestamptz,
