@@ -111,7 +111,8 @@ public class AssignmentController {
 
     // TODO: Implement flags
     /** The flag to behave as if auth is enabled */
-    private static final boolean AUTH_ENABLED = false;
+    // TODO: Figure out "final": It was taken away to be able to change the value of the field for testing
+    private static Boolean AUTH_ENABLED = false;
 
     /** A logger */
     private static final Logger logger = LoggerFactory.getLogger(AssignmentController.class);

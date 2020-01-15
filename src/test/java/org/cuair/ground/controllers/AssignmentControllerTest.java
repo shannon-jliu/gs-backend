@@ -21,6 +21,10 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.ArrayList;
 import java.io.*;
@@ -50,6 +54,8 @@ public class AssignmentControllerTest {
         Ebean.beginTransaction();
         Ebean.deleteAll(assignments);
         Ebean.commitTransaction();
+
+        ReflectionTestUtils.setField(controller, "AUTH_ENABLED", false);
     }
 
     @Test
@@ -77,6 +83,7 @@ public class AssignmentControllerTest {
     @Test
     public void getByUser() throws Exception {
         // Auth is disabled
+        // ReflectionTestUtils.setField(controller, "AUTH_ENABLED", true);
         mvc.perform(MockMvcRequestBuilders.get("/assignment/user").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(400))
                 .andExpect(content().string(equalTo("")));
