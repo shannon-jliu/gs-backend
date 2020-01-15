@@ -84,6 +84,10 @@ dependencies {
 
     // Config
     implementation "com.typesafe:config:1.4.0"
+
+    // Crypto
+    implementation 'org.mindrot:jbcrypt:0.4'
+
 }
 
 ebean {

@@ -65,7 +65,6 @@ public class ImageControllerTest {
 
     // TODO: Get full coverage
 
-
     @Test
     public void getAll() throws Exception {
         ArrayList<Image> list = new ArrayList();
