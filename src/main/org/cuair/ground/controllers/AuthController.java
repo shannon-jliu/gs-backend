@@ -17,7 +17,7 @@ import java.io.IOException;
 
 /** API callbacks to handle authenticating with the ground server */
 @RestController
-@RequestMapping(value = "/assignment")
+@RequestMapping(value = "/auth")
 public class AuthController {
 
     /**

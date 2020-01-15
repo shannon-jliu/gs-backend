@@ -42,7 +42,7 @@ import org.springframework.http.HttpStatus;
 
 /** API callbacks to handle creation/retrieval of Assignment model objects */
 @RestController
-@RequestMapping(value = "/auth")
+@RequestMapping(value = "/assignment")
 public class AssignmentController {
 
     /** The database access object for the assignment database */
