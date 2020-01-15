@@ -410,7 +410,7 @@ public class Geotag extends CUAirModel {
      * @return True if the object equals this Geotag
      */
     @Override
-    public boolean equals(@NotNull Object o) {
+    public boolean equals(Object o) {
         Geotag other = (Geotag) o;
 
         // unsure if deepEquals will handle Radian.equals

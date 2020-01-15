@@ -6,6 +6,7 @@ import org.cuair.ground.models.AuthToken
 import org.mindrot.jbcrypt.BCrypt
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
+import org.springframework.http.HttpHeaders
 
 /** Utilities for accessing authentication information from requests */
 class AuthUtil {
@@ -23,7 +24,8 @@ class AuthUtil {
         private val APPLICATION_SECRET = "PlayConfig.PLAY_CRYPTO_SECRET"
 
         /** Generated bcrypt salt */
-        private val salt = "PlayConfig.CUAIR_AUTH_SALT"
+        // TODO: IMPLEMENT FLAG
+        private val salt = "\$2a\$10\$jYhW.WEWTi0DKMmfvw6tne"
 
         /**
          * Hashes the password with a salt
@@ -63,8 +65,8 @@ class AuthUtil {
          * @param json the request headers
          * @return the authentication token
          */
-        fun getToken(json: ObjectNode): AuthToken? {
-            val token = json.get(AUTH_TOKEN_HEADER).asText();
+        fun getToken(headers: HttpHeaders): AuthToken? {
+            val token = headers.get(AUTH_TOKEN_HEADER)?.get(0);
 
             if (token != null) {
                 return authTokenDao.getByToken(token)

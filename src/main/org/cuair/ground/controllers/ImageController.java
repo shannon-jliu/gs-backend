@@ -24,9 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.multipart.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -34,9 +31,12 @@ import javax.servlet.http.*;
 import org.springframework.web.multipart.support.*;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 /** Contains all the callbacks for all the public api endpoints for the Image  */
+@CrossOrigin
 @RestController
 @RequestMapping(value = "/image")
 public class ImageController {
@@ -78,7 +78,7 @@ public class ImageController {
      * @return HTTP response
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseEntity<Image> get(@PathVariable Long id) {
+    public ResponseEntity<Image> get(@RequestParam Long id) {
         Image image = (Image) imageDao.get(id);
         return (image != null) ? ResponseEntity.ok(image) : ResponseEntity.noContent().build();
     }
@@ -193,7 +193,8 @@ public class ImageController {
      * @return an HTTP response
      */
     @RequestMapping(method = RequestMethod.POST)
-    public CompletableFuture<ResponseEntity> create(@RequestParam("files") MultipartFile[] files, @RequestParam("jsonString") String jsonString) {
+    public CompletableFuture<ResponseEntity> create(@RequestParam MultipartFile[] files, @RequestBody HttpEntity<String> httpEntity) {
+        String jsonString = httpEntity.getBody();
         // check if request is valid
         CompletableFuture<ResponseEntity> validate = validateRequestBody(files, jsonString, true);
         if (validate != null) {
@@ -288,7 +289,7 @@ public class ImageController {
      * @return an HTTP response
      */
     @RequestMapping(value = "/geotag/{id}", method = RequestMethod.GET)
-    public ResponseEntity getGeotagCoordinates(@PathVariable Long id) {
+    public ResponseEntity getGeotagCoordinates(@RequestParam Long id) {
         if (id == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Image ID is null");
         Image i = (Image) imageDao.get(id);
         if (i != null) {
@@ -306,7 +307,8 @@ public class ImageController {
      * @return an HTTP response
      */
     @RequestMapping(value = "/dummy", method = RequestMethod.POST)
-    public ResponseEntity dummyCreate(@RequestParam("files") MultipartFile[] files, @RequestParam("jsonString") String jsonString) {
+    public ResponseEntity dummyCreate(@RequestParam("files") MultipartFile[] files, @RequestBody HttpEntity<String> httpEntity) {
+        String jsonString = httpEntity.getBody();
         ObjectNode json = null;
         try {
             json = getJSON(jsonString);

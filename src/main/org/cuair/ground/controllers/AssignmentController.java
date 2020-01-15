@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -38,9 +39,13 @@ import javax.servlet.http.*;
 import org.springframework.web.multipart.support.*;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 /** API callbacks to handle creation/retrieval of Assignment model objects */
+@CrossOrigin
 @RestController
 @RequestMapping(value = "/assignment")
 public class AssignmentController {
@@ -87,17 +92,11 @@ public class AssignmentController {
      * @return Result containing all the user assignments as json
      */
     @RequestMapping(value = "/user", method = RequestMethod.GET)
-    public ResponseEntity getByUser(@RequestParam String jsonString) {
+    public ResponseEntity getByUser(@RequestHeader HttpHeaders headers) {
         if (AUTH_ENABLED) {
             // grab user name
-            ObjectNode json = null;
-            try {
-                json = (ObjectNode) mapper.readTree(jsonString);
-            } catch (IOException e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e);
-            }
+            AuthToken token = AuthUtil.Companion.getToken(headers);
 
-            AuthToken token = AuthUtil.Companion.getToken(json);
             if (token != null) {
                 return ResponseEntity.ok(assignmentDao.getAllForUser(token.getUsername()));
             } else {
@@ -111,7 +110,7 @@ public class AssignmentController {
     // TODO: Implement flags
     /** The flag to behave as if auth is enabled */
     // TODO: Figure out "final": It was taken away to be able to change the value of the field for testing
-    private static Boolean AUTH_ENABLED = false;
+    private static Boolean AUTH_ENABLED = true;
 
     /** A logger */
     private static final Logger logger = LoggerFactory.getLogger(AssignmentController.class);
@@ -131,21 +130,14 @@ public class AssignmentController {
      * @return Result containing the generated assignment as json
      */
     @RequestMapping(value = "/work/{type}", method = RequestMethod.POST)
-    public ResponseEntity createWork(@RequestParam String type, @RequestParam String jsonString) {
+    public ResponseEntity createWork(@RequestHeader HttpHeaders headers, @RequestParam String type) {
         ClientType assignee = ClientType.valueOf(type);
         Assignment a;
 
         // if auth disabled, continue with old behavior
         if (AUTH_ENABLED) {
             // grab user name and assign assignment to that username
-            ObjectNode json = null;
-            try {
-                json = (ObjectNode) mapper.readTree(jsonString);
-            } catch (IOException e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e);
-            }
-
-            AuthToken token = AuthUtil.Companion.getToken(json);
+            AuthToken token = AuthUtil.Companion.getToken(headers);
             if (token != null) {
                 a = assignmentDao.getWork(assignee, token.getUsername());
             } else {
@@ -170,7 +162,8 @@ public class AssignmentController {
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     // TODO: Is this necessary?
     // @ValidateJson(Assignment.class)
-    public ResponseEntity update(@RequestParam Long id, @RequestParam String jsonString) {
+    public ResponseEntity update(@RequestParam Long id, @RequestBody HttpEntity<String> httpEntity) {
+        String jsonString = httpEntity.getBody();
         Assignment a = assignmentDao.get(id);
         if (a == null) {
             return ResponseEntity.noContent().build();

@@ -332,7 +332,7 @@ public abstract class TargetSighting extends ClientCreatable {
      * @return True if the object equals this AlphanumTargetSighting
      */
     @Override
-    public boolean equals(@NotNull Object o) {
+    public boolean equals(Object o) {
         TargetSighting other = (TargetSighting) o;
 
         if (!super.equals(o)) {

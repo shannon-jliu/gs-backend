@@ -45,7 +45,7 @@ public abstract class ClientCreatable extends CUAirModel {
      * @return True if the object equals this model
      */
     @Override
-    public boolean equals(@NotNull Object o) {
+    public boolean equals(Object o) {
       ClientCreatable other = (ClientCreatable) o;
 
       return Objects.deepEquals(this.creator, other.getCreator());

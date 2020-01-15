@@ -82,7 +82,7 @@ public class EmergentTarget extends Target {
      * @return True if the object equals this QRTargetSighting
      */
     @Override
-    public boolean equals(@NotNull Object o) {
+    public boolean equals(Object o) {
         if (!super.equals(o)) {
             return false;
         }

@@ -137,7 +137,7 @@ public abstract class Target extends ClientCreatable {
      * @return True if the object equals this Target
      */
     @Override
-    public boolean equals(@NotNull Object o) {
+    public boolean equals(Object o) {
         Target other = (Target) o;
 
         if (!super.equals(other)) {

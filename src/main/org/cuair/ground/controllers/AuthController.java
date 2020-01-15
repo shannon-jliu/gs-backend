@@ -9,16 +9,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpEntity;
 import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
+import org.springframework.web.bind.annotation.CrossOrigin;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** API callbacks to handle authenticating with the ground server */
+@CrossOrigin
 @RestController
 @RequestMapping(value = "/auth")
 public class AuthController {
+
+    /** A logger */
+    private static final Logger logger = LoggerFactory.getLogger(AssignmentController.class);
 
     /**
      * Gets an auth token if the credentials are valid
@@ -26,20 +36,18 @@ public class AuthController {
      * @return auth token
      */
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity get(@RequestHeader HttpHeaders headers, @RequestParam String jsonString) {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode json = null;
-        try {
-            json = (ObjectNode) mapper.readTree(jsonString);
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e);
-        }
-        AuthToken confirmationToken = AuthUtil.Companion.getToken(json);
+    public ResponseEntity get(@RequestHeader HttpHeaders headers) {
+        AuthToken confirmationToken = AuthUtil.Companion.getToken(headers);
 
-        ResponseEntity confirmation = ResponseEntity.ok("");
-        if (confirmationToken.getAdmin()) {
-            confirmation = ResponseEntity.ok("admin");
+        if (confirmationToken != null) {
+            return ResponseEntity.ok(confirmationToken.getToken());
         }
+
+        // TODO: Fix admin/logging in if already have auth token
+        // ResponseEntity confirmation = ResponseEntity.ok("");
+        // if (confirmationToken.getAdmin()) {
+        //     confirmation = ResponseEntity.ok("admin");
+        // }
 
         List<String> password = headers.get("Authorization");
         if (password != null) {

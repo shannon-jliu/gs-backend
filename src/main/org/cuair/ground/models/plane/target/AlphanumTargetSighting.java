@@ -17,8 +17,7 @@ import org.cuair.ground.models.Shape;
 import org.cuair.ground.models.geotag.Geotag;
 
 /** Alphanumeric Target Sighting that has features associated with alphanmuerics. */
-// TODO: Figure out if this annotation is necessary
-// @Entity
+@Entity
 public class AlphanumTargetSighting extends TargetSighting {
 
     /** The target of this target sighting */
@@ -429,7 +428,7 @@ public class AlphanumTargetSighting extends TargetSighting {
      * @return True if the object equals this AlphanumTargetSighting
      */
     @Override
-    public boolean equals(@NotNull Object o) {
+    public boolean equals(Object o) {
         if (!super.equals(o)) {
           return false;
         }

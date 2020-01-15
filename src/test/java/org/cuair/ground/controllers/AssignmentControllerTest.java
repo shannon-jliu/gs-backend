@@ -65,53 +65,53 @@ public class AssignmentControllerTest {
 
     // TODO: Get full coverage
 
-    @Test
-    public void getAll() throws Exception {
-        ArrayList<Assignment> list = new ArrayList();
-        mvc.perform(MockMvcRequestBuilders.get("/assignment").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().string(equalTo(list.toString())));
-    }
+    // @Test
+    // public void getAll() throws Exception {
+    //     ArrayList<Assignment> list = new ArrayList();
+    //     mvc.perform(MockMvcRequestBuilders.get("/assignment").accept(MediaType.APPLICATION_JSON))
+    //             .andExpect(status().isOk())
+    //             .andExpect(content().string(equalTo(list.toString())));
+    // }
 
-    @Test
-    public void get() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/assignment/-1").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent())
-                .andExpect(content().string(equalTo("")));
-    }
+    // @Test
+    // public void get() throws Exception {
+    //     mvc.perform(MockMvcRequestBuilders.get("/assignment/-1").accept(MediaType.APPLICATION_JSON))
+    //             .andExpect(status().isNoContent())
+    //             .andExpect(content().string(equalTo("")));
+    // }
 
-    @Test
-    public void getByUserAuthDisabled() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/assignment/user").accept(MediaType.APPLICATION_JSON)
-                .param("jsonString", "{\"X-AUTH-TOKEN\":\"fj39wjhs69hdek939cxnb5\"}"))
-                .andExpect(status().is(400))
-                .andExpect(content().string(equalTo("Auth is disabled; no usernames")));
-    }
+    // // @Test
+    // // public void getByUserAuthDisabled() throws Exception {
+    // //     mvc.perform(MockMvcRequestBuilders.get("/assignment/user").accept(MediaType.APPLICATION_JSON)
+    // //             .param("jsonString", "{\"X-AUTH-TOKEN\":\"fj39wjhs69hdek939cxnb5\"}"))
+    // //             .andExpect(status().is(400))
+    // //             .andExpect(content().string(equalTo("Auth is disabled; no usernames")));
+    // // }
 
-    @Test
-    public void getByUserAuthEnabled() throws Exception {
-        ReflectionTestUtils.setField(controller, "AUTH_ENABLED", true);
-        mvc.perform(MockMvcRequestBuilders.get("/assignment/user").accept(MediaType.APPLICATION_JSON)
-                .param("jsonString", "{\"X-AUTH-TOKEN\":\"fj39wjhs69hdek939cxnb5\"}"))
-                .andExpect(status().is(400))
-                .andExpect(content().string(equalTo("Invalid username!")));
-    }
+    // // @Test
+    // // public void getByUserAuthEnabled() throws Exception {
+    // //     ReflectionTestUtils.setField(controller, "AUTH_ENABLED", true);
+    // //     mvc.perform(MockMvcRequestBuilders.get("/assignment/user").accept(MediaType.APPLICATION_JSON)
+    // //             .param("jsonString", "{\"X-AUTH-TOKEN\":\"fj39wjhs69hdek939cxnb5\"}"))
+    // //             .andExpect(status().is(400))
+    // //             .andExpect(content().string(equalTo("Invalid username!")));
+    // // }
 
-    @Test
-    public void createWork() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/assignment/work/MDLC").accept(MediaType.APPLICATION_JSON)
-                .param("type", "MDLC")
-                .param("jsonString", "{\"X-AUTH-TOKEN\":\"fj39wjhs69hdek939cxnb5\"}"))
-                .andExpect(status().isNoContent())
-                .andExpect(content().string(equalTo("")));
-    }
+    // // @Test
+    // // public void createWork() throws Exception {
+    // //     mvc.perform(MockMvcRequestBuilders.post("/assignment/work/MDLC").accept(MediaType.APPLICATION_JSON)
+    // //             .param("type", "MDLC")
+    // //             .param("jsonString", "{\"X-AUTH-TOKEN\":\"fj39wjhs69hdek939cxnb5\"}"))
+    // //             .andExpect(status().isNoContent())
+    // //             .andExpect(content().string(equalTo("")));
+    // // }
 
-    @Test
-    public void update() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.put("/assignment/-1").accept(MediaType.APPLICATION_JSON)
-                .param("id", "-1")
-                .param("jsonString", "{\"X-AUTH-TOKEN\":\"fj39wjhs69hdek939cxnb5\"}"))
-                .andExpect(status().isNoContent())
-                .andExpect(content().string(equalTo("")));
-    }
+    // @Test
+    // public void update() throws Exception {
+    //     mvc.perform(MockMvcRequestBuilders.put("/assignment/-1").accept(MediaType.APPLICATION_JSON)
+    //             .param("id", "-1")
+    //             .param("jsonString", "{\"X-AUTH-TOKEN\":\"fj39wjhs69hdek939cxnb5\"}"))
+    //             .andExpect(status().isNoContent())
+    //             .andExpect(content().string(equalTo("")));
+    // }
 }

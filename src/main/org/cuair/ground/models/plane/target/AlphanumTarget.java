@@ -197,7 +197,7 @@ public class AlphanumTarget extends Target {
     }
 
     @Override
-    public boolean equals(@NotNull Object o) {
+    public boolean equals(Object o) {
         if (o == null || !super.equals(o)) {
             return false;
         }
