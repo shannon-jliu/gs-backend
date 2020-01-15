@@ -32,7 +32,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.multipart.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
@@ -43,7 +42,7 @@ import org.springframework.http.HttpStatus;
 
 /** API callbacks to handle creation/retrieval of Assignment model objects */
 @RestController
-@RequestMapping(value = "/assignment")
+@RequestMapping(value = "/auth")
 public class AssignmentController {
 
     /** The database access object for the assignment database */

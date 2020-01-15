@@ -81,20 +81,27 @@ public class AssignmentControllerTest {
     }
 
     @Test
-    public void getByUser() throws Exception {
-        // Auth is disabled
-        // ReflectionTestUtils.setField(controller, "AUTH_ENABLED", true);
-        mvc.perform(MockMvcRequestBuilders.get("/assignment/user").accept(MediaType.APPLICATION_JSON))
+    public void getByUserAuthDisabled() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.get("/assignment/user").accept(MediaType.APPLICATION_JSON)
+                .param("jsonString", "{\"X-AUTH-TOKEN\":\"fj39wjhs69hdek939cxnb5\"}"))
                 .andExpect(status().is(400))
-                .andExpect(content().string(equalTo("")));
+                .andExpect(content().string(equalTo("Auth is disabled; no usernames")));
+    }
+
+    @Test
+    public void getByUserAuthEnabled() throws Exception {
+        ReflectionTestUtils.setField(controller, "AUTH_ENABLED", true);
+        mvc.perform(MockMvcRequestBuilders.get("/assignment/user").accept(MediaType.APPLICATION_JSON)
+                .param("jsonString", "{\"X-AUTH-TOKEN\":\"fj39wjhs69hdek939cxnb5\"}"))
+                .andExpect(status().is(400))
+                .andExpect(content().string(equalTo("Invalid username!")));
     }
 
     @Test
     public void createWork() throws Exception {
-        // Auth is disabled
         mvc.perform(MockMvcRequestBuilders.post("/assignment/work/MDLC").accept(MediaType.APPLICATION_JSON)
                 .param("type", "MDLC")
-                .param("jsonString", "{\"token\":fj39wjhs69hdek939cxnb5}"))
+                .param("jsonString", "{\"X-AUTH-TOKEN\":\"fj39wjhs69hdek939cxnb5\"}"))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string(equalTo("")));
     }
@@ -103,7 +110,7 @@ public class AssignmentControllerTest {
     public void update() throws Exception {
         mvc.perform(MockMvcRequestBuilders.put("/assignment/-1").accept(MediaType.APPLICATION_JSON)
                 .param("id", "-1")
-                .param("jsonString", "{\"token\":fj39wjhs69hdek939cxnb5}"))
+                .param("jsonString", "{\"X-AUTH-TOKEN\":\"fj39wjhs69hdek939cxnb5\"}"))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string(equalTo("")));
     }

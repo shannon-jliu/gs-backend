@@ -5,6 +5,7 @@ import org.cuair.ground.daos.DAOFactory
 import org.cuair.ground.models.AuthToken
 import org.mindrot.jbcrypt.BCrypt
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.fasterxml.jackson.databind.node.TextNode
 
 /** Utilities for accessing authentication information from requests */
 class AuthUtil {
@@ -63,7 +64,7 @@ class AuthUtil {
          * @return the authentication token
          */
         fun getToken(json: ObjectNode): AuthToken? {
-            val token = json.get(AUTH_TOKEN_HEADER) as String
+            val token = json.get(AUTH_TOKEN_HEADER).asText();
 
             if (token != null) {
                 return authTokenDao.getByToken(token)

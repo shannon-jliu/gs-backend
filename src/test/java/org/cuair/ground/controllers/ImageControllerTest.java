@@ -141,8 +141,6 @@ public class ImageControllerTest {
         String[] timestampParts = recent.getTimestamp().toString().split(" ", 2);
         String expectedTimestamp = timestampParts[0] + "T09" + timestampParts[1].substring(2, timestampParts[1].length()) + "+0000";
 
-        System.out.println("a;lsdfkj;asdfjk: " + expectedTimestamp);
-
         MvcResult result = resultActions.andReturn();
         String contentAsString = result.getResponse().getContentAsString();
 
