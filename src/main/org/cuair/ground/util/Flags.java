@@ -1,11 +1,15 @@
 package org.cuair.ground.util;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.*;
+import org.springframework.context.annotation.*;
 
 /*
  * To use a flag, add it in src/main/resources/application.properties, and then here, and
  * import this class.
  */
+@Configuration
+@ConfigurationProperties
 public class Flags {
 
     @Value("${spring.datasource.password}") public static String CUAIR_PLANE_CAMERA_GIMBAL_KEK;

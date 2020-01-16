@@ -50,18 +50,21 @@ import org.springframework.http.CacheControl;
 
 import org.cuair.ground.util.Flags;
 
+import org.springframework.boot.context.properties.*;
+
 /** Contains all the callbacks for all the public api endpoints for the Image  */
 @CrossOrigin
 @RestController
 @RequestMapping(value = "/image")
+@EnableConfigurationProperties(Flags.class)
 public class ImageController {
     /** Database accessor object for image database */
     private TimestampDatabaseAccessor imageDao = (TimestampDatabaseAccessor) DAOFactory.getDAO(DAOFactory.ModelDAOType.TIMESTAMP_DATABASE_ACCESSOR, Image.class);
 
     /** String path to the folder where all the images are stored  */
-    private String PLANE_IMAGE_DIR = Flags.CUAIR_PLANE_CAMERA_GIMBAL_KEK;
+    private String imgDirectory = Flags.CUAIR_PLANE_CAMERA_GIMBAL_KEK;
 
-    String imgDirectory = null;
+    // String imgDirectory = null;
 
     private String PLANE_IMAGE_BACKUP_DIR = Flags.PLANE_IMAGE_BACKUP_DIR;
 
@@ -111,7 +114,7 @@ public class ImageController {
      */
     @RequestMapping(value = "/file/{file}", method = RequestMethod.GET)
     public ResponseEntity getFile(@PathVariable String file) {
-        logger.info(PLANE_IMAGE_DIR);
+        logger.info(imgDirectory);
         // TODO: Is this necessary? It will be caught in exception FileNotFoundException below
         File image = FileUtils.getFile(imgDirectory + file);
         if (image.exists()) {
