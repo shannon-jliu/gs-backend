@@ -13,7 +13,7 @@ import org.cuair.ground.models.plane.target.AlphanumTargetSighting;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import org.springframework.http.ResponseEntity;
@@ -83,7 +83,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
      *     type
      */
     @RequestMapping(value = "/creator/{type}", method = RequestMethod.GET)
-    public ResponseEntity getAllForCreator(@RequestParam String type) {
+    public ResponseEntity getAllForCreator(@PathVariable String type) {
         return super.getAllForCreator(type);
     }
 
@@ -120,7 +120,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
     // @ValidateJson(AlphanumTargetSighting.class)
     // TODO: Change this route on the frontend
     @RequestMapping(value = "/assignment/{id}", method = RequestMethod.POST)
-    public ResponseEntity create(@RequestParam Long id, @RequestBody HttpEntity<String> httpEntity) {
+    public ResponseEntity create(@PathVariable Long id, @RequestBody HttpEntity<String> httpEntity) {
         String jsonString = httpEntity.getBody();
         ObjectMapper mapper = new ObjectMapper();
         JsonNode json = null;
@@ -174,7 +174,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
     // TODO: Figure out if this is necessary
     // @ValidateJson(AlphanumTargetSighting.class)
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public ResponseEntity update(@RequestParam Long id, @RequestBody HttpEntity<String> httpEntity) {
+    public ResponseEntity update(@PathVariable Long id, @RequestBody HttpEntity<String> httpEntity) {
         AlphanumTargetSighting ts = alphaDao.get(id);
         if (ts == null) {
             return ResponseEntity.noContent().build();
@@ -273,7 +273,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
      * @return HTTP response with json of deleted target sighting
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity delete(@RequestParam Long id) {
+    public ResponseEntity delete(@PathVariable Long id) {
         AlphanumTargetSighting ts = alphaDao.get(id);
 
         if (ts == null) {

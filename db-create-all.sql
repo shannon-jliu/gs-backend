@@ -1,6 +1,6 @@
 create table alphanum_target (
   id                            bigserial not null,
-  creator                       varchar(4),
+  creator                       integer,
   geotag_id                     bigint,
   judge_target_id               bigint,
   thumbnail_tsid                bigint,
@@ -9,7 +9,7 @@ create table alphanum_target (
   alpha                         varchar(255),
   alpha_color                   integer,
   offaxis                       boolean,
-  constraint ck_alphanum_target_creator check ( creator in ('mdlc','adlc')),
+  constraint ck_alphanum_target_creator check ( creator in (0,1)),
   constraint ck_alphanum_target_shape check ( shape in (0,1,2,3,4,5,6,7,8,9,10,11,12)),
   constraint ck_alphanum_target_shape_color check ( shape_color in (0,1,2,3,4,5,6,7,8,9)),
   constraint ck_alphanum_target_alpha_color check ( alpha_color in (0,1,2,3,4,5,6,7,8,9)),
@@ -19,7 +19,7 @@ create table alphanum_target (
 
 create table alphanum_target_sighting (
   id                            bigserial not null,
-  creator                       varchar(4),
+  creator                       integer,
   assignment_id                 bigint,
   geotag_id                     bigint,
   pixel_x                       integer,
@@ -40,7 +40,7 @@ create table alphanum_target_sighting (
   alpha_color_confidence        float,
   adlc_class_conf               float,
   offaxis                       boolean,
-  constraint ck_alphanum_target_sighting_creator check ( creator in ('mdlc','adlc')),
+  constraint ck_alphanum_target_sighting_creator check ( creator in (0,1)),
   constraint ck_alphanum_target_sighting_mdlc_class_conf check ( mdlc_class_conf in ('high','medium','low')),
   constraint ck_alphanum_target_sighting_shape check ( shape in (0,1,2,3,4,5,6,7,8,9,10,11,12)),
   constraint ck_alphanum_target_sighting_shape_color check ( shape_color in (0,1,2,3,4,5,6,7,8,9)),
@@ -53,10 +53,10 @@ create table assignment (
   id                            bigserial not null,
   timestamp                     timestamptz,
   image_id                      bigint,
-  assignee                      varchar(4) not null,
+  assignee                      integer not null,
   done                          boolean default false not null,
   username                      varchar(255),
-  constraint ck_assignment_assignee check ( assignee in ('mdlc','adlc')),
+  constraint ck_assignment_assignee check ( assignee in (0,1)),
   constraint pk_assignment primary key (id)
 );
 
@@ -80,19 +80,19 @@ create table camera_gimbal_settings (
 
 create table emergent_target (
   id                            bigserial not null,
-  creator                       varchar(4),
+  creator                       integer,
   geotag_id                     bigint,
   judge_target_id               bigint,
   thumbnail_tsid                bigint,
   description                   varchar(255),
-  constraint ck_emergent_target_creator check ( creator in ('mdlc','adlc')),
+  constraint ck_emergent_target_creator check ( creator in (0,1)),
   constraint uq_emergent_target_geotag_id unique (geotag_id),
   constraint pk_emergent_target primary key (id)
 );
 
 create table emergent_target_sighting (
   id                            bigserial not null,
-  creator                       varchar(4),
+  creator                       integer,
   assignment_id                 bigint,
   geotag_id                     bigint,
   pixel_x                       integer,
@@ -104,7 +104,7 @@ create table emergent_target_sighting (
   orientation_confidence        float,
   target_id                     bigint,
   description                   varchar(255),
-  constraint ck_emergent_target_sighting_creator check ( creator in ('mdlc','adlc')),
+  constraint ck_emergent_target_sighting_creator check ( creator in (0,1)),
   constraint ck_emergent_target_sighting_mdlc_class_conf check ( mdlc_class_conf in ('high','medium','low')),
   constraint uq_emergent_target_sighting_geotag_id unique (geotag_id),
   constraint pk_emergent_target_sighting primary key (id)

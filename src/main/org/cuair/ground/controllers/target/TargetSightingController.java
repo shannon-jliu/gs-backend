@@ -144,11 +144,11 @@ public abstract class TargetSightingController<T extends TargetSighting> {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Don't pass geotag for updates");
         }
 
-        if (other.getPixelX() != null && !other.getPixelX().equals(ts.getPixelX())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Don't change value of pixelX. Current value is " + ts.getPixelX());
+        if (other.getpixel_x() != null && !other.getpixel_x().equals(ts.getpixel_x())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Don't change value of pixel_x. Current value is " + ts.getpixel_x());
         }
-        if (other.getPixelY() != null && !other.getPixelY().equals(ts.getPixelY())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Don't change value of pixelY. Current value is " + ts.getPixelY());
+        if (other.getpixel_y() != null && !other.getpixel_y().equals(ts.getpixel_y())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Don't change value of pixel_y. Current value is " + ts.getpixel_y());
         }
         if (other.getWidth() != null && !other.getWidth().equals(ts.getWidth())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Don't change value of width. Current value is " + ts.getWidth());

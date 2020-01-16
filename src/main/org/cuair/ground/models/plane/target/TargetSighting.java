@@ -33,10 +33,10 @@ public abstract class TargetSighting extends ClientCreatable {
     protected Geotag geotag;
 
     /** The x pixel coordinate of the center of the target sighting in the specific Image */
-    protected Integer pixelX;
+    protected Integer pixel_x;
 
     /** The y pixel coordinate of the center of the target sighting in the specific Image */
-    protected Integer pixelY;
+    protected Integer pixel_y;
 
     /** The horizontal pixel width of the target sighting in the specific image */
     protected Integer width;
@@ -62,9 +62,9 @@ public abstract class TargetSighting extends ClientCreatable {
      *
      * @param creator        the ClientType of the Target Sighting
      * @param geotag         Geotag of this Target Sighting
-     * @param pixelX         Integer x pixel coordinate of the center of the
+     * @param pixel_x         Integer x pixel coordinate of the center of the
      *                       target sighting in the specific Image
-     * @param pixelY         Integer y pixel coordinate of the center of the
+     * @param pixel_y         Integer y pixel coordinate of the center of the
      *                       target sighting in the specific Image
      * @param radiansFromTop the orientation of the Target Sighting
      * @param
@@ -79,8 +79,8 @@ public abstract class TargetSighting extends ClientCreatable {
      */
     public TargetSighting(
             ClientType creator,
-            Integer pixelX,
-            Integer pixelY,
+            Integer pixel_x,
+            Integer pixel_y,
             Integer width,
             Integer height,
             Geotag geotag,
@@ -89,8 +89,8 @@ public abstract class TargetSighting extends ClientCreatable {
             Confidence mdlcClassConf,
             Assignment assignment) {
         super(creator);
-        this.pixelX = pixelX;
-        this.pixelY = pixelY;
+        this.pixel_x = pixel_x;
+        this.pixel_y = pixel_y;
         this.width = width;
         this.height = height;
         this.geotag = geotag;
@@ -109,11 +109,11 @@ public abstract class TargetSighting extends ClientCreatable {
     public void updateFromTargetSighting(TargetSighting other) {
         assert this.getAssignment() != null;
 
-        if (other.getPixelX() != null) {
-            this.pixelX = other.getPixelX();
+        if (other.getpixel_x() != null) {
+            this.pixel_x = other.getpixel_x();
         }
-        if (other.getPixelY() != null) {
-            this.pixelY = other.getPixelY();
+        if (other.getpixel_y() != null) {
+            this.pixel_y = other.getpixel_y();
         }
         if (other.getWidth() != null) {
             this.width = other.getWidth();
@@ -148,19 +148,19 @@ public abstract class TargetSighting extends ClientCreatable {
     /**
      * Gets the x pixel coordinate of the TargetSighting
      *
-     * @return pixelX Integer x pixel coordinate
+     * @return pixel_x Integer x pixel coordinate
      */
-    public Integer getPixelX() {
-        return pixelX;
+    public Integer getpixel_x() {
+        return pixel_x;
     }
 
     /**
      * Sets the x pixel coordinate of the TargetSighting
      *
-     * @param pixelX Integer x pixel coordinate
+     * @param pixel_x Integer x pixel coordinate
      */
-    public void setPixelX(Integer pixelX) {
-        this.pixelX = pixelX;
+    public void setpixel_x(Integer pixel_x) {
+        this.pixel_x = pixel_x;
     }
 
     /**
@@ -168,17 +168,17 @@ public abstract class TargetSighting extends ClientCreatable {
      *
      * @return Integer y pixel coordinate
      */
-    public Integer getPixelY() {
-        return pixelY;
+    public Integer getpixel_y() {
+        return pixel_y;
     }
 
     /**
      * Sets the y pixel coordinate of the TargetSighting
      *
-     * @param pixelY Integer y pixel coordinate
+     * @param pixel_y Integer y pixel coordinate
      */
-    public void setPixelY(Integer pixelY) {
-        this.pixelY = pixelY;
+    public void setpixel_y(Integer pixel_y) {
+        this.pixel_y = pixel_y;
     }
 
     /**
@@ -223,7 +223,7 @@ public abstract class TargetSighting extends ClientCreatable {
      * @return Integer x pixel coordinate
      */
     public Integer calculateUpperLeftX() {
-        return pixelX - getWidth() / 2;
+        return pixel_x - getWidth() / 2;
     }
 
     /**
@@ -232,7 +232,7 @@ public abstract class TargetSighting extends ClientCreatable {
      * @return Integer y pixel coordinate
      */
     public Integer calculateUpperLeftY() {
-        return pixelY - getHeight() / 2;
+        return pixel_y - getHeight() / 2;
     }
 
     /**
@@ -343,11 +343,11 @@ public abstract class TargetSighting extends ClientCreatable {
             return false;
         }
 
-        if (!Objects.deepEquals(this.pixelX, other.getPixelX())) {
+        if (!Objects.deepEquals(this.pixel_x, other.getpixel_x())) {
             return false;
         }
 
-        if (!Objects.deepEquals(this.pixelY, other.getPixelY())) {
+        if (!Objects.deepEquals(this.pixel_y, other.getpixel_y())) {
             return false;
         }
 

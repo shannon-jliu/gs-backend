@@ -27,7 +27,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -98,6 +97,8 @@ public class AssignmentController {
             AuthToken token = AuthUtil.Companion.getToken(headers);
 
             if (token != null) {
+                logger.info("they are getting the user's assignments lmao pls");
+                logger.info("there are " + assignmentDao.getAllForUser(token.getUsername()).size() + " assignments for the user");
                 return ResponseEntity.ok(assignmentDao.getAllForUser(token.getUsername()));
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid username!");
@@ -106,6 +107,30 @@ public class AssignmentController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Auth is disabled; no usernames");
         }
     }
+
+    /**
+     * Gets all assignments whose id is greater than the given id.
+     *
+     * @param id the id to find all assignments strictly greater than
+     * @return Result containing all relevant assignments as json
+     */
+    // TODO: Figure out if this is needed/wanted. Was not in the new_routes.txt file, but is still queried by the frontend
+    // when getting new images from the ground server, i.e. clicking the right arrow on the tagging page
+    @RequestMapping(value = "/after/{id}", method = RequestMethod.GET)
+    public ResponseEntity getAfterId(@RequestHeader HttpHeaders headers, @PathVariable Long id) {
+        if (AUTH_ENABLED) {
+            // grab user name
+            AuthToken token = AuthUtil.Companion.getToken(headers);
+            if (token != null) {
+                return ResponseEntity.ok(assignmentDao.getAllAfterId(id, token.getUsername()));
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid username!");
+            }
+        } else {
+            return ResponseEntity.ok(assignmentDao.getAllAfterId(id, DEFAULT_USER));
+        }
+    }
+
 
     // TODO: Implement flags
     /** The flag to behave as if auth is enabled */
@@ -130,7 +155,7 @@ public class AssignmentController {
      * @return Result containing the generated assignment as json
      */
     @RequestMapping(value = "/work/{type}", method = RequestMethod.POST)
-    public ResponseEntity createWork(@RequestHeader HttpHeaders headers, @RequestParam String type) {
+    public ResponseEntity createWork(@RequestHeader HttpHeaders headers, @PathVariable String type) {
         ClientType assignee = ClientType.valueOf(type);
         Assignment a;
 
@@ -162,7 +187,7 @@ public class AssignmentController {
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     // TODO: Is this necessary?
     // @ValidateJson(Assignment.class)
-    public ResponseEntity update(@RequestParam Long id, @RequestBody HttpEntity<String> httpEntity) {
+    public ResponseEntity update(@PathVariable Long id, @RequestBody HttpEntity<String> httpEntity) {
         String jsonString = httpEntity.getBody();
         Assignment a = assignmentDao.get(id);
         if (a == null) {

@@ -19,21 +19,34 @@ import org.cuair.ground.daos.DAOFactory;
 import org.cuair.ground.daos.TimestampDatabaseAccessor;
 import org.cuair.ground.models.Image;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.multipart.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
 import org.springframework.web.multipart.support.*;
+import org.springframework.web.multipart.*;
+import org.springframework.util.MultiValueMap;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.CrossOrigin;
+
+import org.apache.commons.io.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import org.springframework.http.CacheControl;
 
 /** Contains all the callbacks for all the public api endpoints for the Image  */
 @CrossOrigin
@@ -49,6 +62,9 @@ public class ImageController {
     private String backupImgDirectory = "backup_images/";
 
     private ObjectMapper mapper = new ObjectMapper();
+
+    /** A logger */
+    private static final Logger logger = LoggerFactory.getLogger(ImageController.class);
 
     /**
      * Constructs an HTTP response with all the images.
@@ -78,9 +94,42 @@ public class ImageController {
      * @return HTTP response
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseEntity<Image> get(@RequestParam Long id) {
+    public ResponseEntity<Image> get(@PathVariable Long id) {
         Image image = (Image) imageDao.get(id);
         return (image != null) ? ResponseEntity.ok(image) : ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Constructs a HTTP response with the image file with url `file`
+     *
+     * @param file String image url for the File we are extracting
+     * @return HTTP response
+     */
+    @RequestMapping(value = "/file/{file}", method = RequestMethod.GET)
+    public ResponseEntity getFile(@PathVariable String file) {
+        // TODO: Is this necessary? It will be caught in exception FileNotFoundException below
+        File image = FileUtils.getFile(imgDirectory + file);
+        if (image.exists()) {
+            HttpHeaders headers = new HttpHeaders();
+            InputStream in = null;
+            try {
+                in = new FileInputStream(imgDirectory + file);
+            } catch (FileNotFoundException e) {
+                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File not found: " + imgDirectory + file);
+            }
+
+            byte[] media = null;
+            try {
+                media = IOUtils.toByteArray(in);
+            } catch (IOException e) {
+                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error reading file: " + imgDirectory + file);
+            }
+            headers.setCacheControl(CacheControl.noCache().getHeaderValue());
+
+            ResponseEntity<byte[]> responseEntity = new ResponseEntity<>(media, headers, HttpStatus.OK);
+            return responseEntity;
+        }
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -193,8 +242,14 @@ public class ImageController {
      * @return an HTTP response
      */
     @RequestMapping(method = RequestMethod.POST)
-    public CompletableFuture<ResponseEntity> create(@RequestParam MultipartFile[] files, @RequestBody HttpEntity<String> httpEntity) {
-        String jsonString = httpEntity.getBody();
+    // public CompletableFuture<ResponseEntity> create(@PathVariable MultipartFile[] files, @PathVariable String jsonString) {
+    public CompletableFuture<ResponseEntity> create(MultipartHttpServletRequest request) {
+        Map<String, String[]> formData = request.getParameterMap();
+        logger.info("A;LSDKFJ;ASDKFJA;SLDKFJAS;LDFJKASL;DKFJ");
+        logger.info(formData.get("jsonString")[0]);
+        String jsonString = formData.get("jsonString")[0];
+        // MultipartFile[] files = (MultipartFile[]) formData.get("files");
+        MultipartFile[] files = {request.getFile("files")};
         // check if request is valid
         CompletableFuture<ResponseEntity> validate = validateRequestBody(files, jsonString, true);
         if (validate != null) {
@@ -289,7 +344,7 @@ public class ImageController {
      * @return an HTTP response
      */
     @RequestMapping(value = "/geotag/{id}", method = RequestMethod.GET)
-    public ResponseEntity getGeotagCoordinates(@RequestParam Long id) {
+    public ResponseEntity getGeotagCoordinates(@PathVariable Long id) {
         if (id == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Image ID is null");
         Image i = (Image) imageDao.get(id);
         if (i != null) {
@@ -307,7 +362,7 @@ public class ImageController {
      * @return an HTTP response
      */
     @RequestMapping(value = "/dummy", method = RequestMethod.POST)
-    public ResponseEntity dummyCreate(@RequestParam("files") MultipartFile[] files, @RequestBody HttpEntity<String> httpEntity) {
+    public ResponseEntity dummyCreate(@PathVariable("files") MultipartFile[] files, @RequestBody HttpEntity<String> httpEntity) {
         String jsonString = httpEntity.getBody();
         ObjectNode json = null;
         try {

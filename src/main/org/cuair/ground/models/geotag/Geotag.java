@@ -125,12 +125,12 @@ public class Geotag extends CUAirModel {
             altitude = telemetry.getAltitude();
         }
 
-        double pixelX = sighting.getPixelX();
-        double pixelY = sighting.getPixelY();
+        double pixel_x = sighting.getpixel_x();
+        double pixel_y = sighting.getpixel_y();
         double planeYaw = telemetry.getPlaneYaw() * Math.PI / 180;
         double centerLongitude = telemetry.getGps().getLongitude();
         double centerLatitude = telemetry.getGps().getLatitude();
-        this.gpsLocation = getPixelCoordinates(centerLatitude, centerLongitude, altitude, pixelX, pixelY, planeYaw);
+        this.gpsLocation = getPixelCoordinates(centerLatitude, centerLongitude, altitude, pixel_x, pixel_y, planeYaw);
         this.radiansFromNorth = getRadiansFromNorth(planeYaw, sighting.getRadiansFromTop());
     }
 
@@ -138,8 +138,8 @@ public class Geotag extends CUAirModel {
         double latitude,
         double longitude,
         double altitude,
-        double pixelX,
-        double pixelY,
+        double pixel_x,
+        double pixel_y,
         double planeYawRadians) {
         // total horizontal distance imaged in feet
         double hdi =
@@ -160,11 +160,11 @@ public class Geotag extends CUAirModel {
         double dppvert = vdi / IMAGE_HEIGHT;
 
         // finding distance from the center
-        double deltaPixelX = pixelX - (IMAGE_WIDTH / 2);
-        double deltaPixelY = (IMAGE_HEIGHT / 2) - pixelY;
+        double deltapixel_x = pixel_x - (IMAGE_WIDTH / 2);
+        double deltapixel_y = (IMAGE_HEIGHT / 2) - pixel_y;
 
-        double dppH = deltaPixelX * dpphoriz;
-        double dppV = deltaPixelY * dppvert;
+        double dppH = deltapixel_x * dpphoriz;
+        double dppV = deltapixel_y * dppvert;
 
         // matrix rotation to account for the yaw - (clockwise)
         double target_reference_x_feet =

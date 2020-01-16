@@ -9,11 +9,17 @@ import org.cuair.ground.models.Assignment;
 import org.cuair.ground.models.ClientType;
 import org.cuair.ground.models.Image;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /** Database Accessor Object that provides an interface for persisting assignments. */
 public class AssignmentDatabaseAccessor extends TimestampDatabaseAccessor<Assignment> {
 
     /** The database access object for the image database */
     private static final TimestampDatabaseAccessor<Image> imageDao = new TimestampDatabaseAccessor<>(Image.class);
+
+    /** A logger */
+    private static final Logger logger = LoggerFactory.getLogger(AssignmentDatabaseAccessor.class);
 
     /** Constructs a database accessor object for the assignment class */
     AssignmentDatabaseAccessor() {
@@ -32,9 +38,9 @@ public class AssignmentDatabaseAccessor extends TimestampDatabaseAccessor<Assign
             "SELECT id FROM (SELECT i.id AS id, MAX(COALESCE"
                 + "(a.timestamp, timestamp'1970-01-01 00:00:00')) AS assign_time, "
                 + "BOOL_OR(COALESCE(a.done, FALSE)) AS done, a.assignee, a.username FROM "
-                + "(SELECT * FROM Assignment WHERE assignee='"
-                + clientType.name().toLowerCase()
-                + "') a FULL OUTER JOIN Image i ON a.image_id="
+                + "(SELECT * FROM assignment WHERE assignee="
+                + clientType.getId()
+                + ") a FULL OUTER JOIN Image i ON a.image_id="
                 + "i.id GROUP BY i.id, a.assignee, a.username) AS JoinedAssignments WHERE "
                 + "DONE=false ORDER BY assign_time LIMIT 1";
         return getAssignment(ultimateSql, clientType, null);
@@ -53,9 +59,9 @@ public class AssignmentDatabaseAccessor extends TimestampDatabaseAccessor<Assign
             "SELECT id FROM (SELECT i.id AS id, MAX(COALESCE"
                 + "(a.timestamp, timestamp'1970-01-01 00:00:00')) AS assign_time, "
                 + "BOOL_OR(COALESCE(a.done, FALSE)) AS done, a.assignee, a.username FROM "
-                + "(SELECT * FROM Assignment WHERE assignee='"
-                + clientType.name().toLowerCase()
-                + "') a FULL OUTER JOIN Image i ON a.image_id="
+                + "(SELECT * FROM assignment WHERE assignee="
+                + clientType.getId()
+                + ") a FULL OUTER JOIN Image i ON a.image_id="
                 + "i.id GROUP BY i.id, a.assignee, a.username) AS JoinedAssignments WHERE "
                 + "id NOT IN (SELECT image_id FROM assignment WHERE username='"
                 + username
@@ -76,6 +82,7 @@ public class AssignmentDatabaseAccessor extends TimestampDatabaseAccessor<Assign
     public Assignment getAssignment(String querySql, ClientType clientType, String username) {
         SqlQuery query = Ebean.createSqlQuery(querySql);
         List<SqlRow> result = query.findList();
+        logger.info("result size: " + result.size());
         if (result.size() > 0) {
             Image image = imageDao.get(result.get(0).getLong("id"));
             Assignment a = new Assignment(image, clientType, username);
@@ -94,7 +101,7 @@ public class AssignmentDatabaseAccessor extends TimestampDatabaseAccessor<Assign
     public List<Assignment> getAllForImageId(Long imageId) {
         return Ebean.find(getModelClass()).where().eq("image_id", imageId).findList();
     }
-    
+
     /**
      * Retrieves all instances of Assignments that are assigned to a user. Returns empty list if the
      * user either does not exist or has no assignments
@@ -105,7 +112,7 @@ public class AssignmentDatabaseAccessor extends TimestampDatabaseAccessor<Assign
     public List<Assignment> getAllForUser(String user) {
         return Ebean.find(getModelClass()).where().eq("username", user).findList();
     }
-    
+
     /**
      * Retrieves all assignment ids that are greater than the specified id. Only to be used when auth
      * is disabled. This will be MDLC only.

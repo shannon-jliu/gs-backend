@@ -63,9 +63,9 @@ public class AlphanumTargetSighting extends TargetSighting {
      * @param alphaColor String color of the alphanumeric
      * @param offaxis Boolean of whether the target is off-axis
      * @param geotag Geotag of this Target Sighting
-     * @param pixelX Integer x pixel coordinate of the center of the target sighting in the specific
+     * @param pixel_x Integer x pixel coordinate of the center of the target sighting in the specific
      *     Image
-     * @param pixelY Integer y pixel coordinate of the center of the target sighting in the specific
+     * @param pixel_y Integer y pixel coordinate of the center of the target sighting in the specific
      *     Image
      * @param target the Target of this Target Sighting
      * @param radiansFromTop the orientation of the Target Sighting
@@ -81,8 +81,8 @@ public class AlphanumTargetSighting extends TargetSighting {
             @JsonProperty("alpha") String alpha,
             @JsonProperty("alphaColor") Color alphaColor,
             @JsonProperty("offaxis") Boolean offaxis,
-            @JsonProperty("pixelX") Integer pixelX,
-            @JsonProperty("pixelY") Integer pixelY,
+            @JsonProperty("pixel_x") Integer pixel_x,
+            @JsonProperty("pixel_y") Integer pixel_y,
             @JsonProperty("width") Integer width,
             @JsonProperty("height") Integer height,
             @JsonProperty("geotag") Geotag geotag,
@@ -97,8 +97,8 @@ public class AlphanumTargetSighting extends TargetSighting {
             @JsonProperty("mdlcClassConf") Confidence mdlcClassConf) {
         super(
             creator,
-            pixelX,
-            pixelY,
+            pixel_x,
+            pixel_y,
             width,
             height,
             geotag,
