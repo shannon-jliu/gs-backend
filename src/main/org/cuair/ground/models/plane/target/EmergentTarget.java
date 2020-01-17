@@ -24,15 +24,15 @@ public class EmergentTarget extends Target {
      * @param creator the Creator of the Target
      * @param geotag Geotag of this Target
      * @param judgeTargetId Long id of this Target on the competition server
-     * @param thumbnailTSId Long id of Target Sighting used for thumbnail
+     * @param thumbnail_tsid Long id of Target Sighting used for thumbnail
      */
     public EmergentTarget(
             ClientType creator,
             Geotag geotag,
             String description,
             Long judgeTargetId,
-            Long thumbnailTSId) {
-        super(creator, geotag, judgeTargetId, thumbnailTSId);
+            Long thumbnail_tsid) {
+        super(creator, geotag, judgeTargetId, thumbnail_tsid);
         this.description = description;
     }
 
