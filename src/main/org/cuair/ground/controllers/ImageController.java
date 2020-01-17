@@ -59,12 +59,11 @@ public class ImageController {
     /** Database accessor object for image database */
     private TimestampDatabaseAccessor imageDao = (TimestampDatabaseAccessor) DAOFactory.getDAO(DAOFactory.ModelDAOType.TIMESTAMP_DATABASE_ACCESSOR, Image.class);
 
-    /** String path to the folder where all the images are stored  */
-    private String PLANE_IMAGE_BACKUP_DIR = "images/";
+    /** String path to the folder where all the images are stored */
+    @Value("${plane.image.dir}") private String PLANE_IMAGE_DIR;
 
-    @Value("${plane.image.dir}") private String kek;
-
-    private String PLANE_IMAGE_BACKUP_DIR = "images/backups/";
+    /** String path to the folder where all the images are backed up */
+    @Value("${plane.image.backup.dir}") private String PLANE_IMAGE_BACKUP_DIR;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -78,7 +77,6 @@ public class ImageController {
      */
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<Image>> getAll() {
-        logger.info(kek);
         return ResponseEntity.ok(imageDao.getAll());
     }
 
