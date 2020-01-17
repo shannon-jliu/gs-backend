@@ -7,12 +7,12 @@ import org.springframework.beans.factory.annotation.Value;
 @RestController
 public class TestController {
 
-	// Unused, temporarily for display purposes
-	@Value("${cuair.plane.camera_gimbal}") public String sampleVar;
+    // Unused, temporarily for display purposes
+    @Value("${cuair.plane.camera_gimbal}") public String sampleVar;
 
-	@RequestMapping(value = "/")
-	public String index() {
-		return "test";
-	}
+    @RequestMapping(value = "/")
+    public String index() {
+        return "test";
+    }
 
 }
