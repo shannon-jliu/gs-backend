@@ -53,6 +53,9 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
         (AssignmentDatabaseAccessor)
             DAOFactory.getDAO(DAOFactory.ModellessDAOType.ASSIGNMENT_DATABASE_ACCESSOR);
 
+    /** An object mapper */
+    private static final ObjectMapper mapper = new ObjectMapper();
+
     /**
      * Gets the TargetSightingDatabaseAccessor object for this target sighting
      *
@@ -122,7 +125,6 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
     @RequestMapping(value = "/assignment/{id}", method = RequestMethod.POST)
     public ResponseEntity create(@PathVariable Long id, @RequestBody HttpEntity<String> httpEntity) {
         String jsonString = httpEntity.getBody();
-        ObjectMapper mapper = new ObjectMapper();
         JsonNode json = null;
         try {
             json = mapper.readTree(jsonString);
@@ -181,7 +183,6 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
         }
 
         String jsonString = httpEntity.getBody();
-        ObjectMapper mapper = new ObjectMapper();
         JsonNode json = null;
         try {
             json = mapper.readTree(jsonString);
