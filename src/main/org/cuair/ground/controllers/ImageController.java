@@ -111,7 +111,6 @@ public class ImageController {
      */
     @RequestMapping(value = "/file/{file}", method = RequestMethod.GET)
     public ResponseEntity getFile(@PathVariable String file) {
-        // logger.info(PLANE_IMAGE_BACKUP_DIR);
         // TODO: Is this necessary? It will be caught in exception FileNotFoundException below
         File image = FileUtils.getFile(PLANE_IMAGE_BACKUP_DIR + file);
         if (image.exists()) {
