@@ -168,8 +168,8 @@ public class EmergentTargetSightingController extends TargetSightingController<E
             return ResponseEntity.noContent().build();
         }
 
-        if (ts.getTarget() != null && ts.getTarget().getThumbnailTSId() == id) {
-            ts.getTarget().setThumbnailTSId(0L);
+        if (ts.getTarget() != null && ts.getTarget().getthumbnail_tsid() == id) {
+            ts.getTarget().setthumbnail_tsid(0L);
             eTargetDao.update(ts.getTarget());
             // TODO (mariasam1): delete thumbnail through interop
         }

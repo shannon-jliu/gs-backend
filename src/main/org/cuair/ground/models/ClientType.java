@@ -1,16 +1,16 @@
 package org.cuair.ground.models;
 
 import io.ebean.annotation.EnumValue;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /** Enum representing the different possible creators for a model */
 public enum ClientType {
+
+    // TODO: Figure out if @JsonProperty, @JsonAlias, @JsonValue, and @Creator are needed
+
     /** Signifies that the MDLC client created the model */
-    @JsonProperty("mdlc")
     @EnumValue("0")
     MDLC("mdlc"),
     /** Signifies that the ADLC client created the model */
-    @JsonProperty("adlc")
     @EnumValue("1")
     ADLC("adlc");
 
@@ -33,7 +33,6 @@ public enum ClientType {
      *
      * @return
      */
-    // @JsonValue
     public String getName() {
         return name;
     }
@@ -44,7 +43,7 @@ public enum ClientType {
      * @param name String name of the client type
      */
     ClientType(String name) {
-        this.name = name;
+        this.name = name.toLowerCase();
         if (name == "mdlc") {
             id = 0;
         } else {

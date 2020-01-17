@@ -123,7 +123,7 @@ abstract class TargetController<T : Target> {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Don't pass creator for updates")
         }
 
-        val isTSIdUpdated = t.thumbnailTSId != other.thumbnailTSId
+        val isTSIdUpdated = t.getthumbnail_tsid() != other.getthumbnail_tsid()
 
         t.updateFromTarget(other)
         if (other.geotag !== null) {
@@ -136,7 +136,7 @@ abstract class TargetController<T : Target> {
         // TODO: Add client code
         // if (PlayConfig.CUAIR_INTEROP_REQUESTS) {
         //     if (isTSIdUpdated) {
-        //         interopClient.updateTargetImage(targetSightingDao.get(t.thumbnailTSId))
+        //         interopClient.updateTargetImage(targetSightingDao.get(t.thumbnail_tsid))
         //     }
         //     interopClient.updateTarget(getTargetDao().get(t.id))
         // }

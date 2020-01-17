@@ -26,6 +26,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.Enumeration;
+
 /** Controller to handle Alphanumeric Target sightings model objects */
 @CrossOrigin
 @RestController
@@ -121,24 +124,8 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
      */
     // TODO: Figure out if this is necessary
     // @ValidateJson(AlphanumTargetSighting.class)
-    // TODO: Change this route on the frontend
     @RequestMapping(value = "/assignment/{id}", method = RequestMethod.POST)
-    public ResponseEntity create(@PathVariable Long id, @RequestBody HttpEntity<String> httpEntity) {
-        String jsonString = httpEntity.getBody();
-        JsonNode json = null;
-        try {
-            json = mapper.readTree(jsonString);
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e);
-        }
-
-        AlphanumTargetSighting ts = null;
-        try {
-            ts = mapper.treeToValue(json, AlphanumTargetSighting.class);
-        } catch (JsonProcessingException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when convert json to AlphanumTargetSighting instance: \n" + e);
-        }
-
+    public ResponseEntity create(@PathVariable Long id, @RequestBody AlphanumTargetSighting ts) {
         if (ts.isOffaxis() != null && ts.isOffaxis()) {
             if (ts.getTarget() != null)
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Don't pass targets for off-axis sighting creates");
@@ -155,7 +142,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
                 // Sets new target thumbnail
                 if (ts.getTarget() != null) {
                     AlphanumTarget t = alphaTargetDao.get(ts.getTarget().getId());
-                    t.setThumbnailTSId(ts.getId());
+                    t.setthumbnail_tsid(ts.getId());
                     alphaTargetDao.update(t);
                     // TODO: Implement flags (used to be PlayConfig.CUAIR_INTEROP_REQUESTS)
                     if (false) {
@@ -214,7 +201,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
             ts.getTarget() != null
                 && (other.getTarget() == null
                     || !ts.getTarget().getId().equals(other.getTarget().getId()))
-                && ts.getTarget().getThumbnailTSId().equals(ts.getId());
+                && ts.getTarget().getthumbnail_tsid().equals(ts.getId());
         AlphanumTarget tToEraseFrom = ts.getTarget();
         // checks whether new thumb for new target should be updated
         boolean updateNewThumb =
@@ -228,20 +215,20 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
             if (toEraseThumb) {
                 if (ts.getCreator() == ClientType.MDLC) {
                     // If MDLC, set thumb for original target to default value
-                    tToEraseFrom.setThumbnailTSId(0L);
+                    tToEraseFrom.setthumbnail_tsid(0L);
                     // TODO (mariasam1): delete thumbnail through interop
                 } else {
                     // If ADLC, set thumb for original target to most recent ts (or default if none)
                     AlphanumTargetSighting newThumb = alphaDao.getLastSightingForTarget(tToEraseFrom.getId());
                     if (newThumb != null) {
                         newThumb.setTarget(tToEraseFrom);
-                        tToEraseFrom.setThumbnailTSId(newThumb.getId());
+                        tToEraseFrom.setthumbnail_tsid(newThumb.getId());
                         // TODO: Implement flags (used to be PlayConfig.CUAIR_INTEROP_REQUESTS)
                         if (false) {
                             // interopClient.updateTargetImage(newThumb);
                         }
                     } else {
-                        tToEraseFrom.setThumbnailTSId(0L);
+                        tToEraseFrom.setthumbnail_tsid(0L);
                         // TODO (mariasam1): delete thumbnail through interop
                     }
                 }
@@ -255,7 +242,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
                 // Sets new thumbnail for updated target
                 if (updateNewThumb) {
                     AlphanumTarget t = alphaTargetDao.get(ts.getTarget().getId());
-                    t.setThumbnailTSId(ts.getId());
+                    t.setthumbnail_tsid(ts.getId());
                     alphaTargetDao.update(t);
                     // TODO: Implement flags (used to be PlayConfig.CUAIR_INTEROP_REQUESTS)
                     if (false) {
@@ -283,22 +270,22 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
 
         final ResponseEntity retval = super.delete(ts);
 
-        if (ts.getTarget() != null && ts.getTarget().getThumbnailTSId().equals(id)) {
+        if (ts.getTarget() != null && ts.getTarget().getthumbnail_tsid().equals(id)) {
             if (ts.getCreator() == ClientType.MDLC) {
                 // If MDLC, set thumb for original target to default value
-                ts.getTarget().setThumbnailTSId(0L);
+                ts.getTarget().setthumbnail_tsid(0L);
                 // TODO (mariasam1): delete thumbnail through interop
             } else {
                 // If ADLC, set thumb for original target to most recent ts (or default if none)
                 AlphanumTargetSighting newThumb = alphaDao.getLastSightingForTarget(ts.getTarget().getId());
                 if (newThumb != null) {
-                    ts.getTarget().setThumbnailTSId(newThumb.getId());
+                    ts.getTarget().setthumbnail_tsid(newThumb.getId());
                     // TODO: Implement flags (used to be PlayConfig.CUAIR_INTEROP_REQUESTS)
                     if (false) {
                         // interopClient.updateTargetImage(newThumb);
                     }
                 } else {
-                    ts.getTarget().setThumbnailTSId(0L);
+                    ts.getTarget().setthumbnail_tsid(0L);
                 }
             }
             alphaTargetDao.update(ts.getTarget());

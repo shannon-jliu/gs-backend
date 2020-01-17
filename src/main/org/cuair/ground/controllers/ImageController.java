@@ -112,21 +112,21 @@ public class ImageController {
     @RequestMapping(value = "/file/{file}", method = RequestMethod.GET)
     public ResponseEntity getFile(@PathVariable String file) {
         // TODO: Is this necessary? It will be caught in exception FileNotFoundException below
-        File image = FileUtils.getFile(PLANE_IMAGE_BACKUP_DIR + file);
+        File image = FileUtils.getFile(PLANE_IMAGE_DIR + file);
         if (image.exists()) {
             HttpHeaders headers = new HttpHeaders();
             InputStream in = null;
             try {
-                in = new FileInputStream(PLANE_IMAGE_BACKUP_DIR + file);
+                in = new FileInputStream(PLANE_IMAGE_DIR + file);
             } catch (FileNotFoundException e) {
-                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File not found: " + PLANE_IMAGE_BACKUP_DIR + file);
+                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File not found: " + PLANE_IMAGE_DIR + file);
             }
 
             byte[] media = null;
             try {
                 media = IOUtils.toByteArray(in);
             } catch (IOException e) {
-                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error reading file: " + PLANE_IMAGE_BACKUP_DIR + file);
+                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error reading file: " + PLANE_IMAGE_DIR + file);
             }
             headers.setCacheControl(CacheControl.noCache().getHeaderValue());
 
@@ -316,11 +316,11 @@ public class ImageController {
         }
         String imageExtension = contentType.split("\\/")[1];
         imageFileName += "." + imageExtension;
-        i.setLocalImageUrl(PLANE_IMAGE_BACKUP_DIR + imageFileName);
+        i.setLocalImageUrl(PLANE_IMAGE_DIR + imageFileName);
 
         // store the image locally
         try {
-            FileUtils.moveFile(imageFile, FileUtils.getFile(PLANE_IMAGE_BACKUP_DIR + imageFileName));
+            FileUtils.moveFile(imageFile, FileUtils.getFile(PLANE_IMAGE_DIR + imageFileName));
         } catch (FileExistsException e) {
             return CompletableFuture.completedFuture(
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File with timestamp already exists")
