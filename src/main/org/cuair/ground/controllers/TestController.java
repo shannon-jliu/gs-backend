@@ -12,6 +12,7 @@ public class TestController {
 
     @RequestMapping(value = "/")
     public String index() {
+      System.out.println(CUAIR_PLANE_CAMERA_GIMBAL);
       return "test";
     }
 
