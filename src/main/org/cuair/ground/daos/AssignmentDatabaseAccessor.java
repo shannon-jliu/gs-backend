@@ -82,7 +82,6 @@ public class AssignmentDatabaseAccessor extends TimestampDatabaseAccessor<Assign
     public Assignment getAssignment(String querySql, ClientType clientType, String username) {
         SqlQuery query = Ebean.createSqlQuery(querySql);
         List<SqlRow> result = query.findList();
-        logger.info("result size: " + result.size());
         if (result.size() > 0) {
             Image image = imageDao.get(result.get(0).getLong("id"));
             Assignment a = new Assignment(image, clientType, username);

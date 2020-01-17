@@ -40,7 +40,10 @@ public class AuthController {
         AuthToken confirmationToken = AuthUtil.Companion.getToken(headers);
 
         if (confirmationToken != null) {
-            return ResponseEntity.ok(confirmationToken.getToken());
+            if (confirmationToken.getAdmin()) {
+                return ResponseEntity.ok("admin");
+            }
+            return ResponseEntity.ok("");
         }
 
         // TODO: Fix admin/logging in if already have auth token

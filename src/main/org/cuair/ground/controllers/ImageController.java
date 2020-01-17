@@ -48,25 +48,23 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import org.springframework.http.CacheControl;
 
-import org.cuair.ground.util.Flags;
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.*;
 
 /** Contains all the callbacks for all the public api endpoints for the Image  */
 @CrossOrigin
 @RestController
 @RequestMapping(value = "/image")
-@EnableConfigurationProperties(Flags.class)
 public class ImageController {
     /** Database accessor object for image database */
     private TimestampDatabaseAccessor imageDao = (TimestampDatabaseAccessor) DAOFactory.getDAO(DAOFactory.ModelDAOType.TIMESTAMP_DATABASE_ACCESSOR, Image.class);
 
     /** String path to the folder where all the images are stored  */
-    private String imgDirectory = Flags.CUAIR_PLANE_CAMERA_GIMBAL_KEK;
+    private String PLANE_IMAGE_BACKUP_DIR = "images/";
 
-    // String imgDirectory = null;
+    @Value("${plane.image.dir}") private String kek;
 
-    private String PLANE_IMAGE_BACKUP_DIR = Flags.PLANE_IMAGE_BACKUP_DIR;
+    private String PLANE_IMAGE_BACKUP_DIR = "images/backups/";
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -80,6 +78,7 @@ public class ImageController {
      */
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<Image>> getAll() {
+        logger.info(kek);
         return ResponseEntity.ok(imageDao.getAll());
     }
 
@@ -114,23 +113,23 @@ public class ImageController {
      */
     @RequestMapping(value = "/file/{file}", method = RequestMethod.GET)
     public ResponseEntity getFile(@PathVariable String file) {
-        logger.info(imgDirectory);
+        // logger.info(PLANE_IMAGE_BACKUP_DIR);
         // TODO: Is this necessary? It will be caught in exception FileNotFoundException below
-        File image = FileUtils.getFile(imgDirectory + file);
+        File image = FileUtils.getFile(PLANE_IMAGE_BACKUP_DIR + file);
         if (image.exists()) {
             HttpHeaders headers = new HttpHeaders();
             InputStream in = null;
             try {
-                in = new FileInputStream(imgDirectory + file);
+                in = new FileInputStream(PLANE_IMAGE_BACKUP_DIR + file);
             } catch (FileNotFoundException e) {
-                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File not found: " + imgDirectory + file);
+                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File not found: " + PLANE_IMAGE_BACKUP_DIR + file);
             }
 
             byte[] media = null;
             try {
                 media = IOUtils.toByteArray(in);
             } catch (IOException e) {
-                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error reading file: " + imgDirectory + file);
+                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error reading file: " + PLANE_IMAGE_BACKUP_DIR + file);
             }
             headers.setCacheControl(CacheControl.noCache().getHeaderValue());
 
@@ -253,10 +252,7 @@ public class ImageController {
     // public CompletableFuture<ResponseEntity> create(@PathVariable MultipartFile[] files, @PathVariable String jsonString) {
     public CompletableFuture<ResponseEntity> create(MultipartHttpServletRequest request) {
         Map<String, String[]> formData = request.getParameterMap();
-        logger.info("A;LSDKFJ;ASDKFJA;SLDKFJAS;LDFJKASL;DKFJ");
-        logger.info(formData.get("jsonString")[0]);
         String jsonString = formData.get("jsonString")[0];
-        // MultipartFile[] files = (MultipartFile[]) formData.get("files");
         MultipartFile[] files = {request.getFile("files")};
         // check if request is valid
         CompletableFuture<ResponseEntity> validate = validateRequestBody(files, jsonString, true);
@@ -323,11 +319,11 @@ public class ImageController {
         }
         String imageExtension = contentType.split("\\/")[1];
         imageFileName += "." + imageExtension;
-        i.setLocalImageUrl(imgDirectory + imageFileName);
+        i.setLocalImageUrl(PLANE_IMAGE_BACKUP_DIR + imageFileName);
 
         // store the image locally
         try {
-            FileUtils.moveFile(imageFile, FileUtils.getFile(imgDirectory + imageFileName));
+            FileUtils.moveFile(imageFile, FileUtils.getFile(PLANE_IMAGE_BACKUP_DIR + imageFileName));
         } catch (FileExistsException e) {
             return CompletableFuture.completedFuture(
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File with timestamp already exists")

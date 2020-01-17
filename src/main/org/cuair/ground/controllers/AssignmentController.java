@@ -97,8 +97,6 @@ public class AssignmentController {
             AuthToken token = AuthUtil.Companion.getToken(headers);
 
             if (token != null) {
-                logger.info("they are getting the user's assignments lmao pls");
-                logger.info("there are " + assignmentDao.getAllForUser(token.getUsername()).size() + " assignments for the user");
                 return ResponseEntity.ok(assignmentDao.getAllForUser(token.getUsername()));
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid username!");
