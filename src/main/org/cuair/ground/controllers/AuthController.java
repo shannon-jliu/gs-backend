@@ -21,11 +21,19 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.beans.factory.annotation.Value;
+
 /** API callbacks to handle authenticating with the ground server */
 @CrossOrigin
 @RestController
 @RequestMapping(value = "/auth")
 public class AuthController {
+
+    @Value("${cuair.auth.user_password_hash}") private String CUAIR_AUTH_USER_PASSWORD_HASH;
+    @Value("${cuair.auth.admin_password_hash}") private String CUAIR_AUTH_ADMIN_PASSWORD_HASH;
+    @Value("${cuair.auth.overwritable_usernames}") private List<String> CUAIR_AUTH_OVERWRITABLE_USERNAMES;
+    @Value("${cuair.auth.camera_password_hash}") private String CUAIR_AUTH_CAMERA_PASSWORD_HASH;
+    @Value("${cuair.auth.judges_password_hash}") private String CUAIR_AUTH_JUDGES_PASSWORD_HASH;
 
     /** A logger */
     private static final Logger logger = LoggerFactory.getLogger(AssignmentController.class);
@@ -64,14 +72,37 @@ public class AuthController {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Only one value should be in the \"Username\" header");
                 }
 
+                boolean reserved = CUAIR_AUTH_OVERWRITABLE_USERNAMES.contains(username.get(0));
+
                 String confirmationTokenUsername = (confirmationToken != null) ? confirmationToken.getUsername() : null;
 
-                if (AuthUtil.Companion.userExists(username.get(0)) && confirmationTokenUsername != username.get(0)) {
+                if (AuthUtil.Companion.userExists(username.get(0)) && confirmationTokenUsername != username.get(0) && !reserved) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username is already taken");
                 }
 
-                // TODO: Implement hash checking
-                return ResponseEntity.ok(AuthUtil.Companion.createToken(username.get(0), true));
+                String hash = AuthUtil.Companion.hashPassword(password.get(0));
+                if (hash == CUAIR_AUTH_USER_PASSWORD_HASH) {
+                    if (reserved) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username is reserved");
+                    }
+                    return ResponseEntity.ok(AuthUtil.Companion.createToken(username.get(0), false));
+                } else if (hash == CUAIR_AUTH_ADMIN_PASSWORD_HASH) {
+                    if (reserved) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username is reserved");
+                    }
+                    return ResponseEntity.ok(AuthUtil.Companion.createToken(username.get(0), true));
+                } else if (hash == CUAIR_AUTH_CAMERA_PASSWORD_HASH) {
+                    if (username.get(0) != "Camera") {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username should be \"Camera\"");
+                    }
+                    return ResponseEntity.ok(AuthUtil.Companion.createToken(username.get(0), true));
+                } else if (hash == CUAIR_AUTH_JUDGES_PASSWORD_HASH) {
+                    if (username.get(0) != "JudgesView") {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username should be \"JudgesView\"");
+                    }
+                    return ResponseEntity.ok(AuthUtil.Companion.createToken(username.get(0), true));
+                }
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid password");
             } else {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Missing \"Username\" header");
             }

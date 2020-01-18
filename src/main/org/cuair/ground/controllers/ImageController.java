@@ -49,7 +49,6 @@ import java.io.InputStream;
 import org.springframework.http.CacheControl;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.*;
 
 /** Contains all the callbacks for all the public api endpoints for the Image  */
 @CrossOrigin
