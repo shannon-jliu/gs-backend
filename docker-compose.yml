@@ -7,16 +7,15 @@ services:
             - 5432
         container_name: postgres_db
         volumes:
-            - ./pgdata:/var/lib/postgresql/data
+            - ./pgdata/storage:/var/lib/postgresql/
             - ./pg-docker-script:/docker-entrypoint-initdb.d
         restart: always
         environment:
-            POSTGRES_USER: postgres
-            POSTGRES_MULTIPLE_DATABASES: groundserver,groundservertest
+            POSTGRES_MULTIPLE_DATABASES: gsbackend,gsbackendtest
             POSTGRES_PASSWORD: admin
-  
-    groundserver:
-        image: groundserver:latest
+
+    gsbackend:
+        image: gsbackend:latest
         build:
             context: .
         working_dir: "/home/gs-backend"
