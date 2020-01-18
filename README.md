@@ -74,9 +74,16 @@ Native solutions are no longer being maintained. Using Docker to run the backend
       * `createuser --createdb --pwprompt --superuser --createrole postgres`
   - Enter the Postgres terminal
       * `psql -U postgres`
-  - Create the database
+  - Create the main database
       * ```
         CREATE DATABASE groundserver
+        WITH ENCODING='UTF8'
+        OWNER=postgres
+        CONNECTION LIMIT=-1;
+        ```
+  - Create the test database
+      * ```
+        CREATE DATABASE groundservertest
         WITH ENCODING='UTF8'
         OWNER=postgres
         CONNECTION LIMIT=-1;
