@@ -22,8 +22,8 @@ public class EmergentTargetSighting extends TargetSighting {
     /** @param description description of the emergent target sighting */
     public EmergentTargetSighting(
             ClientType creator,
-            Integer pixelX,
-            Integer pixelY,
+            Integer pixel_x,
+            Integer pixel_y,
             Integer width,
             Integer height,
             Geotag geotag,
@@ -35,8 +35,8 @@ public class EmergentTargetSighting extends TargetSighting {
             Assignment assignment) {
         super(
             creator,
-            pixelX,
-            pixelY,
+            pixel_x,
+            pixel_y,
             width,
             height,
             geotag,
