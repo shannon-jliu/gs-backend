@@ -81,10 +81,9 @@ abstract class TargetController<T : Target> {
      * @param t T target to be created
      * @return the created Target as JSON
      */
-    fun create(t: T): ResponseEntity<Any> {
+    open fun create(t: T): ResponseEntity<Any> {
         if (t.id != null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Don't pass ids for creates")
         if (t.creator == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Create request should have creator");
-
         getTargetDao().create(t)
         // TODO: Add interop code
         // if (PlayConfig.CUAIR_INTEROP_REQUESTS) {

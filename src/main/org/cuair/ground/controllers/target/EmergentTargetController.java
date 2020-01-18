@@ -72,22 +72,7 @@ public class EmergentTargetController extends TargetController<EmergentTarget> {
     // TODO: Figure out if this is necessary
     // @ValidateJson(EmergentTarget::class)
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity create(@RequestBody HttpEntity<String> httpEntity) {
-        String jsonString = httpEntity.getBody();
-        JsonNode json = null;
-        try {
-            json = mapper.readTree(jsonString);
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e);
-        }
-
-        EmergentTarget t = null;
-        try {
-            t = mapper.treeToValue(json, EmergentTarget.class);
-        } catch (JsonProcessingException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when convert json to EmergentTarget instance: \n" + e);
-        }
-
+    public ResponseEntity create(@RequestBody EmergentTarget t) {
         return super.create(t);
     }
 
@@ -100,25 +85,10 @@ public class EmergentTargetController extends TargetController<EmergentTarget> {
     // @ValidateJson(EmergentTarget::class)
     // TODO: Figure out if this is necessary
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public ResponseEntity update(@PathVariable Long id, @RequestBody HttpEntity<String> httpEntity) {
+    public ResponseEntity update(@PathVariable Long id, @RequestBody EmergentTarget other) {
         EmergentTarget t = targetDao.get(id);
         if (t == null) {
             return ResponseEntity.noContent().build();
-        }
-
-        String jsonString = httpEntity.getBody();
-        JsonNode json = null;
-        try {
-            json = mapper.readTree(jsonString);
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e);
-        }
-
-        EmergentTarget other = null;
-        try {
-            other = mapper.treeToValue(json, EmergentTarget.class);
-        } catch (JsonProcessingException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when convert json to EmergentTarget instance: \n" + e);
         }
 
         return super.update(id, t, other);

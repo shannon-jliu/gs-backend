@@ -81,22 +81,7 @@ public class AlphanumTargetController extends TargetController<AlphanumTarget> {
     // TODO: Figure out if this is necessary
     // @ValidateJson(AlphanumTarget.class)
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity create(@RequestBody HttpEntity<String> httpEntity) {
-        String jsonString = httpEntity.getBody();
-        JsonNode json = null;
-        try {
-            json = mapper.readTree(jsonString);
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e);
-        }
-
-        AlphanumTarget t = null;
-        try {
-            t = mapper.treeToValue(json, AlphanumTarget.class);
-        } catch (JsonProcessingException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when convert json to AlphanumTarget instance: \n" + e);
-        }
-
+    public ResponseEntity create(@RequestBody AlphanumTarget t) {
         // TODO: Figure out why these off-axis-related lines of code are here
         if (t.isOffaxis() != null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Don't pass offaxis for target creates");
@@ -114,25 +99,10 @@ public class AlphanumTargetController extends TargetController<AlphanumTarget> {
     // TODO: Figure out if this is necessary
     // @ValidateJson(AlphanumTarget.class)
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public ResponseEntity update(@PathVariable Long id, @RequestBody HttpEntity<String> httpEntity) {
+    public ResponseEntity update(@PathVariable Long id, @RequestBody AlphanumTarget other) {
         AlphanumTarget t = targetDao.get(id);
         if (t == null) {
             return ResponseEntity.noContent().build();
-        }
-
-        String jsonString = httpEntity.getBody();
-        JsonNode json = null;
-        try {
-            json = mapper.readTree(jsonString);
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e);
-        }
-
-        AlphanumTarget other = null;
-        try {
-            other = mapper.treeToValue(json, AlphanumTarget.class);
-        } catch (JsonProcessingException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when convert json to AlphanumTarget instance: \n" + e);
         }
 
         // TODO: Figure out why these off-axis-related lines of code are here

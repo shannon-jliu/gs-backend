@@ -246,7 +246,6 @@ public class ImageController {
      * @return an HTTP response
      */
     @RequestMapping(method = RequestMethod.POST)
-    // public CompletableFuture<ResponseEntity> create(@PathVariable MultipartFile[] files, @PathVariable String jsonString) {
     public CompletableFuture<ResponseEntity> create(MultipartHttpServletRequest request) {
         Map<String, String[]> formData = request.getParameterMap();
         String jsonString = formData.get("jsonString")[0];
@@ -363,8 +362,11 @@ public class ImageController {
      * @return an HTTP response
      */
     @RequestMapping(value = "/dummy", method = RequestMethod.POST)
-    public ResponseEntity dummyCreate(@PathVariable("files") MultipartFile[] files, @RequestBody HttpEntity<String> httpEntity) {
-        String jsonString = httpEntity.getBody();
+    public ResponseEntity dummyCreate (MultipartHttpServletRequest request) {
+        Map<String, String[]> formData = request.getParameterMap();
+        String jsonString = formData.get("jsonString")[0];
+        MultipartFile[] files = {request.getFile("files")};
+
         ObjectNode json = null;
         try {
             json = getJSON(jsonString);

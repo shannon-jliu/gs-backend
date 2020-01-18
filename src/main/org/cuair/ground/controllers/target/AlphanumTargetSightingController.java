@@ -163,25 +163,10 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
     // TODO: Figure out if this is necessary
     // @ValidateJson(AlphanumTargetSighting.class)
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public ResponseEntity update(@PathVariable Long id, @RequestBody HttpEntity<String> httpEntity) {
+    public ResponseEntity update(@PathVariable Long id, @RequestBody AlphanumTargetSighting other) {
         AlphanumTargetSighting ts = alphaDao.get(id);
         if (ts == null) {
             return ResponseEntity.noContent().build();
-        }
-
-        String jsonString = httpEntity.getBody();
-        JsonNode json = null;
-        try {
-            json = mapper.readTree(jsonString);
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e);
-        }
-
-        AlphanumTargetSighting other = null;
-        try {
-            other = mapper.treeToValue(json, AlphanumTargetSighting.class);
-        } catch (JsonProcessingException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when convert json to AlphanumTargetSighting instance: \n" + e);
         }
 
         // checks if the target is offaxis or updated to offaxis and if a target is set

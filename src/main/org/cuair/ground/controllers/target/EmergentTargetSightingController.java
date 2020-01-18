@@ -93,23 +93,7 @@ public class EmergentTargetSightingController extends TargetSightingController<E
     // TODO: Figure out if this is necessary
     // @ValidateJson(EmergentTargetSighting.class)
     @RequestMapping(value = "/assignment/{id}", method = RequestMethod.POST)
-    public ResponseEntity create(@PathVariable Long id, @RequestBody HttpEntity<String> httpEntity) {
-        String jsonString = httpEntity.getBody();
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode json = null;
-        try {
-            json = mapper.readTree(jsonString);
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e);
-        }
-
-        EmergentTargetSighting ts = null;
-        try {
-            ts = mapper.treeToValue(json, EmergentTargetSighting.class);
-        } catch (JsonProcessingException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when convert json to EmergentTargetSighting instance: \n" + e);
-        }
-
+    public ResponseEntity create(@PathVariable Long id, @RequestBody EmergentTargetSighting ts) {
         EmergentTarget t = eTargetDao.getAll().get(0);
         if (ts.getCreator() != ClientType.MDLC) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Only MDLC should be creating Emergent Target Sightings");
@@ -127,23 +111,7 @@ public class EmergentTargetSightingController extends TargetSightingController<E
     // TODO: Figure out if this is necessary
     // @ValidateJson(EmergentTargetSighting.class)
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public ResponseEntity update(@PathVariable Long id, @RequestBody HttpEntity<String> httpEntity) {
-        String jsonString = httpEntity.getBody();
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode json = null;
-        try {
-            json = mapper.readTree(jsonString);
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e);
-        }
-
-        EmergentTargetSighting other = null;
-        try {
-            other = mapper.treeToValue(json, EmergentTargetSighting.class);
-        } catch (JsonProcessingException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when convert json to EmergentTargetSighting instance: \n" + e);
-        }
-
+    public ResponseEntity update(@PathVariable Long id, @RequestBody EmergentTargetSighting other) {
         if (other.getTarget() != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Don't pass targets for emergent target sighting update");
         }

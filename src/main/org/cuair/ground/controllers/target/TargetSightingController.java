@@ -124,7 +124,7 @@ public abstract class TargetSightingController<T extends TargetSighting> {
      * @param id Long id of target sighting
      * @return HTTP response with json of updated target sighting
      */
-    public abstract ResponseEntity update(Long id, HttpEntity<String> httpEntity);
+    public abstract ResponseEntity update(Long id, T other);
 
     /**
      * Constructs an HTTP response after updating a target sighting given an updated target sighting
