@@ -43,6 +43,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
+import org.springframework.beans.factory.annotation.Value;
+
 /** API callbacks to handle creation/retrieval of Assignment model objects */
 @CrossOrigin
 @RestController
@@ -129,17 +131,15 @@ public class AssignmentController {
         }
     }
 
-
-    // TODO: Implement flags
     /** The flag to behave as if auth is enabled */
     // TODO: Figure out "final": It was taken away to be able to change the value of the field for testing
-    private static Boolean AUTH_ENABLED = true;
+    @Value("${cuair.auth.enabled}") private static boolean AUTH_ENABLED;
 
     /** A logger */
     private static final Logger logger = LoggerFactory.getLogger(AssignmentController.class);
 
     /** Default username if auth disabled */
-    private static String DEFAULT_USER = "High Ground";
+    @Value("${cuair.auth.default_username}") private static String DEFAULT_USER;
 
     private ObjectMapper mapper = new ObjectMapper();
 

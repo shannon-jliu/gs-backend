@@ -7,6 +7,7 @@ import org.mindrot.jbcrypt.BCrypt
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
 import org.springframework.http.HttpHeaders
+import org.springframework.beans.factory.annotation.Value
 
 /** Utilities for accessing authentication information from requests */
 class AuthUtil {
