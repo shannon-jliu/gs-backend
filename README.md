@@ -46,6 +46,27 @@ This assumes you already have some version of Java installed.
 1. To install `pre-commit`, run
   - `pip install pre-commit`
   - `pre-commit install` to run `pre-commit` hooks to ensure your commits are nice
+2. Run `./setup` in order to create the dependencies.
+
+## DISCLAIMER
+Native solutions are no longer being maintained. Using Docker to run the backend is highly recommended. If you must run/develop the backend natively, instructions are provided later on in the README.
+
+## Docker
+1. Ensure that the following four files have the following four lines changed to below:
+  - `application.properties`
+      * `spring.datasource.url=jdbc:postgresql://db:5432/groundserver`
+  - `ebean.properties`
+      * `datasource.db.databaseUrl=jdbc:postgresql://db:5432/groundserver`
+  - `test-application.properties`
+      * `spring.datasource.url=jdbc:postgresql://db:5432/groundservertest`
+  - `test-ebean.properties`
+      * `datasource.db.databaseUrl=jdbc:postgresql://db:5432/groundservertest`
+2. If you have never built the ground server image before, or if you have changed the Dockerfile, from the root directory of the project run
+  - `docker-compose build`
+3. To create a Docker container, then from the root directory of the project run
+  -  `docker-compose up`
+
+## Setup (Native)
 1. Setup the database
   - Begin the postgres server:
       * `postgres -D <path-to-postgres-installation>`
@@ -60,9 +81,18 @@ This assumes you already have some version of Java installed.
         OWNER=postgres
         CONNECTION LIMIT=-1;
         ```
-1. Run `./setup` in order to create the dependencies.
 
-## Running
+## Running (Native)
+Ensure that the following four files have the following four lines changed to below:
+  - `application.properties`
+      * `spring.datasource.url=jdbc:postgresql:groundserver`
+  - `ebean.properties`
+      * `datasource.db.databaseUrl=jdbc:postgresql:groundserver`
+  - `test-application.properties`
+      * `spring.datasource.url=jdbc:postgresql:groundservertest`
+  - `test-ebean.properties`
+      * `datasource.db.databaseUrl=jdbc:postgresql:groundservertest`
+
 Then run `./run` in order to start up the server on port `9000`!
 
 ## Development guide

@@ -1,5 +1,0 @@
-ebean:
-  test:
-    platform: postgres
-    ddlMode: dropCreate
-    dbName: groundservertest

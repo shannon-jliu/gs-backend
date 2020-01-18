@@ -1,0 +1,28 @@
+version: '3.3'
+
+services:
+    db:
+        image: postgres:latest
+        expose:
+            - 5432
+        container_name: postgres_db
+        volumes:
+            - ./pgdata/storage:/var/lib/postgresql/
+            - ./pg-docker-script:/docker-entrypoint-initdb.d
+        restart: always
+        environment:
+            POSTGRES_MULTIPLE_DATABASES: gsbackend,gsbackendtest
+            POSTGRES_PASSWORD: admin
+
+    gsbackend:
+        image: gsbackend:latest
+        build:
+            context: .
+        working_dir: "/home/gs-backend"
+        depends_on:
+            - db
+        volumes:
+            - ./:/home/gs-backend
+        ports:
+            - 9000:9000
+        restart: always
