@@ -43,12 +43,11 @@ public class Lifecycle {
 		// ClientFactory.initializeAutopilotClient(autopilotClient);
 		// ClientFactory.initializeCGSClient(cameraGimbalClient);
 		RequestsHelper.meep();
-		System.out.println("here before");
 		try {
-			ClientFactory.initializeInteropClient(interopClient);
+			//ClientFactory.initializeInteropClient(interopClient);
 
 			//findUser();
-			System.out.println("fdfdsafsd");
+			//System.out.println("fdfdsafsd");
 		} catch (Exception e) {
 
 			System.out.println("exception");
