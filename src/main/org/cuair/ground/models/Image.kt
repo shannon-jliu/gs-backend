@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.ebean.annotation.EnumValue
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty
 
 /** Represents an image and its corresponding metadata as sent down from the plane */
 @Entity
@@ -37,8 +37,6 @@ class Image(
 
     /** The possible image modes: fixed, tracking, and off-axis */
     enum class ImgMode (val mode: String) {
-        // @EnumValue("retract") FIXED("retract"),
-        // @JsonValue @EnumValue("retract") FIXED("retract"),
         @JsonProperty("retract") @EnumValue("0") FIXED("retract"),
         @JsonProperty("tracking") @EnumValue("1") TRACKING("tracking"),
         @JsonProperty("off-axis") @EnumValue("2") OFFAXIS("off-axis")
@@ -55,14 +53,16 @@ class Image(
         val imageGPS = imageTelemetry.getGps()
         val centerLatitude = imageGPS?.getLatitude()
         val centerLongitude = imageGPS?.getLongitude()
-        val planeYaw = imageTelemetry.getPlaneYaw()?.times(Math.PI/180)
+        val planeYawRadians = imageTelemetry.getPlaneYaw()?.times(Math.PI/180)
         val altitude = imageTelemetry.getAltitude()
 
         // TOOD: !! vs ?. --> And should this be done in the declarations above?
-        val topLeft = Geotag.getPixelCoordinates(centerLatitude!!, centerLongitude!!, altitude!!, 0.0, 0.0, planeYaw!!)
-        val topRight = Geotag.getPixelCoordinates(centerLatitude, centerLongitude, altitude, Geotag.IMAGE_WIDTH, 0.0, planeYaw)
-        val bottomLeft = Geotag.getPixelCoordinates(centerLatitude, centerLongitude, altitude, 0.0, Geotag.IMAGE_HEIGHT, planeYaw)
-        val bottomRight = Geotag.getPixelCoordinates(centerLatitude, centerLongitude, altitude, Geotag.IMAGE_WIDTH, Geotag.IMAGE_HEIGHT, planeYaw)
+        val topLeft = Geotag.getPixelCoordinates(centerLatitude!!, centerLongitude!!, altitude!!, 0.0, 0.0, planeYawRadians!!)
+        val topRight = Geotag.getPixelCoordinates(centerLatitude, centerLongitude, altitude, Geotag.IMAGE_WIDTH, 0.0, planeYawRadians)
+        val bottomLeft = Geotag.getPixelCoordinates(centerLatitude, centerLongitude, altitude, 0.0, Geotag.IMAGE_HEIGHT, planeYawRadians)
+        val bottomRight = Geotag.getPixelCoordinates(centerLatitude, centerLongitude, altitude, Geotag.IMAGE_WIDTH, Geotag.IMAGE_HEIGHT, planeYawRadians)
+        println("HELLO THERE")
+        println(topLeft.getLatitude())
 
         val mapper = ObjectMapper()
         val locs = mapper.createObjectNode() as ObjectNode
@@ -70,7 +70,7 @@ class Image(
         locs.put("topRight", mapper.writeValueAsString(topRight))
         locs.put("bottomLeft", mapper.writeValueAsString(bottomLeft))
         locs.put("bottomRight", mapper.writeValueAsString(bottomRight))
-        locs.put("orientation", mapper.writeValueAsString(planeYaw))
+        locs.put("orientation", mapper.writeValueAsString(planeYawRadians))
         locs.put("url", this.imageUrl)
         return locs
     }

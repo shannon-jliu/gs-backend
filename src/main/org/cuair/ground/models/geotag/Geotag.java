@@ -21,22 +21,29 @@ import org.cuair.ground.models.plane.target.EmergentTarget;
 import org.cuair.ground.models.plane.target.EmergentTargetSighting;
 import org.cuair.ground.models.plane.target.Target;
 import org.cuair.ground.models.plane.target.TargetSighting;
+import org.cuair.ground.models.exceptions.InvalidGpsLocationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 
 /** Represents the position and orientation of an object on the ground */
 @Entity
 public class Geotag extends CUAirModel {
 
+    // TODO: Fix this initialization issue to use the properties file properly
     /** Field of view of camera horizontally and vertically */
-    private static final double FOV_HORIZONTAL_RADIANS = 0.0;
+    // @Value("${cuair.geotag.fov_horizontal_radians}") private static double FOV_HORIZONTAL_RADIANS;
+    private static double FOV_HORIZONTAL_RADIANS = 0.7328394987;
 
-    private static final double FOV_VERTICAL_RADIANS = 0.0;
+    // @Value("${cuair.geotag.fov_vertical_radians}") private static double FOV_VERTICAL_RADIANS;
+    private static double FOV_VERTICAL_RADIANS = 0.560476881;
 
     /** Width of height and image in pixels */
-    public static final double IMAGE_WIDTH = 0.0;
+    // @Value("${cuair.geotag.image_width}") public static double IMAGE_WIDTH;
+    public static double IMAGE_WIDTH = 4912.0;
 
-    public static final double IMAGE_HEIGHT = 0.0;
+    // @Value("${cuair.geotag.image_height}") public static double IMAGE_HEIGHT;
+    public static double IMAGE_HEIGHT = 3684.0;
 
     /** A logger */
     private static final Logger logger = LoggerFactory.getLogger(GpsLocation.class);
@@ -182,11 +189,12 @@ public class Geotag extends CUAirModel {
 
         GpsLocation gps = null;
         // TODO: Fix this. For some reason when uncommented, it thinks there is an uncaught exception
-        // try {
-        //     gps = new GpsLocation(latitude_of_target_y, longitude_of_target_x);
-        // } catch (InvalidGpsLocationException e) {
-        //     logger.error(e.getMessage());
-        // }
+        try {
+            gps = new GpsLocation(latitude_of_target_y, longitude_of_target_x);
+        } catch (InvalidGpsLocationException e) {
+            logger.error(e.getMessage());
+        }
+        logger.error(Double.toString(FOV_HORIZONTAL_RADIANS));
         return gps;
     }
 

@@ -2,19 +2,22 @@ package org.cuair.ground.models.geotag
 
 import java.util.Objects
 import javax.persistence.Entity
+import javax.persistence.Embedded
 import javax.validation.constraints.NotNull
 import org.cuair.ground.models.CUAirModel
 
 /** Represents telemetry of an object
-    altitude is in meters 
+    altitude is in meters
     planeYaw is in degrees with 0 at north and increasing in the clockwise direction
     orientation will contain gimbal roll/pitch
     */
 @Entity
 class Telemetry(
+        @Embedded
         private var gps: GpsLocation?,
         private var altitude: Double?,
         private var planeYaw: Double?,
+        @Embedded
         private var orientation : GimbalOrientation?
 ) : CUAirModel() {
 
@@ -24,7 +27,7 @@ class Telemetry(
      * @return GpsLocation? The aerial position of this telemetry data
      */
     fun getGps(): GpsLocation? {
-        return gps;
+        return gps
     }
 
     /**
@@ -33,7 +36,7 @@ class Telemetry(
      * @return Double? The aerial position of this telemetry data
      */
     fun getAltitude(): Double? {
-        return altitude;
+        return altitude
     }
 
     /**
@@ -42,7 +45,7 @@ class Telemetry(
      * @return Double The heading of this telemetry data as radians from north
      */
     fun getPlaneYaw(): Double? {
-        return planeYaw;
+        return planeYaw
     }
 
     // TODO: Add the rest of the methods
