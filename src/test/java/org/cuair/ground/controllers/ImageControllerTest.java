@@ -220,7 +220,8 @@ public class ImageControllerTest {
         // make request
         // TODO: Figure out if there is a way to check for no content type set
         ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get("/image/1").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(equalTo("")));
 
         // clear database
         cleanDb();
@@ -270,23 +271,17 @@ public class ImageControllerTest {
     }
 
     /** Tests GET most recent call when no models are in table */
-    @Ignore
-    public void testGetRecentDoesntExist() {
+    @Test
+    public void testGetRecentDoesntExist() throws Exception {
         // make request
         // TODO: Figure out if there is a way to check for no content type set
         ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get("/image/recent").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(equalTo("")));
 
         // clear database
         cleanDb();
     }
-
-    // @Test
-    // public void getRecent() throws Exception {
-    //     mvc.perform(MockMvcRequestBuilders.get("/image/recent").accept(MediaType.APPLICATION_JSON))
-    //             .andExpect(status().isNoContent())
-    //             .andExpect(content().string(equalTo("")));
-    // }
 
     // @Test
     // public void get() throws Exception {
