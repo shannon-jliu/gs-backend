@@ -8,6 +8,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 import org.junit.Before;
+import org.junit.After;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -82,10 +83,10 @@ public class ImageControllerTest {
                 logger.error("Unable to create image directory: " + PLANE_IMAGE_DIR + "\n");
             }
         }
-
-        cleanDb();
     }
 
+    /** After each test, clean the database */
+    @After
     public void cleanDb() {
         List<Image> images = Ebean.find(Image.class).findList();
         Ebean.beginTransaction();
