@@ -116,39 +116,39 @@ public class ImageControllerTest {
     }
 
     /** Tests the GET all call for a database containing images */
-    // @Test
-    // public void testGetAll() throws Exception {
-    //     // instantiate models
-    //     List<Image> expected = new ArrayList<>();
+    @Test
+    public void testGetAll() throws Exception {
+        // instantiate models
+        List<Image> expected = new ArrayList<>();
 
-    //     Image i1 = new Image("/some/local/file/url", null, ImgMode.TRACKING);
-    //     i1.setTimestamp(new Timestamp(1234L));
-    //     imageDao.create(i1);
-    //     expected.add(i1);
+        Image i1 = new Image("/some/local/file/url", null, ImgMode.TRACKING);
+        i1.setTimestamp(new Timestamp(1234L));
+        imageDao.create(i1);
+        expected.add(i1);
 
-    //     Image i2 = new Image("/another/local/file/url", null, ImgMode.FIXED);
-    //     i2.setTimestamp(new Timestamp(2345L));
-    //     imageDao.create(i2);
-    //     expected.add(i2);
+        Image i2 = new Image("/another/local/file/url", null, ImgMode.FIXED);
+        i2.setTimestamp(new Timestamp(2345L));
+        imageDao.create(i2);
+        expected.add(i2);
 
-    //     // make request
-    //     ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get("/image").accept(MediaType.APPLICATION_JSON))
-    //             .andExpect(content().contentTypeCompatibleWith("application/json"))
-    //             .andExpect(status().isOk());
+        // make request
+        ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get("/image").accept(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith("application/json"))
+                .andExpect(status().isOk());
 
-    //     MvcResult result = resultActions.andReturn();
+        MvcResult result = resultActions.andReturn();
 
-    //     // deserialize result
-    //     List<Image> actual = null;
-    //     actual = new ObjectMapper().readValue(result.getResponse().getContentAsString(),
-    //                     TypeFactory.defaultInstance().constructCollectionType(List.class, Image.class));
+        // deserialize result
+        List<Image> actual = null;
+        actual = new ObjectMapper().readValue(result.getResponse().getContentAsString(),
+                        TypeFactory.defaultInstance().constructCollectionType(List.class, Image.class));
 
-    //     // tests
-    //     assertEquals(expected, actual);
+        // tests
+        assertEquals(expected, actual);
 
-    //     // clear database
-    //     cleanDb();
-    // }
+        // clear database
+        cleanDb();
+    }
 
     /** Tests that geotagging for four corners of an image works */
     @Test
@@ -331,6 +331,35 @@ public class ImageControllerTest {
                 .andExpect(content().string(equalTo("")));
 
         // clear database
+        cleanDb();
+    }
+
+    /** Tests POST call to validate its response */
+    @Test
+    public void testCreate() throws Exception {
+        InputStream is = new BufferedInputStream(new FileInputStream("src/test/java/org/cuair/ground/controllers/test_images/test_0.jpg"));
+        MockMultipartFile firstFile = new MockMultipartFile("files", "test_0.jpg", "image", is);
+
+        String timestamp = "100000000000006";
+        String imgMode = "retract";
+
+        ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
+                            .file(firstFile)
+                            .param("jsonString", "{\"timestamp\":"+timestamp+",\"imgMode\":\""+imgMode+"\"}")
+                        ).andExpect(status().isOk());
+        MvcResult result = resultAction.andReturn();
+
+        Image recent = (Image) controller.getRecent().getBody();
+        Long expectedId = recent.getId();
+
+        ResponseEntity asyncedResponseEntity = (ResponseEntity) result.getAsyncResult();
+        Image response = (Image) asyncedResponseEntity.getBody();
+
+        ObjectMapper mapper = new ObjectMapper();
+        String imageAsString = mapper.writeValueAsString(response);
+
+        assertEquals(recent, response);
+
         cleanDb();
     }
 
