@@ -361,7 +361,7 @@ public class ImageController {
      * @return an HTTP response
      */
     @RequestMapping(value = "/dummy", method = RequestMethod.POST)
-    public ResponseEntity dummyCreate (MultipartHttpServletRequest request) {
+    public ResponseEntity dummyCreate(MultipartHttpServletRequest request) {
         Map<String, String[]> formData = request.getParameterMap();
         String jsonString = formData.get("jsonString")[0];
         MultipartFile[] files = {request.getFile("files")};

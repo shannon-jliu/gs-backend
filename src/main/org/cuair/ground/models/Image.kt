@@ -61,8 +61,6 @@ class Image(
         val topRight = Geotag.getPixelCoordinates(centerLatitude, centerLongitude, altitude, Geotag.IMAGE_WIDTH, 0.0, planeYawRadians)
         val bottomLeft = Geotag.getPixelCoordinates(centerLatitude, centerLongitude, altitude, 0.0, Geotag.IMAGE_HEIGHT, planeYawRadians)
         val bottomRight = Geotag.getPixelCoordinates(centerLatitude, centerLongitude, altitude, Geotag.IMAGE_WIDTH, Geotag.IMAGE_HEIGHT, planeYawRadians)
-        println("HELLO THERE")
-        println(topLeft.getLatitude())
 
         val mapper = ObjectMapper()
         val locs = mapper.createObjectNode() as ObjectNode

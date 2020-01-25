@@ -48,6 +48,15 @@ class Telemetry(
         return planeYaw
     }
 
+    /**
+     * Gets the gimbal orientation of this telemetry data
+     *
+     * @return GimbalOrientation The gimbal orientation of this telemetry data
+     */
+    fun getOrientation(): GimbalOrientation? {
+        return orientation
+    }
+
     // TODO: Add the rest of the methods
 
     /**

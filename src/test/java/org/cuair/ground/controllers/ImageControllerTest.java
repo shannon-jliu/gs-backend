@@ -38,6 +38,7 @@ import org.cuair.ground.models.exceptions.InvalidGpsLocationException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 
 import io.ebean.Ebean;
 import org.apache.commons.io.FileUtils;
@@ -60,7 +61,6 @@ public class ImageControllerTest {
     @Value("${plane.image.dir}") private String PLANE_IMAGE_DIR;
 
     private TimestampDatabaseAccessor<Image> imageDao;
-    private DatabaseAccessor<Telemetry> telemetryDao;
 
     /** A logger */
     private static final Logger logger = LoggerFactory.getLogger(ImageController.class);
@@ -75,7 +75,6 @@ public class ImageControllerTest {
     @Before
     public void setup() {
         imageDao = (TimestampDatabaseAccessor) DAOFactory.getDAO(DAOFactory.ModelDAOType.TIMESTAMP_DATABASE_ACCESSOR, Image.class);
-        telemetryDao = (DatabaseAccessor) DAOFactory.getDAO(DAOFactory.ModelDAOType.DATABASE_ACCESSOR, Telemetry.class);
 
         File imgDir = new File(PLANE_IMAGE_DIR);
         if (!imgDir.exists()) {
@@ -84,24 +83,6 @@ public class ImageControllerTest {
             }
         }
     }
-
-    // TODO: Implement client code
-    // @After
-    // public void clearQueue() {
-    //     try {
-    //         Field field = ImageClient.class.getDeclaredField("gimbalViewRequests");
-    //         field.setAccessible(true);
-    //         Queue<Image> queue = (Queue<Image>) field.get(imageClient);
-    //         queue.clear();
-
-    //         field = ImageClient.class.getDeclaredField("autopilotRequests");
-    //         field.setAccessible(true);
-    //         queue = (Queue<Image>) field.get(imageClient);
-    //         queue.clear();
-    //     } catch (NoSuchFieldException | IllegalAccessException e) {
-    //         e.printStackTrace();
-    //     }
-    // }
 
     public void cleanDb() {
         List<Image> images = Ebean.find(Image.class).findList();
@@ -132,31 +113,59 @@ public class ImageControllerTest {
                 .andExpect(content().string(equalTo(list.toString())));
     }
 
+    /** Tests the GET all call for a database containing images */
+    @Test
+    public void testGetAll() throws Exception {
+        // instantiate models
+        List<Image> expected = new ArrayList<>();
+
+        Image i1 = new Image("/some/local/file/url", null, ImgMode.TRACKING);
+        i1.setTimestamp(new Timestamp(1234L));
+        imageDao.create(i1);
+        expected.add(i1);
+
+        Image i2 = new Image("/another/local/file/url", null, ImgMode.FIXED);
+        i2.setTimestamp(new Timestamp(2345L));
+        imageDao.create(i2);
+        expected.add(i2);
+
+        // make request
+        ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get("/image").accept(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith("application/json"))
+                .andExpect(status().isOk());
+
+        MvcResult result = resultActions.andReturn();
+
+        // deserialize result
+        List<Image> actual = null;
+        actual = new ObjectMapper().readValue(result.getResponse().getContentAsString(),
+                        TypeFactory.defaultInstance().constructCollectionType(List.class, Image.class));
+
+        // tests
+        assertEquals(expected, actual);
+
+        // clear database
+        cleanDb();
+    }
+
     /** Tests that geotagging for four corners of an image works */
     @Test
     public void testGeotagFourCorners() throws Exception {
         // instantiate models
-        GpsLocation gpsLoc = null;
-        try {
-            gpsLoc = new GpsLocation(42.4475428000000008, -76.6122976999999992);
-        } catch (InvalidGpsLocationException e) {
-            logger.error("Invalid GpsLocation\n");
-        }
-
+        GpsLocation gpsLoc = new GpsLocation(42.4475428000000008, -76.6122976999999992);
         Telemetry expectedTelemetry = new Telemetry(
                     gpsLoc,
                     221.555125199999992,
                     45.0,
                     new GimbalOrientation(-30.0, 0.0)
                 );
-        telemetryDao.create(expectedTelemetry);
-
         Image img = new Image("/some/local/file/url", expectedTelemetry, ImgMode.TRACKING);
         img.setTimestamp(new Timestamp(1234L));
         imageDao.create(img);
 
         // make request and tests
-        mvc.perform(MockMvcRequestBuilders.get("/image/geotag/1").accept(MediaType.APPLICATION_JSON))
+        // TODO: Figure out why this isn't 1
+        mvc.perform(MockMvcRequestBuilders.get("/image/geotag/2").accept(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(equalTo(
@@ -169,18 +178,105 @@ public class ImageControllerTest {
                             + "\"orientation\":\"0.7853981633974483\",\"url\":\"/some/local/file/url\"}"
                     )));
 
-        // // instantiate models
-        // TelemetryData expectedTelemetry2 = new TelemetryData(null, null, null);
-        // telemetryDataDao.create(expectedTelemetry2);
+        // clear database
+        cleanDb();
+    }
 
-        // Image img2 = new Image("/some/local/file/url2", expectedTelemetry2, null);
-        // img2.setTimestamp(new Timestamp(1234L));
-        // imageDao.create(img2);
+    /** Tests the GET by id call */
+    @Test
+    public void testGet() throws Exception {
+        // instantiate models
+        GpsLocation gpsLoc = new GpsLocation(42.4475428000000008, -76.6122976999999992);
+        Telemetry expectedTelemetry = new Telemetry(
+                    gpsLoc,
+                    221.555125199999992,
+                    45.0,
+                    new GimbalOrientation(-30.0, 0.0)
+                );
+        Image expected = new Image("/some/local/file/url", expectedTelemetry, ImgMode.TRACKING);
+        expected.setTimestamp(new Timestamp(1234L));
+        imageDao.create(expected);
 
-        // // make request
-        // Result result2 = route(org.cuair.ground.controllers.routes.ImageController.getGeotagCoordinates(2));
-        // // tests
-        // assertEquals(NO_CONTENT, result2.status());
+        // make request
+        ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get("/image/1").accept(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith("application/json"))
+                .andExpect(status().isOk());
+
+        MvcResult result = resultActions.andReturn();
+
+        // deserialize result
+        Image actual = new ObjectMapper().readValue(result.getResponse().getContentAsString(), Image.class);
+
+        // test
+        assertEquals(expected, actual);
+
+        // clear database
+        cleanDb();
+    }
+
+    /** Tests GET by id call when model with specific id doesn't exist */
+    @Test
+    public void testGetDoesntExist() throws Exception {
+        // make request
+        // TODO: Figure out if there is a way to check for no content type set
+        ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get("/image/1").accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        // clear database
+        cleanDb();
+    }
+
+    /** Tests GET most recent call */
+    @Test
+    public void testGetRecent() throws Exception {
+        // instantiate models
+        GpsLocation gpsLoc1 = new GpsLocation(42.4475428000000008, -76.6122976999999992);
+        Telemetry expectedTelemetry1 = new Telemetry(
+                    gpsLoc1,
+                    221.555125199999992,
+                    45.0,
+                    new GimbalOrientation(-30.0, 0.0)
+                );
+        Image i1 = new Image("/some/local/file/url", expectedTelemetry1, ImgMode.TRACKING);
+        i1.setTimestamp(new Timestamp(1234L));
+        imageDao.create(i1);
+
+        GpsLocation gpsLoc2 = new GpsLocation(42.4475428000000008, -76.6122976999999992);
+        Telemetry expectedTelemetry2 = new Telemetry(
+                    gpsLoc2,
+                    221.555125199999992,
+                    45.0,
+                    new GimbalOrientation(-30.0, 0.0)
+                );
+        Image i2 = new Image("/another/local/file/url", expectedTelemetry2, ImgMode.TRACKING);
+        i2.setTimestamp(new Timestamp(2345L));
+        imageDao.create(i2);
+
+        // make request
+        ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get("/image/recent").accept(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith("application/json"))
+                .andExpect(status().isOk());
+
+        MvcResult result = resultActions.andReturn();
+
+        // deserialize result
+        Image actual = new ObjectMapper().readValue(result.getResponse().getContentAsString(), Image.class);
+
+        // test
+        assertEquals(i2, actual);
+
+        // clear database
+        cleanDb();
+    }
+
+    /** Tests GET most recent call when no models are in table */
+    @Ignore
+    public void testGetRecentDoesntExist() {
+        // make request
+        // TODO: Figure out if there is a way to check for no content type set
+        ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get("/image/recent").accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
         // clear database
         cleanDb();
     }

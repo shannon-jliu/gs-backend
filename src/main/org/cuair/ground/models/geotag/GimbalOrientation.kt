@@ -20,6 +20,9 @@ class GimbalOrientation(var roll: Double, var pitch: Double) {
      * @return true if the object equals this GimbalOrientation
      */
     override fun equals(@NotNull other: Any?): Boolean {
+        println("PLEASE")
+        println(this)
+        println(other)
         if (other !is GimbalOrientation) return false
 
         if ((this.roll != other.roll) && abs(this.roll - other.roll) > ACCEPTABLE_ERROR) {

@@ -194,7 +194,6 @@ public class Geotag extends CUAirModel {
         } catch (InvalidGpsLocationException e) {
             logger.error(e.getMessage());
         }
-        logger.error(Double.toString(FOV_HORIZONTAL_RADIANS));
         return gps;
     }
 
