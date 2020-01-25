@@ -103,39 +103,6 @@ public class ImageController {
     }
 
     /**
-     * Constructs a HTTP response with the image file with url `file`
-     *
-     * @param file String image url for the File we are extracting
-     * @return HTTP response
-     */
-    @RequestMapping(value = "/file/{file}", method = RequestMethod.GET)
-    public ResponseEntity getFile(@PathVariable String file) {
-        // TODO: Is this necessary? It will be caught in exception FileNotFoundException below
-        File image = FileUtils.getFile(PLANE_IMAGE_DIR + file);
-        if (image.exists()) {
-            HttpHeaders headers = new HttpHeaders();
-            InputStream in = null;
-            try {
-                in = new FileInputStream(PLANE_IMAGE_DIR + file);
-            } catch (FileNotFoundException e) {
-                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File not found: " + PLANE_IMAGE_DIR + file);
-            }
-
-            byte[] media = null;
-            try {
-                media = IOUtils.toByteArray(in);
-            } catch (IOException e) {
-                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error reading file: " + PLANE_IMAGE_DIR + file);
-            }
-            headers.setCacheControl(CacheControl.noCache().getHeaderValue());
-
-            ResponseEntity<byte[]> responseEntity = new ResponseEntity<>(media, headers, HttpStatus.OK);
-            return responseEntity;
-        }
-        return ResponseEntity.noContent().build();
-    }
-
-    /**
      * Checks to see if the body of a call to /image is valid. Returns a badRequest if not, null if it
      * is a proper call.
      *
@@ -350,6 +317,25 @@ public class ImageController {
             return ResponseEntity.ok(i.getLocations());
         }
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Returns JSON of all gps locations of the four corners of an image based on Geotag index 0 - top
+     * left; index 1 - top right; index 2 - bottom left; index 3 - bottom right;
+     *
+     * @return an HTTP response
+     */
+    @RequestMapping(value = "/geotag", method = RequestMethod.GET)
+    public ResponseEntity getAllGeotagCoordinates() {
+        List<Long> ids = imageDao.getAllIds();
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode imageGeotags = mapper.createObjectNode();
+        for (Long id : ids) {
+            Image i = (Image) imageDao.get(id);
+            ObjectNode locs = i.getLocations();
+            if (locs != null) imageGeotags.put(Long.toString(id), locs);
+        }
+        return ResponseEntity.ok(imageGeotags);
     }
 
     /**

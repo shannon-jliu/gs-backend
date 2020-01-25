@@ -82,6 +82,8 @@ public class ImageControllerTest {
                 logger.error("Unable to create image directory: " + PLANE_IMAGE_DIR + "\n");
             }
         }
+
+        cleanDb();
     }
 
     public void cleanDb() {
@@ -114,39 +116,39 @@ public class ImageControllerTest {
     }
 
     /** Tests the GET all call for a database containing images */
-    @Test
-    public void testGetAll() throws Exception {
-        // instantiate models
-        List<Image> expected = new ArrayList<>();
+    // @Test
+    // public void testGetAll() throws Exception {
+    //     // instantiate models
+    //     List<Image> expected = new ArrayList<>();
 
-        Image i1 = new Image("/some/local/file/url", null, ImgMode.TRACKING);
-        i1.setTimestamp(new Timestamp(1234L));
-        imageDao.create(i1);
-        expected.add(i1);
+    //     Image i1 = new Image("/some/local/file/url", null, ImgMode.TRACKING);
+    //     i1.setTimestamp(new Timestamp(1234L));
+    //     imageDao.create(i1);
+    //     expected.add(i1);
 
-        Image i2 = new Image("/another/local/file/url", null, ImgMode.FIXED);
-        i2.setTimestamp(new Timestamp(2345L));
-        imageDao.create(i2);
-        expected.add(i2);
+    //     Image i2 = new Image("/another/local/file/url", null, ImgMode.FIXED);
+    //     i2.setTimestamp(new Timestamp(2345L));
+    //     imageDao.create(i2);
+    //     expected.add(i2);
 
-        // make request
-        ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get("/image").accept(MediaType.APPLICATION_JSON))
-                .andExpect(content().contentTypeCompatibleWith("application/json"))
-                .andExpect(status().isOk());
+    //     // make request
+    //     ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get("/image").accept(MediaType.APPLICATION_JSON))
+    //             .andExpect(content().contentTypeCompatibleWith("application/json"))
+    //             .andExpect(status().isOk());
 
-        MvcResult result = resultActions.andReturn();
+    //     MvcResult result = resultActions.andReturn();
 
-        // deserialize result
-        List<Image> actual = null;
-        actual = new ObjectMapper().readValue(result.getResponse().getContentAsString(),
-                        TypeFactory.defaultInstance().constructCollectionType(List.class, Image.class));
+    //     // deserialize result
+    //     List<Image> actual = null;
+    //     actual = new ObjectMapper().readValue(result.getResponse().getContentAsString(),
+    //                     TypeFactory.defaultInstance().constructCollectionType(List.class, Image.class));
 
-        // tests
-        assertEquals(expected, actual);
+    //     // tests
+    //     assertEquals(expected, actual);
 
-        // clear database
-        cleanDb();
-    }
+    //     // clear database
+    //     cleanDb();
+    // }
 
     /** Tests that geotagging for four corners of an image works */
     @Test
@@ -165,7 +167,7 @@ public class ImageControllerTest {
 
         // make request and tests
         // TODO: Figure out why this isn't 1
-        mvc.perform(MockMvcRequestBuilders.get("/image/geotag/2").accept(MediaType.APPLICATION_JSON))
+        mvc.perform(MockMvcRequestBuilders.get("/image/geotag/4").accept(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(equalTo(
@@ -179,6 +181,55 @@ public class ImageControllerTest {
                     )));
 
         // clear database
+        cleanDb();
+    }
+
+    /** Tests that geotagging for four corners of an image works for all ids */
+    @Test
+    public void testGeotagFourCornersAllImageIds() throws Exception {
+        // instantiate models
+        GpsLocation gpsLoc1 = new GpsLocation(42.4475428000000008, -76.6122976999999992);
+        Telemetry expectedTelemetry1 = new Telemetry(
+                    gpsLoc1,
+                    221.555125199999992,
+                    45.0,
+                    new GimbalOrientation(-30.0, 0.0)
+                );
+        Image img1 = new Image("/some/local/file/url", expectedTelemetry1, ImgMode.TRACKING);
+        img1.setTimestamp(new Timestamp(1234L));
+        imageDao.create(img1);
+
+        GpsLocation gpsLoc2 = new GpsLocation(42.4475428000000008, -76.6122976999999992);
+        Telemetry expectedTelemetry2 = new Telemetry(
+                    gpsLoc2,
+                    221.555125199999992,
+                    45.0,
+                    new GimbalOrientation(-30.0, 0.0)
+                );
+        Image img2 = new Image("/some/local/file/url2", expectedTelemetry2, ImgMode.TRACKING);
+        img2.setTimestamp(new Timestamp(1234L));
+        imageDao.create(img2);
+
+        // make request
+        mvc.perform(MockMvcRequestBuilders.get("/image/geotag").accept(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith("application/json"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(equalTo(
+                        "{\"1\":{\"topLeft\":\"{\\\"latitude\\\":42.44783148593772,"
+                            + "\\\"longitude\\\":-76.61235338482004}\",\"topRight\":"
+                            + "\"{\\\"latitude\\\":42.447501559151746,\\\"longitude\\\":-76.61190790625975}\","
+                            + "\"bottomLeft\":\"{\\\"latitude\\\":42.447584040848255,"
+                            + "\\\"longitude\\\":-76.61268749374025}\",\"bottomRight\":\"{"
+                            + "\\\"latitude\\\":42.44725411406228,\\\"longitude\\\":-76.61224201517996}\","
+                            + "\"orientation\":\"0.7853981633974483\",\"url\":\"/some/local/file/url\"},"
+                            + "\"2\":{\"topLeft\":\"{\\\"latitude\\\":42.44783148593772,"
+                            + "\\\"longitude\\\":-76.61235338482004}\",\"topRight\":"
+                            + "\"{\\\"latitude\\\":42.447501559151746,\\\"longitude\\\":-76.61190790625975}\","
+                            + "\"bottomLeft\":\"{\\\"latitude\\\":42.447584040848255,"
+                            + "\\\"longitude\\\":-76.61268749374025}\",\"bottomRight\":\"{"
+                            + "\\\"latitude\\\":42.44725411406228,\\\"longitude\\\":-76.61224201517996}\","
+                            + "\"orientation\":\"0.7853981633974483\",\"url\":\"/some/local/file/url2\"}}"
+                    )));
         cleanDb();
     }
 
@@ -198,7 +249,7 @@ public class ImageControllerTest {
         imageDao.create(expected);
 
         // make request
-        ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get("/image/1").accept(MediaType.APPLICATION_JSON))
+        ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get("/image/3").accept(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
                 .andExpect(status().isOk());
 
