@@ -17,8 +17,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import java.util.concurrent.CompletableFuture;
-import org.cuair.ground.util.Flags;
-import org.cuair.ground.util.RequestsHelper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
