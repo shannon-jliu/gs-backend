@@ -17,10 +17,6 @@ public class TestController {
 
     @RequestMapping(value = "/")
     public String index() {
-      RequestsHelper.meep();
-      // WebClient client3 = WebClient.builder().baseUrl("http://0.0.0.0:8001").defaultCookie("cookieKey", "cookieValue").defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE).defaultUriVariables(Collections.singletonMap("url", "http://localhost:8001")).build();
-      // Mono<Flags> fds = client3.method(HttpMethod.POST).uri("/resource").accept().exchange().flatMap(response -> response.bodyToMono(Flags.class));
-
       return "test";
     }
 
