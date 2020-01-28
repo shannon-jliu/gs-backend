@@ -338,11 +338,13 @@ public class ImageControllerTest {
     /** Tests POST call to validate its response */
     @Test
     public void testCreate() throws Exception {
-        InputStream is = new BufferedInputStream(new FileInputStream("src/test/java/org/cuair/ground/controllers/test_images/test_0.jpg"));
+        String imageUrl = "src/test/java/org/cuair/ground/controllers/test_images/test_0.jpg";
+        InputStream is = new BufferedInputStream(new FileInputStream(imageUrl));
         MockMultipartFile firstFile = new MockMultipartFile("files", "test_0.jpg", "image", is);
 
         String timestamp = "100000000000006";
         String imgMode = "retract";
+        Image expectedImg = new Image("/api/v1/image/file/"+timestamp+".jpeg", null, ImgMode.FIXED);
 
         ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
                             .file(firstFile)
@@ -351,15 +353,14 @@ public class ImageControllerTest {
         MvcResult result = resultAction.andReturn();
 
         Image recent = (Image) controller.getRecent().getBody();
-        Long expectedId = recent.getId();
 
         ResponseEntity asyncedResponseEntity = (ResponseEntity) result.getAsyncResult();
         Image response = (Image) asyncedResponseEntity.getBody();
 
         ObjectMapper mapper = new ObjectMapper();
-        String imageAsString = mapper.writeValueAsString(response);
 
-        assertEquals(recent, response);
+        assertEquals(expectedImg, response);
+        assertEquals(expectedImg, recent);
 
         cleanDb();
     }
