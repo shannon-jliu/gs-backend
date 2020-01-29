@@ -147,11 +147,15 @@ public class ImageController {
 
         // POST-specific requirements, maybe better way to do this than just nested if statement?
         if (isPost) {
+            System.out.println("bruh wtf BROOOOOOOOO");
             if (json.get("id") != null) {
                 return CompletableFuture.completedFuture(
                     ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Don't put id in json of image POST request")
                 );
             }
+
+            System.out.println(json.get("id"));
+            System.out.println(json.get("timestamp"));
 
             if (json.get("timestamp") == null) {
                 return CompletableFuture.completedFuture(

@@ -13,6 +13,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -146,9 +147,6 @@ public class ImageControllerTest {
 
         // tests
         assertEquals(expected, actual);
-
-        // clear database
-        cleanDb();
     }
 
     /** Tests that geotagging for four corners of an image works */
@@ -180,9 +178,6 @@ public class ImageControllerTest {
                             + "\\\"latitude\\\":42.44725411406228,\\\"longitude\\\":-76.61224201517996}\","
                             + "\"orientation\":\"0.7853981633974483\",\"url\":\"/some/local/file/url\"}"
                     )));
-
-        // clear database
-        cleanDb();
     }
 
     /** Tests that geotagging for four corners of an image works for all ids */
@@ -231,7 +226,6 @@ public class ImageControllerTest {
                             + "\\\"latitude\\\":42.44725411406228,\\\"longitude\\\":-76.61224201517996}\","
                             + "\"orientation\":\"0.7853981633974483\",\"url\":\"/some/local/file/url2\"}}"
                     )));
-        cleanDb();
     }
 
     /** Tests the GET by id call */
@@ -261,9 +255,6 @@ public class ImageControllerTest {
 
         // test
         assertEquals(expected, actual);
-
-        // clear database
-        cleanDb();
     }
 
     /** Tests GET by id call when model with specific id doesn't exist */
@@ -274,9 +265,6 @@ public class ImageControllerTest {
         ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get("/image/1").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string(equalTo("")));
-
-        // clear database
-        cleanDb();
     }
 
     /** Tests GET most recent call */
@@ -317,9 +305,6 @@ public class ImageControllerTest {
 
         // test
         assertEquals(i2, actual);
-
-        // clear database
-        cleanDb();
     }
 
     /** Tests GET most recent call when no models are in table */
@@ -330,9 +315,6 @@ public class ImageControllerTest {
         ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get("/image/recent").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string(equalTo("")));
-
-        // clear database
-        cleanDb();
     }
 
     /** Tests POST call to validate its response */
@@ -349,7 +331,7 @@ public class ImageControllerTest {
         ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
                             .file(firstFile)
                             .param("jsonString", "{\"timestamp\":"+timestamp+",\"imgMode\":\""+imgMode+"\"}")
-                        ).andExpect(status().isOk());
+                        );
         MvcResult result = resultAction.andReturn();
 
         Image recent = (Image) controller.getRecent().getBody();
@@ -359,10 +341,35 @@ public class ImageControllerTest {
 
         ObjectMapper mapper = new ObjectMapper();
 
+        assertEquals(HttpStatus.OK, asyncedResponseEntity.getStatusCode());
         assertEquals(expectedImg, response);
         assertEquals(expectedImg, recent);
+    }
 
-        cleanDb();
+    // TODO: add testCreateTooManyParts() when fix json.size() condition
+
+    /** Tests POST call when json part is not valid json. */
+    @Test
+    public void testCreateWithInvalidJson() throws Exception {
+        String imageUrl = "src/test/java/org/cuair/ground/controllers/test_images/test_0.jpg";
+        InputStream is = new BufferedInputStream(new FileInputStream(imageUrl));
+        MockMultipartFile firstFile = new MockMultipartFile("files", "test_0.jpg", "image", is);
+
+        String timestamp = "100000000000006";
+        String imgMode = "retract";
+
+        ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
+                            .file(firstFile)
+                            .param("jsonString", "\"imgMode\":\""+imgMode+"\"}")
+                        );
+        MvcResult result = resultAction.andReturn();
+
+        ResponseEntity asyncedResponseEntity = (ResponseEntity) result.getAsyncResult();
+        String response = (String) asyncedResponseEntity.getBody();
+
+        assertEquals(HttpStatus.BAD_REQUEST, asyncedResponseEntity.getStatusCode());
+        assert(response.contains("Json part invalid"));
+        assertEquals(0, imageDao.getAllIds().size());
     }
 
     // @Test
