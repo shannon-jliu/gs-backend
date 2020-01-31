@@ -372,72 +372,199 @@ public class ImageControllerTest {
         assertEquals(0, imageDao.getAllIds().size());
     }
 
-    // @Test
-    // public void get() throws Exception {
-    //     mvc.perform(MockMvcRequestBuilders.get("/image/-1").accept(MediaType.APPLICATION_JSON))
-    //             .andExpect(status().isNoContent())
-    //             .andExpect(content().string(equalTo("")));
-    // }
+    /** Tests POST call when json part does not contain timestamp. */
+    @Test
+    public void testCreateWithNoTimestamp() throws Exception {
+        String imageUrl = "src/test/java/org/cuair/ground/controllers/test_images/test_0.jpg";
+        InputStream is = new BufferedInputStream(new FileInputStream(imageUrl));
+        MockMultipartFile firstFile = new MockMultipartFile("files", "test_0.jpg", "image", is);
 
-    // @Test
-    // public void create() throws Exception {
-    //     InputStream is = new BufferedInputStream(new FileInputStream("src/test/java/org/cuair/ground/controllers/test_images/test_0.jpg"));
-    //     MockMultipartFile firstFile = new MockMultipartFile("files", "test_0.jpg", "image", is);
+        String timestamp = "100000000000006";
+        String imgMode = "retract";
 
-    //     String timestamp = "100000000000006";
-    //     String imgMode = "retract";
+        ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
+                            .file(firstFile)
+                            .param("jsonString", "{\"imgMode\":\""+imgMode+"\"}")
+                        );
+        MvcResult result = resultAction.andReturn();
 
-    //     ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
-    //                         .file(firstFile)
-    //                         .param("jsonString", "{\"timestamp\":"+timestamp+",\"imgMode\":\""+imgMode+"\"}")
-    //                     ).andExpect(status().isOk());
-    //     MvcResult result = resultAction.andReturn();
+        ResponseEntity asyncedResponseEntity = (ResponseEntity) result.getAsyncResult();
+        String response = (String) asyncedResponseEntity.getBody();
 
-    //     Image recent = (Image) controller.getRecent().getBody();
-    //     Long expectedId = recent.getId();
+        assertEquals(HttpStatus.BAD_REQUEST, asyncedResponseEntity.getStatusCode());
+        assertEquals("Json part must include timestamp field", response);
+        assertEquals(0, imageDao.getAllIds().size());
+    }
 
-    //     ResponseEntity asyncedResponseEntity = (ResponseEntity) result.getAsyncResult();
-    //     Image i = (Image) asyncedResponseEntity.getBody();
+    /** Tests POST call when a custom field name is added to the request body. */
+    @Test
+    public void testCreateWithCustomFieldName() throws Exception {
+        String imageUrl = "src/test/java/org/cuair/ground/controllers/test_images/test_0.jpg";
+        InputStream is = new BufferedInputStream(new FileInputStream(imageUrl));
+        MockMultipartFile firstFile = new MockMultipartFile("files", "test_0.jpg", "image", is);
 
-    //     ObjectMapper mapper = new ObjectMapper();
-    //     String imageAsString = mapper.writeValueAsString(i);
+        String timestamp = "100000000000006";
+        String imgMode = "retract";
+        Image expectedImg = new Image("/api/v1/image/file/"+timestamp+".jpeg", null, ImgMode.FIXED);
 
-    //     assertEquals(imageAsString,
-    //             "{\"id\":"+expectedId+",\"timestamp\":"+timestamp+",\"localImageUrl\":\"images/"+timestamp+".jpeg\",\"imageUrl\":\"/api/v1/image/file/"+timestamp+".jpeg\",\"telemetry\":null,\"imgMode\":\""+imgMode+"\"}"
-    //         );
-    // }
+        String fieldName = "name";
+        String name = "CUAir";
+        ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
+                            .file(firstFile)
+                            .param("jsonString", "{\"timestamp\":"+timestamp+",\"imgMode\":\""+imgMode+"\",\""+fieldName+"\":\""+name+"\"}")
+                        );
+        MvcResult result = resultAction.andReturn();
 
-    // @Test
-    // public void getGeotagCoordinates() throws Exception {
-    //     mvc.perform(MockMvcRequestBuilders.get("/image/geotag/-1").accept(MediaType.APPLICATION_JSON))
-    //             .andExpect(status().isNoContent())
-    //             .andExpect(content().string(equalTo("")));
-    // }
+        Image recent = (Image) controller.getRecent().getBody();
 
-    // @Test
-    // public void dummyCreate() throws Exception {
-    //     InputStream is = new BufferedInputStream(new FileInputStream("src/test/java/org/cuair/ground/controllers/test_images/test_0.jpg"));
-    //     MockMultipartFile firstFile = new MockMultipartFile("files", "test_0.jpg", "image", is);
+        ResponseEntity asyncedResponseEntity = (ResponseEntity) result.getAsyncResult();
+        String response = (String) asyncedResponseEntity.getBody();
 
-    //     String timestamp = "100000000000006";
-    //     String imgMode = "retract";
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, asyncedResponseEntity.getStatusCode());
+        assert(response.contains("Unrecognized field \""+fieldName+"\""));
+    }
 
-    //     ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.multipart("/image/dummy")
-    //                         .file(firstFile)
-    //                         .param("jsonString", "{\"timestamp\":"+timestamp+",\"imgMode\":\""+imgMode+"\"}")
-    //                     ).andExpect(status().isOk());
+    /**
+     * Tests POST call when image left out of request Also tests if new image that is POSTed is not
+     * retrieved from the database
+     */
+    @Test
+    public void testCreateWhenNoImageSent() throws Exception {
+        String timestamp = "100000000000006";
+        String imgMode = "retract";
+        Image expectedImg = new Image("/api/v1/image/file/"+timestamp+".jpeg", null, ImgMode.FIXED);
 
-    //     Image recent = (Image) controller.getRecent().getBody();
-    //     Long expectedId = recent.getId();
-    //     // TODO: Fix this. For some reason, ResponseEntity.ok(i) in the image controller changes the formatting in an odd way.
-    //     String[] timestampParts = recent.getTimestamp().toString().split(" ", 2);
-    //     String expectedTimestamp = timestampParts[0] + "T09" + timestampParts[1].substring(2, timestampParts[1].length()) + "+0000";
+        ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
+                            .param("jsonString", "{\"timestamp\":"+timestamp+",\"imgMode\":\""+imgMode+"\"}")
+                        );
+        MvcResult result = resultAction.andReturn();
 
-    //     MvcResult result = resultActions.andReturn();
-    //     String contentAsString = result.getResponse().getContentAsString();
+        Image recent = (Image) controller.getRecent().getBody();
 
-    //     assertEquals(contentAsString,
-    //             "{\"id\":"+expectedId+",\"timestamp\":\""+expectedTimestamp+"\",\"localImageUrl\":null,\"imageUrl\":null,\"telemetry\":null,\"imgMode\":\""+imgMode+"\"}"
-    //         );
-    // }
+        ResponseEntity asyncedResponseEntity = (ResponseEntity) result.getAsyncResult();
+        String response = (String) asyncedResponseEntity.getBody();
+
+        assertEquals(HttpStatus.BAD_REQUEST, asyncedResponseEntity.getStatusCode());
+        assertEquals("Missing image file in image POST request", response);
+        assertEquals(0, imageDao.getAllIds().size());
+    }
+
+    /**
+     * Tests POST call when json and image left out of request. Also tests if new image that is POSTed
+     * is not retrieved from the database
+     */
+    @Test
+    public void testCreateWithNoParts() throws Exception {
+        String imageUrl = "src/test/java/org/cuair/ground/controllers/test_images/test_0.jpg";
+        InputStream is = new BufferedInputStream(new FileInputStream(imageUrl));
+        MockMultipartFile firstFile = new MockMultipartFile("files", "test_0.jpg", "image", is);
+
+        String timestamp = "100000000000006";
+        String imgMode = "retract";
+        Image expectedImg = new Image("/api/v1/image/file/"+timestamp+".jpeg", null, ImgMode.FIXED);
+
+        ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
+                            .file(firstFile)
+                        );
+        MvcResult result = resultAction.andReturn();
+
+        Image recent = (Image) controller.getRecent().getBody();
+
+        ResponseEntity asyncedResponseEntity = (ResponseEntity) result.getAsyncResult();
+        String response = (String) asyncedResponseEntity.getBody();
+
+        assertEquals(HttpStatus.BAD_REQUEST, asyncedResponseEntity.getStatusCode());
+        assertEquals("Missing json in image POST request", response);
+        assertEquals(0, imageDao.getAllIds().size());
+    }
+
+    /**
+     * Tests POST call when json contains id. Also tests if new image that is POSTed is not retrieved
+     * from the database
+     */
+    @Test
+    public void testCreateWithId() throws Exception {
+        String imageUrl = "src/test/java/org/cuair/ground/controllers/test_images/test_0.jpg";
+        InputStream is = new BufferedInputStream(new FileInputStream(imageUrl));
+        MockMultipartFile firstFile = new MockMultipartFile("files", "test_0.jpg", "image", is);
+
+        String timestamp = "100000000000006";
+        String imgMode = "retract";
+        Image expectedImg = new Image("/api/v1/image/file/"+timestamp+".jpeg", null, ImgMode.FIXED);
+
+        ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
+                            .file(firstFile)
+                            .param("jsonString", "{\"timestamp\":"+timestamp+",\"id\":1}")
+                        );
+        MvcResult result = resultAction.andReturn();
+
+        Image recent = (Image) controller.getRecent().getBody();
+
+        ResponseEntity asyncedResponseEntity = (ResponseEntity) result.getAsyncResult();
+        String response = (String) asyncedResponseEntity.getBody();
+
+        assertEquals(HttpStatus.BAD_REQUEST, asyncedResponseEntity.getStatusCode());
+        assertEquals("Don't put id in json of image POST request", response);
+        assertEquals(0, imageDao.getAllIds().size());
+    }
+
+    // TODO: Add reconnection tests w/ clients? Need client code first
+
+    /*
+     * Tests POST call when json contains id. Also tests if new image that is POSTed is not retrieved
+     * from the database
+     */
+    @Test
+    public void testDummyCreate() throws Exception {
+        String imageUrl = "src/test/java/org/cuair/ground/controllers/test_images/test_0.jpg";
+        InputStream is = new BufferedInputStream(new FileInputStream(imageUrl));
+        MockMultipartFile firstFile = new MockMultipartFile("files", "test_0.jpg", "image", is);
+
+        String timestamp = "100000000000006";
+        String imgMode = "retract";
+        Image expectedImg = new Image(null, null, ImgMode.FIXED);
+
+        ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image/dummy")
+                                            .file(firstFile)
+                                            .param("jsonString", "{\"timestamp\":"+timestamp+",\"imgMode\":\""+imgMode+"\"}")
+                                        )
+                                        .andExpect(status().isOk());
+
+        MvcResult result = resultAction.andReturn();
+        Image response = new ObjectMapper().readValue(result.getResponse().getContentAsString(), Image.class);
+
+        Image recent = (Image) controller.getRecent().getBody();
+
+        assertEquals(expectedImg, response);
+        assertEquals(expectedImg, recent);
+    }
+
+    /*
+     * Tests POST call when json contains id. Also tests if new image that is POSTed is not retrieved
+     * from the database
+     */
+    @Test
+    public void testDummyCreateWithId() throws Exception {
+        String imageUrl = "src/test/java/org/cuair/ground/controllers/test_images/test_0.jpg";
+        InputStream is = new BufferedInputStream(new FileInputStream(imageUrl));
+        MockMultipartFile firstFile = new MockMultipartFile("files", "test_0.jpg", "image", is);
+
+        String timestamp = "100000000000006";
+        String imgMode = "retract";
+        Image expectedImg = new Image("/api/v1/image/file/"+timestamp+".jpeg", null, ImgMode.FIXED);
+
+        ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image/dummy")
+                                            .file(firstFile)
+                                            .param("jsonString", "{\"timestamp\":"+timestamp+",\"id\":1}")
+                                        )
+                                        .andExpect(status().is(400));
+
+        MvcResult result = resultAction.andReturn();
+
+        // deserialize result
+        String response = result.getResponse().getContentAsString();
+
+        assertEquals("Don't put id in json of image POST request", response);
+        assertEquals(0, imageDao.getAllIds().size());
+    }
 }

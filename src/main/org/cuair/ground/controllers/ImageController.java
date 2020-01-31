@@ -110,8 +110,12 @@ public class ImageController {
      * @param isPost true if it is a POST (create) action, false if it is a PUT (update) action
      * @return null if the body is valid, otherwise a badRequest
      */
-    private CompletableFuture<ResponseEntity> validateRequestBody(MultipartFile[] files, String jsonString, boolean isPost) {
-        if (files == null && jsonString == null) {
+    private CompletableFuture<ResponseEntity> validateRequestBody(MultipartHttpServletRequest req, boolean isPost) {
+        Map<String, String[]> formData = req.getParameterMap();
+        String[] jsonStringArray = formData.get("jsonString");
+        MultipartFile[] files = {req.getFile("files")};
+
+        if (files == null && jsonStringArray == null) {
             return CompletableFuture.completedFuture(
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Request should provide multipart/form-data")
             );
@@ -119,7 +123,7 @@ public class ImageController {
 
         String reqType = isPost ? "POST" : "PUT";
 
-        if (files.length == 0) {
+        if (files[0] == null || files.length == 0) {
             return CompletableFuture.completedFuture(
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing image file in image " + reqType + " request")
             );
@@ -129,12 +133,13 @@ public class ImageController {
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Should have only one file in image " + reqType + " request")
             );
         }
-        if (jsonString == null) {
+        if (jsonStringArray == null) {
             return CompletableFuture.completedFuture(
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing json in image " + reqType + " request")
             );
         }
 
+        String jsonString = jsonStringArray[0];
         ObjectNode json = null;
 
         try {
@@ -147,15 +152,11 @@ public class ImageController {
 
         // POST-specific requirements, maybe better way to do this than just nested if statement?
         if (isPost) {
-            System.out.println("bruh wtf BROOOOOOOOO");
             if (json.get("id") != null) {
                 return CompletableFuture.completedFuture(
                     ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Don't put id in json of image POST request")
                 );
             }
-
-            System.out.println(json.get("id"));
-            System.out.println(json.get("timestamp"));
 
             if (json.get("timestamp") == null) {
                 return CompletableFuture.completedFuture(
@@ -217,14 +218,16 @@ public class ImageController {
      */
     @RequestMapping(method = RequestMethod.POST)
     public CompletableFuture<ResponseEntity> create(MultipartHttpServletRequest request) {
-        Map<String, String[]> formData = request.getParameterMap();
-        String jsonString = formData.get("jsonString")[0];
-        MultipartFile[] files = {request.getFile("files")};
         // check if request is valid
-        CompletableFuture<ResponseEntity> validate = validateRequestBody(files, jsonString, true);
+        CompletableFuture<ResponseEntity> validate = validateRequestBody(request, true);
+
         if (validate != null) {
             return validate;
         }
+
+        Map<String, String[]> formData = request.getParameterMap();
+        String jsonString = formData.get("jsonString")[0];
+        MultipartFile[] files = {request.getFile("files")};
 
         ObjectNode json = null;
         try {
