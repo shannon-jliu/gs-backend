@@ -185,8 +185,7 @@ public class AssignmentController {
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     // TODO: Is this necessary?
     // @ValidateJson(Assignment.class)
-    public ResponseEntity update(@PathVariable Long id, @RequestBody HttpEntity<String> httpEntity) {
-        String jsonString = httpEntity.getBody();
+    public ResponseEntity update(@PathVariable Long id, @RequestBody String jsonString) {
         Assignment a = assignmentDao.get(id);
         if (a == null) {
             return ResponseEntity.noContent().build();

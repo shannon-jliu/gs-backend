@@ -4,7 +4,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.junit.Before;
@@ -17,7 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.*;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.mock.web.MockMultipartFile;
 
@@ -25,7 +25,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 
 import java.sql.Timestamp;
 import org.cuair.ground.daos.DAOFactory;
@@ -44,8 +48,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 
 import io.ebean.Ebean;
 import org.apache.commons.io.FileUtils;
-import org.springframework.http.*;
-import java.sql.Timestamp;
+import org.springframework.http.ResponseEntity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -265,6 +268,8 @@ public class ImageControllerTest {
         ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get("/image/1").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string(equalTo("")));
+
+        assertEquals(null, resultActions.andReturn().getResponse().getContentType());
     }
 
     /** Tests GET most recent call */
@@ -311,10 +316,11 @@ public class ImageControllerTest {
     @Test
     public void testGetRecentDoesntExist() throws Exception {
         // make request
-        // TODO: Figure out if there is a way to check for no content type set
         ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get("/image/recent").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string(equalTo("")));
+
+        assertEquals(null, resultActions.andReturn().getResponse().getContentType());
     }
 
     /** Tests POST call to validate its response */
@@ -341,6 +347,8 @@ public class ImageControllerTest {
 
         ObjectMapper mapper = new ObjectMapper();
 
+        // TODO: Should the content type be non-null?
+        assertEquals(null, result.getResponse().getContentType());
         assertEquals(HttpStatus.OK, asyncedResponseEntity.getStatusCode());
         assertEquals(expectedImg, response);
         assertEquals(expectedImg, recent);
@@ -367,6 +375,7 @@ public class ImageControllerTest {
         ResponseEntity asyncedResponseEntity = (ResponseEntity) result.getAsyncResult();
         String response = (String) asyncedResponseEntity.getBody();
 
+        assertEquals(null, result.getResponse().getContentType());
         assertEquals(HttpStatus.BAD_REQUEST, asyncedResponseEntity.getStatusCode());
         assert(response.contains("Json part invalid"));
         assertEquals(0, imageDao.getAllIds().size());
@@ -391,6 +400,7 @@ public class ImageControllerTest {
         ResponseEntity asyncedResponseEntity = (ResponseEntity) result.getAsyncResult();
         String response = (String) asyncedResponseEntity.getBody();
 
+        assertEquals(null, result.getResponse().getContentType());
         assertEquals(HttpStatus.BAD_REQUEST, asyncedResponseEntity.getStatusCode());
         assertEquals("Json part must include timestamp field", response);
         assertEquals(0, imageDao.getAllIds().size());
@@ -420,6 +430,7 @@ public class ImageControllerTest {
         ResponseEntity asyncedResponseEntity = (ResponseEntity) result.getAsyncResult();
         String response = (String) asyncedResponseEntity.getBody();
 
+        assertEquals(null, result.getResponse().getContentType());
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, asyncedResponseEntity.getStatusCode());
         assert(response.contains("Unrecognized field \""+fieldName+"\""));
     }
@@ -444,6 +455,7 @@ public class ImageControllerTest {
         ResponseEntity asyncedResponseEntity = (ResponseEntity) result.getAsyncResult();
         String response = (String) asyncedResponseEntity.getBody();
 
+        assertEquals(null, result.getResponse().getContentType());
         assertEquals(HttpStatus.BAD_REQUEST, asyncedResponseEntity.getStatusCode());
         assertEquals("Missing image file in image POST request", response);
         assertEquals(0, imageDao.getAllIds().size());
@@ -473,6 +485,7 @@ public class ImageControllerTest {
         ResponseEntity asyncedResponseEntity = (ResponseEntity) result.getAsyncResult();
         String response = (String) asyncedResponseEntity.getBody();
 
+        assertEquals(null, result.getResponse().getContentType());
         assertEquals(HttpStatus.BAD_REQUEST, asyncedResponseEntity.getStatusCode());
         assertEquals("Missing json in image POST request", response);
         assertEquals(0, imageDao.getAllIds().size());
@@ -503,6 +516,7 @@ public class ImageControllerTest {
         ResponseEntity asyncedResponseEntity = (ResponseEntity) result.getAsyncResult();
         String response = (String) asyncedResponseEntity.getBody();
 
+        assertEquals(null, result.getResponse().getContentType());
         assertEquals(HttpStatus.BAD_REQUEST, asyncedResponseEntity.getStatusCode());
         assertEquals("Don't put id in json of image POST request", response);
         assertEquals(0, imageDao.getAllIds().size());
@@ -528,6 +542,7 @@ public class ImageControllerTest {
                                             .file(firstFile)
                                             .param("jsonString", "{\"timestamp\":"+timestamp+",\"imgMode\":\""+imgMode+"\"}")
                                         )
+                                        .andExpect(content().contentTypeCompatibleWith("application/json"))
                                         .andExpect(status().isOk());
 
         MvcResult result = resultAction.andReturn();
@@ -557,6 +572,7 @@ public class ImageControllerTest {
                                             .file(firstFile)
                                             .param("jsonString", "{\"timestamp\":"+timestamp+",\"id\":1}")
                                         )
+                                        .andExpect(content().contentTypeCompatibleWith("text/plain;charset=UTF-8"))
                                         .andExpect(status().is(400));
 
         MvcResult result = resultAction.andReturn();
