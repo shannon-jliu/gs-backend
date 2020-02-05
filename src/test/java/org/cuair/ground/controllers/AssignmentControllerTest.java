@@ -507,7 +507,7 @@ public class AssignmentControllerTest {
     // }
 
     @Test
-    public void testInvalidUser() {
+    public void testInvalidUser() throws Exception {
         ReflectionTestUtils.setField(controller, "AUTH_ENABLED", true);
         mvc.perform(MockMvcRequestBuilders.post("/assignment/work/MDLC").accept(MediaType.APPLICATION_JSON)
                                         .header("X-AUTH-TOKEN", "trash"))
