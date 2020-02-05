@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 import org.junit.Before;
@@ -50,6 +51,10 @@ import org.cuair.ground.models.plane.target.AlphanumTargetSighting;
 import org.cuair.ground.models.plane.target.AlphanumTarget;
 import org.cuair.ground.models.geotag.Geotag;
 import org.cuair.ground.models.Image;
+import org.cuair.ground.models.Color;
+import org.cuair.ground.models.ClientType;
+import org.cuair.ground.models.Shape;
+import org.cuair.ground.models.Confidence;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = AlphanumTargetSightingController.class)
@@ -159,19 +164,14 @@ public class AlphanumTargetSightingControllerTest {
         expected.add(t2);
 
         // make request
-        Result result =
-            route(org.cuair.ground.controllers.target.routes.AlphanumTargetSightingController.getAll());
+        ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get("/alphanum_target_sighting").accept(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith("application/json"))
+                .andExpect(status().isOk());
 
         // deserialize result
-        List<AlphanumTargetSighting> actual = new LinkedList<>();
-        ArrayNode jsonArray = (ArrayNode) Json.parse(contentAsString(result));
-        for (JsonNode node : jsonArray) {
-            actual.add(Json.fromJson(node, AlphanumTargetSighting.class));
-        }
+        List<AlphanumTargetSighting> actual = new ObjectMapper().readValue(resultActions.andReturn().getResponse().getContentAsString(), TypeFactory.defaultInstance().constructCollectionType(List.class, AlphanumTargetSighting.class));
 
         // tests
-        assertEquals(OK, result.status());
-        assertEquals("application/json", result.contentType().get());
         assertNotNull(actual);
         for (int i = 0; i < expected.size(); i++) {
             assertEquals(expected.get(i), actual.get(i));
