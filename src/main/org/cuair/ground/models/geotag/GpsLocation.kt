@@ -18,10 +18,12 @@ class GpsLocation
      * @throws InvalidGpsLocationException If latitude is not in range [-90.0,90.0]
      * @throws InvalidGpsLocationException If longitude is not in range [-180.0,180.0]
      */
-   @Throws(InvalidGpsLocationException::class)
+    @Throws(InvalidGpsLocationException::class)
     constructor(
-        @field:Basic(optional = true) private var latitude:Double?,
-        @field:Basic(optional = true) private var longitude:Double?
+        @field:Basic(optional = true)
+        private var latitude: Double,
+        @field:Basic(optional = true)
+        private var longitude: Double
     ) {
         init {
             if (latitude != null && abs(latitude!!) > ABS_LATITUDE_BOUND) {
@@ -37,13 +39,22 @@ class GpsLocation
         }
 
     /**
-    * Change the latitude of this GPS location
-    *
-    * @param latitude The new latitude for this GPS location
-    * @throws InvalidGpsLocationException If latitude is not in range [-90.0,90.0]
-    */
+     * Get the latitude of this GPS location
+     *
+     * @return the latitude of this GPS location
+     */
+    fun getLatitude(): Double {
+        return latitude
+    }
+
+    /**
+     * Change the latitude of this GPS location
+     *
+     * @param latitude The new latitude for this GPS location
+     * @throws InvalidGpsLocationException If latitude is not in range [-90.0,90.0]
+     */
     @Throws(InvalidGpsLocationException::class)
-    fun setLatitude(latitude: Double?) {
+    fun setLatitude(latitude: Double) {
         if (latitude != null && abs(latitude) > ABS_LATITUDE_BOUND) {
             throw InvalidGpsLocationException(
                 "Latitude should be within -$ABS_LATITUDE_BOUND and $ABS_LATITUDE_BOUND"
@@ -53,13 +64,22 @@ class GpsLocation
     }
 
     /**
-    * Change the longitude of this GPS location
-    *
-    * @param longitude The new longitude for this GPS location
-    * @throws InvalidGpsLocationException If longitude is not in range [-180.0,180.0]
-    */
+     * Get the longitude of this GPS location
+     *
+     * @return the longitude of this GPS location
+     */
+    fun getLongitude(): Double {
+        return longitude
+    }
+
+    /**
+     * Change the longitude of this GPS location
+     *
+     * @param longitude The new longitude for this GPS location
+     * @throws InvalidGpsLocationException If longitude is not in range [-180.0,180.0]
+     */
     @Throws(InvalidGpsLocationException::class)
-    fun setLongitude(longitude: Double?) {
+    fun setLongitude(longitude: Double) {
         if (longitude != null && abs(longitude) > ABS_LONGITUDE_BOUND) {
             throw InvalidGpsLocationException(
                 "Longitude should be within -$ABS_LONGITUDE_BOUND and $ABS_LONGITUDE_BOUND"
@@ -69,11 +89,11 @@ class GpsLocation
     }
 
     /**
-    * Determines if the given object is logically equal to this GPS location
-    *
-    * @param other The object to compare
-    * @return True if the object equals this GPS location
-    */
+     * Determines if the given object is logically equal to this GPS location
+     *
+     * @param other The object to compare
+     * @return True if the object equals this GPS location
+     */
     override fun equals(@NotNull other: Any?):Boolean {
         if(other !is GpsLocation) return false
         if (this.latitude != other.latitude) return false

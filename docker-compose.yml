@@ -11,7 +11,7 @@ services:
             - ./pg-docker-script:/docker-entrypoint-initdb.d
         restart: always
         environment:
-            POSTGRES_MULTIPLE_DATABASES: gsbackend,gsbackendtest
+            POSTGRES_MULTIPLE_DATABASES: groundserver,groundservertest
             POSTGRES_PASSWORD: admin
 
     gsbackend:

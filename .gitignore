@@ -3,6 +3,10 @@
 .gradle
 /build/
 /pgdata/
+/images/*
+
+# Ignore auto-generated sql files
+*.sql
 
 # Ignore Gradle GUI config
 gradle-app.setting
