@@ -37,6 +37,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.cuair.ground.util.Flags;
 
 /** Contains all the callbacks for all the public api endpoints for the Image  */
 @CrossOrigin
@@ -47,7 +48,7 @@ public class ImageController {
     private TimestampDatabaseAccessor imageDao = (TimestampDatabaseAccessor) DAOFactory.getDAO(DAOFactory.ModelDAOType.TIMESTAMP_DATABASE_ACCESSOR, Image.class);
 
     /** String path to the folder where all the images are stored */
-    @Value("${plane.image.dir}") private String PLANE_IMAGE_DIR;
+    private String PLANE_IMAGE_DIR = Flags.PLANE_IMAGE_DIR;
 
     private ObjectMapper mapper = new ObjectMapper();
 
