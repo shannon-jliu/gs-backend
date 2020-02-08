@@ -95,7 +95,7 @@ public class ImageController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseEntity get(@PathVariable Long id) {
         Image image = (Image) imageDao.get(id);
-        return (image != null) ? ok(image) : noContent().build();
+        return (image != null) ? ok(image) : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     /**
@@ -159,20 +159,28 @@ public class ImageController {
             return badRequest().body("Json part must include imgMode");
         }
 
+        if (json.get("telemetry") == null) {
+            return badRequest().body("Json part must include telemetry");
+        }
+
+        if (json.get("telemetry").get("gps") == null) {
+            return badRequest().body("Json part must include gps within telemetry");
+        }
+
         if (json.get("telemetry").get("gps").get("latitude") == null) {
-            return badRequest().body("Json part must include latitude");
+            return badRequest().body("Json part must include latitude within gps");
         }
 
         if (json.get("telemetry").get("gps").get("longitude") == null) {
-            return badRequest().body("Json part must include longitude");
+            return badRequest().body("Json part must include longitude within gps");
         }
 
         if (json.get("telemetry").get("altitude") == null) {
-            return badRequest().body("Json part must include altitude");
+            return badRequest().body("Json part must include altitude within telemetry");
         }
 
         if (json.get("telemetry").get("planeYaw") == null) {
-            return badRequest().body("Json part must include heading");
+            return badRequest().body("Json part must include planeYaw within telemetry");
         }
 
         if (json.size() > 6) {
