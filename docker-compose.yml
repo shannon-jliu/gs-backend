@@ -16,6 +16,7 @@ services:
 
     gsbackend:
         image: gsbackend:latest
+        container_name: gsbackend
         build:
             context: .
         working_dir: "/home/gs-backend"
