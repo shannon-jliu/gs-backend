@@ -26,12 +26,12 @@ class GpsLocation
         private var longitude: Double
     ) {
         init {
-            if (latitude != null && abs(latitude!!) > ABS_LATITUDE_BOUND) {
+            if (abs(latitude) > ABS_LATITUDE_BOUND) {
                 throw InvalidGpsLocationException(
                     "Latitude should be within -$ABS_LATITUDE_BOUND and $ABS_LATITUDE_BOUND"
                 )
             }
-            if (longitude != null && abs(longitude!!) > ABS_LONGITUDE_BOUND) {
+            if (abs(longitude) > ABS_LONGITUDE_BOUND) {
                 throw InvalidGpsLocationException(
                     "Longitude should be within -$ABS_LONGITUDE_BOUND and $ABS_LONGITUDE_BOUND"
                 )
@@ -55,7 +55,7 @@ class GpsLocation
      */
     @Throws(InvalidGpsLocationException::class)
     fun setLatitude(latitude: Double) {
-        if (latitude != null && abs(latitude) > ABS_LATITUDE_BOUND) {
+        if (abs(latitude) > ABS_LATITUDE_BOUND) {
             throw InvalidGpsLocationException(
                 "Latitude should be within -$ABS_LATITUDE_BOUND and $ABS_LATITUDE_BOUND"
             )
@@ -80,7 +80,7 @@ class GpsLocation
      */
     @Throws(InvalidGpsLocationException::class)
     fun setLongitude(longitude: Double) {
-        if (longitude != null && abs(longitude) > ABS_LONGITUDE_BOUND) {
+        if (abs(longitude) > ABS_LONGITUDE_BOUND) {
             throw InvalidGpsLocationException(
                 "Longitude should be within -$ABS_LONGITUDE_BOUND and $ABS_LONGITUDE_BOUND"
             )
