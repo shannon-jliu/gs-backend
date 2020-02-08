@@ -11,6 +11,8 @@ import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 import java.net.URI;
 import org.json.*;
+import org.cuair.ground.protobuf.InteropApi.*;
+import com.google.protobuf.util.JsonFormat; 
 
 /*
  * Client for interop communications
@@ -37,28 +39,38 @@ public class InteropClient {
 
     headers.setContentType(MediaType.APPLICATION_JSON);
 
+    Credentials credentials = Credentials.newBuilder()
+      .setUsername(USERNAME)
+      .setPassword(PASSWORD)
+      .build();
+
     // todo with protobuf 
     JSONObject personJsonObject = new JSONObject();
     personJsonObject.put("username", USERNAME);
     personJsonObject.put("password", PASSWORD);
 
-    HttpEntity<String> requestEntity = new HttpEntity<String>(personJsonObject.toString(), headers);
-    ListenableFuture<ResponseEntity<String>> future1 = template.exchange(
-      interopURI, HttpMethod.POST, requestEntity, String.class);
+    try {
 
-    future1.addCallback(new ListenableFutureCallback<ResponseEntity<String>>() {
+      HttpEntity<String> requestEntity = new HttpEntity<String>(JsonFormat.printer().print(credentials), headers);
+      ListenableFuture<ResponseEntity<String>> future1 = template.exchange(
+        interopURI, HttpMethod.POST, requestEntity, String.class);
 
-        @Override
-        public void onSuccess(ResponseEntity<String> result) {
-            // todo
-        }
+      future1.addCallback(new ListenableFutureCallback<ResponseEntity<String>>() {
 
-        @Override
-        public void onFailure(Throwable ex) {
-            // todo
-        }
+          @Override
+          public void onSuccess(ResponseEntity<String> result) {
+            System.out.println("on success");
+              // todo
+          }
 
-    });
+          @Override
+          public void onFailure(Throwable ex) {
+              // todo
+            System.out.println("on failure");
+          }
+
+      });
+    } catch (Exception e) {}
   }
 
 }

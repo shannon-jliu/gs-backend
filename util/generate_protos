@@ -1,0 +1,2 @@
+# Run once initially and everytime *.proto files change
+protoc --java_out=../src/main ../src/main/resources/interop_api.proto --proto_path=../src/main/resources
