@@ -352,4 +352,19 @@ public class ImageController {
         return ok(i);
     }
 
+    /**
+     * Returns JSON of gps locations of the four corners of an image based on Geotag index 0 - top
+     * left; index 1 - top right; index 2 - bottom left; index 3 - bottom right;
+     *
+     * @return an HTTP response
+     */
+    @RequestMapping(value = "/geotag/{id}", method = RequestMethod.GET)
+    public ResponseEntity getGeotagCoordinates(@PathVariable Long id) {
+        if (id == null) return badRequest.body("Image ID is null");
+        Image i = (Image) imageDao.get(id);
+        if (i != null) {
+            return ok(i.getLocations());
+        }
+        return noContent.build();
+    }
 }
