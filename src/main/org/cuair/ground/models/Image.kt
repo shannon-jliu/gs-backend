@@ -21,7 +21,7 @@ class Image(
         var imageUrl: String?,
         /** Closest Telemetry for when this Image was taken  */
         @OneToOne(cascade = [CascadeType.ALL])
-        var telemetry: Telemetry?,
+        var telemetry: Telemetry,
         /** The type of this image. Either FIXED, TRACKING, or OFFAXIS */
         var imgMode: ImgMode
 ) : TimestampModel() {
@@ -29,7 +29,7 @@ class Image(
     /** Secondary constructor that sets imgMode to FIXED by default */
     constructor(
             imageUrl: String,
-            telemetry: Telemetry?
+            telemetry: Telemetry
     ) : this(imageUrl, telemetry, ImgMode.FIXED)
 
     /** The filesystem path this image lives on relative to the server directory */

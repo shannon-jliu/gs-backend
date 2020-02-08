@@ -13,6 +13,18 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.regex.Pattern;
+
+import static org.springframework.http.ResponseEntity.ok;
+import static org.springframework.http.ResponseEntity.noContent;
+import static org.springframework.http.ResponseEntity.badRequest;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
+import java.util.ArrayList;
+
+import javax.servlet.ServletContext;
 import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
 import org.cuair.ground.daos.DAOFactory;
@@ -22,6 +34,12 @@ import org.cuair.ground.models.Image;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.cuair.ground.models.geotag.GpsLocation;
+import org.cuair.ground.models.geotag.Telemetry;
+import org.cuair.ground.models.exceptions.InvalidGpsLocationException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -48,6 +66,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import org.springframework.http.CacheControl;
 
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.beans.factory.annotation.Value;
 
 /** Contains all the callbacks for all the public api endpoints for the Image  */
@@ -61,22 +80,30 @@ public class ImageController {
     /** String path to the folder where all the images are stored */
     @Value("${plane.image.dir}") private String PLANE_IMAGE_DIR;
 
-    /** String path to the folder where all the images are backed up */
-    @Value("${plane.image.backup.dir}") private String PLANE_IMAGE_BACKUP_DIR;
-
     private ObjectMapper mapper = new ObjectMapper();
 
-    /** A logger */
-    private static final Logger logger = LoggerFactory.getLogger(ImageController.class);
+    @Autowired
+    // required for obtaining this server's context to grab the location of the image file
+    private ServletContext context;
 
     /**
      * Constructs an HTTP response with all the images.
      *
      * @return HTTP response
      */
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<Image>> getAll() {
-        return ResponseEntity.ok(imageDao.getAll());
+    @RequestMapping(value = "/all/{id}", method = RequestMethod.GET)
+    public ResponseEntity getAllAfterId(@PathVariable Long id) {
+        List<Image> images = new ArrayList();
+        Image recent = (Image) imageDao.getRecent();
+        if (recent == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } else {
+            Long mostRecentId = recent.getId();
+            for (Long index = id+1; index <= mostRecentId; index++) {
+                images.add((Image) imageDao.get(index));
+            }
+            return ok(images);
+        }
     }
 
     /**
@@ -85,9 +112,9 @@ public class ImageController {
      * @return HTTP response
      */
     @RequestMapping(value = "/recent", method = RequestMethod.GET)
-    public ResponseEntity<Image> getRecent() {
+    public ResponseEntity getRecent() {
         Image recent = (Image) imageDao.getRecent();
-        return (recent != null) ? ResponseEntity.ok(recent) : ResponseEntity.noContent().build();
+        return (recent != null) ? ok(recent) : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     /**
@@ -97,187 +124,129 @@ public class ImageController {
      * @return HTTP response
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseEntity<Image> get(@PathVariable Long id) {
+    public ResponseEntity get(@PathVariable Long id) {
         Image image = (Image) imageDao.get(id);
-        return (image != null) ? ResponseEntity.ok(image) : ResponseEntity.noContent().build();
+        return (image != null) ? ok(image) : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     /**
-     * Checks to see if the body of a call to /image is valid. Returns a badRequest if not, null if it
-     * is a proper call.
+     * Gets the JSON of a verified body. Precondition is that the body is valid (see above method).
      *
-     * @param req the request
-     * @param isPost true if it is a POST (create) action, false if it is a PUT (update) action
-     * @return null if the body is valid, otherwise a badRequest
-     */
-    private CompletableFuture<ResponseEntity> validateRequestBody(MultipartFile[] files, String jsonString, boolean isPost) {
-        if (files == null && jsonString == null) {
-            return CompletableFuture.completedFuture(
-                ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Request should provide multipart/form-data")
-            );
-        }
-
-        String reqType = isPost ? "POST" : "PUT";
-
-        if (files.length == 0) {
-            return CompletableFuture.completedFuture(
-                ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing image file in image " + reqType + " request")
-            );
-        }
-        if (files.length != 1) {
-            return CompletableFuture.completedFuture(
-                ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Should have only one file in image " + reqType + " request")
-            );
-        }
-        if (jsonString == null) {
-            return CompletableFuture.completedFuture(
-                ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing json in image " + reqType + " request")
-            );
-        }
-
-        ObjectNode json = null;
-
-        try {
-            json = (ObjectNode) mapper.readTree(jsonString);
-        } catch (Exception e) {
-            return CompletableFuture.completedFuture(
-                ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Json part invalid: " + e + " \nReceived: " + jsonString)
-            );
-        }
-
-        // POST-specific requirements, maybe better way to do this than just nested if statement?
-        if (isPost) {
-            if (json.get("id") != null) {
-                return CompletableFuture.completedFuture(
-                    ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Don't put id in json of image POST request")
-                );
-            }
-
-            if (json.get("timestamp") == null) {
-                return CompletableFuture.completedFuture(
-                    ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Json part must include timestamp field")
-                );
-            }
-
-            // TODO: But we have timestamp and imgMode in the json part
-            // if (json.size() > 1) {
-            //     return CompletableFuture.completedFuture(
-            //         ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Json part contains invalid field")
-            //     );
-            // }
-        }
-        return null;
-    }
-
-    /**
-     * Gets the JSON of a verified body. Precondition is the the body is valid (see above method).
-     *
-     * @param req the valid request
-     * @return the ObjectNode representing the JSON of the body
-     */
-    private ObjectNode getJSON(String jsonString) throws IOException {
-        return (ObjectNode) mapper.readTree(jsonString);
-    }
-
-    /**
-     * Gets the File file from a MultipartFile file.
-     *
-     * @param file MultipartFile to be converted to a File
-     * @return the file that has been converted to File
-     */
-    private File convert(MultipartFile file) throws IOException {
-        File convFile = new File(file.getOriginalFilename());
-        convFile.createNewFile();
-        FileOutputStream fos = new FileOutputStream(convFile);
-        fos.write(file.getBytes());
-        fos.close();
-        return convFile;
-    }
-
-    /**
+     * @param jsonString the valid JSON body represented as a string
      * Gets the imageFile from a valid body in the form of a File object.
      *
-     * @param req the valid request
+     * @param file the MultipartFile array of files
      * @return the image file
      */
-    private File getImageFile(MultipartFile[] files) throws IOException {
-        return convert(files[0]);
+    private File getImageFile(MultipartFile file) throws IOException {
+      // save file to temp dir created by Spring context
+      File imgFile = new File(context.getRealPath(file.getOriginalFilename()));
+      file.transferTo(imgFile);
+      return imgFile;
     }
 
     /**
      * Creates an Image on our server given the request. Constructs an HTTP response with the
      * json of the image that was created. Option to include custom file name in json.
      *
-     * @param req the request
+     * @param jsonString the json part of the multipart request as a String
+     * @param file the file of the multipart request
      * @return an HTTP response
      */
     @RequestMapping(method = RequestMethod.POST)
-    public CompletableFuture<ResponseEntity> create(MultipartHttpServletRequest request) {
-        Map<String, String[]> formData = request.getParameterMap();
-        String jsonString = formData.get("jsonString")[0];
-        MultipartFile[] files = {request.getFile("files")};
-        // check if request is valid
-        CompletableFuture<ResponseEntity> validate = validateRequestBody(files, jsonString, true);
-        if (validate != null) {
-            return validate;
+    public ResponseEntity upload(@RequestPart("json") String jsonString,
+                                 @RequestPart("files") MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+          return badRequest().body("Missing image file");
+        }
+        if (jsonString == null || jsonString.isEmpty()) {
+          return badRequest().body("Missing json");
         }
 
-        ObjectNode json = null;
+        ObjectNode json;
+
+        try {
+            json = (ObjectNode) mapper.readTree(jsonString);
+        } catch (Exception e) {
+            return badRequest().body("Json part invalid: " + e + " \nReceived: " + jsonString);
+        }
+
+        if (json.get("id") != null) {
+          return badRequest().body("Don't put id in json of image POST request");
+        }
+
+        if (json.get("timestamp") == null) {
+            return badRequest().body("Json part must include timestamp field");
+        }
+
+        if (json.get("imgMode") == null) {
+            return badRequest().body("Json part must include imgMode");
+        }
+
+        if (json.get("telemetry") == null) {
+            return badRequest().body("Json part must include telemetry");
+        }
+
+        if (json.get("telemetry").get("gps") == null) {
+            return badRequest().body("Json part must include gps within telemetry");
+        }
+
+        if (json.get("telemetry").get("gps").get("latitude") == null) {
+            return badRequest().body("Json part must include latitude within gps");
+        }
+
+        if (json.get("telemetry").get("gps").get("longitude") == null) {
+            return badRequest().body("Json part must include longitude within gps");
+        }
+
+        if (json.get("telemetry").get("altitude") == null) {
+            return badRequest().body("Json part must include altitude within telemetry");
+        }
+
+        if (json.get("telemetry").get("planeYaw") == null) {
+            return badRequest().body("Json part must include planeYaw within telemetry");
+        }
+
+        if (json.size() > 6) {
+            return badRequest().body("Json part contains invalid field");
+        }
+
+        // after this part, the body has been validated
         try {
             json = getJSON(jsonString);
         } catch (IOException e) {
-            return CompletableFuture.completedFuture(
-                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e)
-            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e);
         }
 
-        Image i = null;
+        Image i;
         try {
             i = mapper.treeToValue(json, Image.class);
         } catch (JsonProcessingException e) {
-            return CompletableFuture.completedFuture(
-                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when convert json to Image instance: \n" + e)
-            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when converting json to Image instance: \n" + e);
         }
 
-        String name = null;
-        if (json.get("name") != null) {
-            name = json.remove("name").asText();
-        }
+        // set the filename to the timestamp of the image
+        String imageFileName = String.format("%d", i.getTimestamp().getTime());
 
-        // set image file name
-        String imageFileName;
-        if (name != null) {
-            imageFileName = name;
-        } else {
-            imageFileName = String.format("%d", i.getTimestamp().getTime());
-        }
-
-        File imageFile = null;
+        File imageFile;
         try {
-            imageFile = getImageFile(files);
+            imageFile = getImageFile(file);
         } catch (IOException e) {
-            return CompletableFuture.completedFuture(
-                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when extracting image from request: \n" + e)
-            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when extracting image from request: \n" + e);
         }
 
         String contentType;
         try {
             contentType = Files.probeContentType(imageFile.toPath());
         } catch (IOException e) {
-            return CompletableFuture.completedFuture(
-                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing contentType for image file: \n" + e)
-            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing contentType for image file: \n" + e);
         }
 
         // this is necessary because the Files.probeContentType method above
         // does not recognize the file type for files sent from Linux systems
         if (contentType == null) contentType = "image/jpeg"; // default image content type
         if (!contentType.startsWith("image")) {
-            return CompletableFuture.completedFuture(
-                ResponseEntity.status(HttpStatus.BAD_REQUEST).body("expected an image as a filePart")
-            );
+            return badRequest().body("expected an image as a filePart");
         }
         String imageExtension = contentType.split("\\/")[1];
         imageFileName += "." + imageExtension;
@@ -287,55 +256,61 @@ public class ImageController {
         try {
             FileUtils.moveFile(imageFile, FileUtils.getFile(PLANE_IMAGE_DIR + imageFileName));
         } catch (FileExistsException e) {
-            return CompletableFuture.completedFuture(
-                ResponseEntity.status(HttpStatus.BAD_REQUEST).body("File with timestamp already exists")
-            );
+            return badRequest().body("File with timestamp already exists");
         } catch (IOException e) {
-            return CompletableFuture.completedFuture(
-                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when moving image file: \n" + e)
-            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when moving image file: \n" + e);
         }
 
         i.setImageUrl("/api/v1/image/file/" + imageFileName);
 
         imageDao.create(i);
+
+        // TODO: uncomment the following once clients are implemented
         // imageClient.process(i);
-        return CompletableFuture.completedFuture(ResponseEntity.ok(i));
+
+        return ok(i);
     }
 
     /**
-     * Returns JSON of gps locations of the four corners of an image based on Geotag index 0 - top
-     * left; index 1 - top right; index 2 - bottom left; index 3 - bottom right;
+     * Ensures the provided image has non-null telemetry data
      *
-     * @return an HTTP response
+     * @param i the image to be checked
+     * @return the (possibly modified) image
      */
-    @RequestMapping(value = "/geotag/{id}", method = RequestMethod.GET)
-    public ResponseEntity getGeotagCoordinates(@PathVariable Long id) {
-        if (id == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Image ID is null");
-        Image i = (Image) imageDao.get(id);
-        if (i != null) {
-            return ResponseEntity.ok(i.getLocations());
-        }
-        return ResponseEntity.noContent().build();
-    }
+    private Image defaultValues(Image i) throws Exception {
+        Double DEFAULT_LATITUDE = 42.4440;
+        Double DEFAULT_LONGITUDE = 76.5019;
+        Double DEFAULT_ALTITUDE = 100.0;
+        Double DEFAULT_PLANE_YAW = 0.0;
 
-    /**
-     * Returns JSON of all gps locations of the four corners of an image based on Geotag index 0 - top
-     * left; index 1 - top right; index 2 - bottom left; index 3 - bottom right;
-     *
-     * @return an HTTP response
-     */
-    @RequestMapping(value = "/geotag", method = RequestMethod.GET)
-    public ResponseEntity getAllGeotagCoordinates() {
-        List<Long> ids = imageDao.getAllIds();
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode imageGeotags = mapper.createObjectNode();
-        for (Long id : ids) {
-            Image i = (Image) imageDao.get(id);
-            ObjectNode locs = i.getLocations();
-            if (locs != null) imageGeotags.put(Long.toString(id), locs);
+        if (i.getTelemetry() == null) {
+            Telemetry t = new Telemetry(new GpsLocation(DEFAULT_LATITUDE, DEFAULT_LONGITUDE), DEFAULT_ALTITUDE, DEFAULT_PLANE_YAW);
+            i.setTelemetry(t);
+        } else {
+            Telemetry t = i.getTelemetry();
+            if (t.getGps() == null) {
+                t.setGps(new GpsLocation(DEFAULT_LATITUDE, DEFAULT_LONGITUDE));
+            } else {
+                GpsLocation g = t.getGps();
+                if ((Double) g.getLatitude() == null) {
+                    g.setLatitude(DEFAULT_LATITUDE);
+                }
+
+                if ((Double) g.getLongitude() == null) {
+                    g.setLongitude(DEFAULT_LONGITUDE);
+                }
+            }
+
+            if ((Double) t.getAltitude() == null) {
+                t.setAltitude(DEFAULT_ALTITUDE);
+            }
+
+            if ((Double) t.getPlaneYaw() == null) {
+                t.setPlaneYaw(DEFAULT_PLANE_YAW);
+            }
         }
-        return ResponseEntity.ok(imageGeotags);
+
+        return i;
     }
 
     /**
@@ -343,34 +318,38 @@ public class ImageController {
      * telemetry data or gimbal state. Constructs a HTTP response with the json of the image that was
      * created
      *
-     * @param req the request
+     * @param jsonString the json request for this dummy create, as a string
      * @return an HTTP response
      */
     @RequestMapping(value = "/dummy", method = RequestMethod.POST)
-    public ResponseEntity dummyCreate(MultipartHttpServletRequest request) {
-        Map<String, String[]> formData = request.getParameterMap();
-        String jsonString = formData.get("jsonString")[0];
-        MultipartFile[] files = {request.getFile("files")};
-
-        ObjectNode json = null;
+    public ResponseEntity dummyCreate(String jsonString) {
+        ObjectNode json;
         try {
             json = getJSON(jsonString);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e);
         }
 
-        Image i = null;
+        Image i;
         try {
             i = mapper.treeToValue(json, Image.class);
         } catch (JsonProcessingException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when convert json to Image instance: \n" + e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when converting json to Image instance: \n" + e);
         }
 
         if (i.getId() != null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Don't put id in json of image POST request");
+            return badRequest().body("Don't put id in json of image POST request");
         }
+        i.setImageUrl("/api/v1/image/dummy");
+
+        try {
+            defaultValues(i);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when adding default values to Image instance: \n" + e);
+        }
+
         imageDao.create(i);
-        return ResponseEntity.ok(i);
+        return ok(i);
     }
 
 }

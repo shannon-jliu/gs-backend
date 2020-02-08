@@ -70,8 +70,8 @@ dependencies {
 
     implementation("org.avaje.composite:logback:1.1")
 
-    implementation("io.ebean:ebean:11.39.1")
-    implementation("io.ebean:ebean-querybean:12.1.8")
+    // Json
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.9.4"
 
     testImplementation "io.ebean:ebean-test:12.1.9"
 
@@ -87,7 +87,6 @@ dependencies {
 
     // Crypto
     implementation 'org.mindrot:jbcrypt:0.4'
-
 }
 
 ebean {
