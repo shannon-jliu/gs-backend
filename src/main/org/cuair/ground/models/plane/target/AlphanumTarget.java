@@ -246,13 +246,13 @@ public class AlphanumTarget extends Target {
 
         if (this.getGeotag() != null && !this.isOffaxis()) {
             if (this.getGeotag().getGpsLocation() != null
-                    && this.getGeotag().getGpsLocation().getLatitude() != null
-                    && !this.getGeotag().getGpsLocation().getLatitude().isNaN()) {
+                    && (Double) this.getGeotag().getGpsLocation().getLatitude() != null
+                    && !((Double) this.getGeotag().getGpsLocation().getLatitude()).isNaN()) {
                 rootNode.put("latitude", this.getGeotag().getGpsLocation().getLatitude());
             }
             if (this.getGeotag().getGpsLocation() != null
-                    && this.getGeotag().getGpsLocation().getLongitude() != null
-                    && !this.getGeotag().getGpsLocation().getLongitude().isNaN()) {
+                    && (Double) this.getGeotag().getGpsLocation().getLongitude() != null
+                    && !((Double) this.getGeotag().getGpsLocation().getLongitude()).isNaN()) {
                 rootNode.put("longitude", this.getGeotag().getGpsLocation().getLongitude());
             }
             if (this.getGeotag().getRadiansFromNorth() != null) {

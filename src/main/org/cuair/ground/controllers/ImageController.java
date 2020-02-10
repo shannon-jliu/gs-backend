@@ -118,6 +118,39 @@ public class ImageController {
     }
 
     /**
+     * Constructs an HTTP response with the given filename.
+     *
+     * @param file String filename for the requested image file
+     * @return HTTP response
+     */
+    @RequestMapping(value = "/file/{file}", method = RequestMethod.GET)
+    public ResponseEntity getFile(@PathVariable String file) {
+        // TODO: Is this necessary? It will be caught in exception FileNotFoundException below
+        File image = FileUtils.getFile(PLANE_IMAGE_DIR + file);
+        if (image.exists()) {
+            HttpHeaders headers = new HttpHeaders();
+            InputStream in = null;
+            try {
+                in = new FileInputStream(PLANE_IMAGE_DIR + file);
+            } catch (FileNotFoundException e) {
+                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File not found: " + PLANE_IMAGE_DIR + file);
+            }
+
+            byte[] media = null;
+            try {
+                media = IOUtils.toByteArray(in);
+            } catch (IOException e) {
+                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error reading file: " + PLANE_IMAGE_DIR + file);
+            }
+            headers.setCacheControl(CacheControl.noCache().getHeaderValue());
+
+            ResponseEntity<byte[]> responseEntity = new ResponseEntity<>(media, headers, HttpStatus.OK);
+            return responseEntity;
+        }
+        return noContent().build();
+    }
+
+    /**
      * Constructs a HTTP response with the image with id 'id'.
      *
      * @param id Long id for Image
@@ -127,6 +160,16 @@ public class ImageController {
     public ResponseEntity get(@PathVariable Long id) {
         Image image = (Image) imageDao.get(id);
         return (image != null) ? ok(image) : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    /**
+     * Gets the JSON of a verified body. Precondition is that the body is valid (see above method).
+     *
+     * @param jsonString the valid JSON body represented as a string
+     * @return the ObjectNode representing the JSON of the body
+     */
+    private ObjectNode getJSON(String jsonString) throws IOException {
+        return (ObjectNode) mapper.readTree(jsonString);
     }
 
     /**
@@ -360,11 +403,11 @@ public class ImageController {
      */
     @RequestMapping(value = "/geotag/{id}", method = RequestMethod.GET)
     public ResponseEntity getGeotagCoordinates(@PathVariable Long id) {
-        if (id == null) return badRequest.body("Image ID is null");
+        if (id == null) return badRequest().body("Image ID is null");
         Image i = (Image) imageDao.get(id);
         if (i != null) {
             return ok(i.getLocations());
         }
-        return noContent.build();
+        return noContent().build();
     }
 }

@@ -73,42 +73,6 @@ class Telemetry(
         this.planeYaw = planeYaw;
     }
 
-    /**
-     * Gets the gps this of telemetry data
-     *
-     * @return GpsLocation? The aerial position of this telemetry data
-     */
-    fun getGps(): GpsLocation? {
-        return gps
-    }
-
-    /**
-     * Gets the altitude of this telemetry data
-     *
-     * @return Double? The aerial position of this telemetry data
-     */
-    fun getAltitude(): Double? {
-        return altitude
-    }
-
-    /**
-     * Gets the heading of this telemetry data
-     *
-     * @return Double The heading of this telemetry data as radians from north
-     */
-    fun getPlaneYaw(): Double? {
-        return planeYaw
-    }
-
-    /**
-     * Gets the gimbal orientation of this telemetry data
-     *
-     * @return GimbalOrientation The gimbal orientation of this telemetry data
-     */
-    fun getOrientation(): GimbalOrientation? {
-        return orientation
-    }
-
     // TODO: Add the rest of the methods
 
     /**

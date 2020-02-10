@@ -112,13 +112,13 @@ public class EmergentTarget extends Target {
         rootNode.put("type", "emergent");
         if (this.getGeotag() != null) {
             if (this.getGeotag().getGpsLocation() != null
-                    && this.getGeotag().getGpsLocation().getLatitude() != null
-                    && !this.getGeotag().getGpsLocation().getLatitude().isNaN()) {
+                    && (Double) this.getGeotag().getGpsLocation().getLatitude() != null
+                    && !((Double) this.getGeotag().getGpsLocation().getLatitude()).isNaN()) {
                 rootNode.put("latitude", this.getGeotag().getGpsLocation().getLatitude());
             }
             if (this.getGeotag().getGpsLocation() != null
-                    && this.getGeotag().getGpsLocation().getLongitude() != null
-                    && !this.getGeotag().getGpsLocation().getLongitude().isNaN()) {
+                    && (Double) this.getGeotag().getGpsLocation().getLongitude() != null
+                    && !((Double) this.getGeotag().getGpsLocation().getLongitude()).isNaN()) {
                 rootNode.put("longitude", this.getGeotag().getGpsLocation().getLongitude());
             }
         }

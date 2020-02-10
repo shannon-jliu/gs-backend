@@ -110,6 +110,9 @@ public class Geotag extends CUAirModel {
     }
 
     public Geotag(TargetSighting sighting) {
+        if (sighting == null) {
+            return;
+        }
         Assignment assignment = sighting.getAssignment();
         if (assignment == null) {
           return;
@@ -124,11 +127,11 @@ public class Geotag extends CUAirModel {
         }
         GpsLocation gps = telemetry.getGps();
         // TODO: Should this be && or ||?
-        if (gps == null && telemetry.getAltitude() == null) {
+        if (gps == null && (Double) telemetry.getAltitude() == null) {
             return;
         }
         double altitude = -1;
-        if (telemetry.getAltitude() != null) {
+        if ((Double) telemetry.getAltitude() != null) {
             altitude = telemetry.getAltitude();
         }
 
@@ -307,7 +310,7 @@ public class Geotag extends CUAirModel {
         GpsLocation gps = telemetry.getGps();
         double altitude = telemetry.getAltitude();
         // TODO: Should this be && or ||?
-        if (gps == null && telemetry.getAltitude() == null) {
+        if (gps == null && (Double) telemetry.getAltitude() == null) {
             return false;
         }
         return true;

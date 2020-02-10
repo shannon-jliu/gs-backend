@@ -37,7 +37,7 @@ class Image(
 
     /** The possible image modes: fixed, tracking, and off-axis */
     enum class ImgMode (val mode: String) {
-        @JsonProperty("retract") @EnumValue("0") FIXED("retract"),
+        @JsonProperty("fixed") @EnumValue("0") FIXED("fixed"),
         @JsonProperty("tracking") @EnumValue("1") TRACKING("tracking"),
         @JsonProperty("off-axis") @EnumValue("2") OFFAXIS("off-axis")
     }
@@ -49,15 +49,15 @@ class Image(
      */
     @Suppress("DEPRECATION")
     @JsonIgnore fun getLocations(): ObjectNode? {
-        val imageTelemetry = this.telemetry ?: return null
+        val imageTelemetry = this.telemetry
         val imageGPS = imageTelemetry.getGps()
-        val centerLatitude = imageGPS?.getLatitude()
-        val centerLongitude = imageGPS?.getLongitude()
-        val planeYawRadians = imageTelemetry.getPlaneYaw()?.times(Math.PI/180)
+        val centerLatitude = imageGPS.getLatitude()
+        val centerLongitude = imageGPS.getLongitude()
+        val planeYawRadians = imageTelemetry.getPlaneYaw().times(Math.PI/180)
         val altitude = imageTelemetry.getAltitude()
 
         // TOOD: !! vs ?. --> And should this be done in the declarations above?
-        val topLeft = Geotag.getPixelCoordinates(centerLatitude!!, centerLongitude!!, altitude!!, 0.0, 0.0, planeYawRadians!!)
+        val topLeft = Geotag.getPixelCoordinates(centerLatitude, centerLongitude, altitude, 0.0, 0.0, planeYawRadians)
         val topRight = Geotag.getPixelCoordinates(centerLatitude, centerLongitude, altitude, Geotag.IMAGE_WIDTH, 0.0, planeYawRadians)
         val bottomLeft = Geotag.getPixelCoordinates(centerLatitude, centerLongitude, altitude, 0.0, Geotag.IMAGE_HEIGHT, planeYawRadians)
         val bottomRight = Geotag.getPixelCoordinates(centerLatitude, centerLongitude, altitude, Geotag.IMAGE_WIDTH, Geotag.IMAGE_HEIGHT, planeYawRadians)
