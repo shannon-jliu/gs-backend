@@ -23,6 +23,7 @@ Ground Server for the Platform infrastructure, Spring-ified
 - `gradle`
 - Python 3 for `pre-commit`
 - PostgresSQL
+- IntelliJ
 
 ## Installation
 ### Mac OS
@@ -103,5 +104,7 @@ Ensure that the following four files have the following four lines changed to be
 Then run `./run` in order to start up the server on port `9000`!
 
 ## Development guide
+
+See [IntelliJ Setup](docs/intellij_setup.md).
 
 When creating a new branch, please use the format of `<your-username>/<informative-branch-name>`. Do not commit to master (you shouldn't be able to anyway) and only squash PRs (you also shouldn't be able to do anything else either).

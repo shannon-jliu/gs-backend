@@ -68,6 +68,7 @@ import org.springframework.http.CacheControl;
 
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.beans.factory.annotation.Value;
+import org.cuair.ground.util.Flags;
 
 /** Contains all the callbacks for all the public api endpoints for the Image  */
 @CrossOrigin
@@ -78,7 +79,7 @@ public class ImageController {
     private TimestampDatabaseAccessor imageDao = (TimestampDatabaseAccessor) DAOFactory.getDAO(DAOFactory.ModelDAOType.TIMESTAMP_DATABASE_ACCESSOR, Image.class);
 
     /** String path to the folder where all the images are stored */
-    @Value("${plane.image.dir}") private String PLANE_IMAGE_DIR;
+    private String PLANE_IMAGE_DIR = Flags.PLANE_IMAGE_DIR;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -160,6 +161,38 @@ public class ImageController {
     public ResponseEntity get(@PathVariable Long id) {
         Image image = (Image) imageDao.get(id);
         return (image != null) ? ok(image) : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    /**
+     * Constructs an HTTP response with the given filename.
+     *
+     * @param file String filename for the requested image file
+     * @return HTTP response
+     */
+    @RequestMapping(value = "/file/{file}", method = RequestMethod.GET)
+    public ResponseEntity getFile(@PathVariable String file) {
+        File image = FileUtils.getFile(PLANE_IMAGE_DIR + file);
+        if (image.exists()) {
+            HttpHeaders headers = new HttpHeaders();
+            InputStream in = null;
+            try {
+                in = new FileInputStream(PLANE_IMAGE_DIR + file);
+            } catch (FileNotFoundException e) {
+                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File not found: " + PLANE_IMAGE_DIR + file);
+            }
+
+            byte[] media = null;
+            try {
+                media = IOUtils.toByteArray(in);
+            } catch (IOException e) {
+                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error reading file: " + PLANE_IMAGE_DIR + file);
+            }
+            headers.setCacheControl(CacheControl.noCache().getHeaderValue());
+
+            ResponseEntity<byte[]> responseEntity = new ResponseEntity<>(media, headers, HttpStatus.OK);
+            return responseEntity;
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     /**
