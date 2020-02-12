@@ -119,39 +119,6 @@ public class ImageController {
     }
 
     /**
-     * Constructs an HTTP response with the given filename.
-     *
-     * @param file String filename for the requested image file
-     * @return HTTP response
-     */
-    @RequestMapping(value = "/file/{file}", method = RequestMethod.GET)
-    public ResponseEntity getFile(@PathVariable String file) {
-        // TODO: Is this necessary? It will be caught in exception FileNotFoundException below
-        File image = FileUtils.getFile(PLANE_IMAGE_DIR + file);
-        if (image.exists()) {
-            HttpHeaders headers = new HttpHeaders();
-            InputStream in = null;
-            try {
-                in = new FileInputStream(PLANE_IMAGE_DIR + file);
-            } catch (FileNotFoundException e) {
-                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File not found: " + PLANE_IMAGE_DIR + file);
-            }
-
-            byte[] media = null;
-            try {
-                media = IOUtils.toByteArray(in);
-            } catch (IOException e) {
-                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error reading file: " + PLANE_IMAGE_DIR + file);
-            }
-            headers.setCacheControl(CacheControl.noCache().getHeaderValue());
-
-            ResponseEntity<byte[]> responseEntity = new ResponseEntity<>(media, headers, HttpStatus.OK);
-            return responseEntity;
-        }
-        return noContent().build();
-    }
-
-    /**
      * Constructs a HTTP response with the image with id 'id'.
      *
      * @param id Long id for Image
