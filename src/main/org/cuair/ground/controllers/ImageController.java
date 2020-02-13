@@ -10,6 +10,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.ArrayList;
@@ -17,10 +20,12 @@ import java.util.ArrayList;
 import javax.servlet.ServletContext;
 import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.cuair.ground.daos.DAOFactory;
 import org.cuair.ground.daos.TimestampDatabaseAccessor;
 import org.cuair.ground.models.Image;
 import org.cuair.ground.models.geotag.GpsLocation;
+import org.cuair.ground.models.geotag.GimbalOrientation;
 import org.cuair.ground.models.geotag.Telemetry;
 import org.cuair.ground.models.exceptions.InvalidGpsLocationException;
 
@@ -34,6 +39,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.CacheControl;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -132,16 +139,6 @@ public class ImageController {
     }
 
     /**
-     * Gets the JSON of a verified body. Precondition is that the body is valid (see above method).
-     *
-     * @param jsonString the valid JSON body represented as a string
-     * @return the ObjectNode representing the JSON of the body
-     */
-    private ObjectNode getJSON(String jsonString) throws IOException {
-        return (ObjectNode) mapper.readTree(jsonString);
-    }
-
-    /**
      * Gets the imageFile from a valid body in the form of a File object.
      *
      * @param file the MultipartFile array of files
@@ -208,6 +205,18 @@ public class ImageController {
             return badRequest().body("Json part must include longitude within gps");
         }
 
+        if (json.get("telemetry").get("gimOrt") == null) {
+            return badRequest().body("Json part must include gimOrt within telemetry");
+        }
+
+        if (json.get("telemetry").get("gimOrt").get("pitch") == null) {
+            return badRequest().body("Json part must include pitch within gimOrt");
+        }
+
+        if (json.get("telemetry").get("gimOrt").get("roll") == null) {
+            return badRequest().body("Json part must include roll within gimOrt");
+        }
+
         if (json.get("telemetry").get("altitude") == null) {
             return badRequest().body("Json part must include altitude within telemetry");
         }
@@ -216,13 +225,13 @@ public class ImageController {
             return badRequest().body("Json part must include planeYaw within telemetry");
         }
 
-        if (json.size() > 6) {
+        if (json.size() > 8) {
             return badRequest().body("Json part contains invalid field");
         }
 
         // after this part, the body has been validated
         try {
-            json = getJSON(jsonString);
+            json = (ObjectNode) mapper.readTree(jsonString);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e);
         }
@@ -287,13 +296,25 @@ public class ImageController {
      * @return the (possibly modified) image
      */
     private Image defaultValues(Image i) throws Exception {
+        Image.ImgMode DEFAULT_IMAGE_MODE = Image.ImgMode.FIXED;
         Double DEFAULT_LATITUDE = 42.4440;
         Double DEFAULT_LONGITUDE = 76.5019;
         Double DEFAULT_ALTITUDE = 100.0;
         Double DEFAULT_PLANE_YAW = 0.0;
+        Double DEFAULT_GIMBAL_PITCH = 0.0;
+        Double DEFAULT_GIMBAL_ROLL = 0.0;
+
+        if (i.getImgMode() == null) {
+            i.setImgMode(DEFAULT_IMAGE_MODE);
+        }
 
         if (i.getTelemetry() == null) {
-            Telemetry t = new Telemetry(new GpsLocation(DEFAULT_LATITUDE, DEFAULT_LONGITUDE), DEFAULT_ALTITUDE, DEFAULT_PLANE_YAW);
+            Telemetry t = new Telemetry(
+                new GpsLocation(DEFAULT_LATITUDE, DEFAULT_LONGITUDE), 
+                DEFAULT_ALTITUDE, 
+                DEFAULT_PLANE_YAW,
+                new GimbalOrientation(DEFAULT_GIMBAL_PITCH, DEFAULT_GIMBAL_ROLL)
+            );
             i.setTelemetry(t);
         } else {
             Telemetry t = i.getTelemetry();
@@ -307,6 +328,19 @@ public class ImageController {
 
                 if ((Double) g.getLongitude() == null) {
                     g.setLongitude(DEFAULT_LONGITUDE);
+                }
+            }
+
+            if (t.getGimOrt() == null) {
+                t.setGimOrt(new GimbalOrientation(DEFAULT_GIMBAL_PITCH, DEFAULT_GIMBAL_ROLL));
+            } else {
+                GimbalOrientation g = t.getGimOrt();
+                if ((Double) g.getPitch() == null) {
+                    g.setPitch(DEFAULT_GIMBAL_PITCH);
+                }
+
+                if ((Double) g.getRoll() == null) {
+                    g.setRoll(DEFAULT_GIMBAL_ROLL);
                 }
             }
 
@@ -331,11 +365,11 @@ public class ImageController {
      * @return an HTTP response
      */
     @RequestMapping(value = "/dummy", method = RequestMethod.POST)
-    public ResponseEntity dummyCreate(String jsonString) {
+    public ResponseEntity dummyCreate(@RequestPart("json") String jsonString) {
         ObjectNode json;
         try {
-            json = getJSON(jsonString);
-        } catch (IOException e) {
+            json = (ObjectNode) mapper.readTree(jsonString);
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e);
         }
 
@@ -360,5 +394,4 @@ public class ImageController {
         imageDao.create(i);
         return ok(i);
     }
-
 }
