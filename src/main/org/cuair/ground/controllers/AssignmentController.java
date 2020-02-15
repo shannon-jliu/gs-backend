@@ -5,10 +5,10 @@ import org.cuair.ground.daos.AssignmentDatabaseAccessor;
 import org.cuair.ground.daos.DAOFactory;
 import org.cuair.ground.models.Assignment;
 // TODO: Implement once auth has been finalized
-// import org.cuair.ground.models.AuthToken;
+import org.cuair.ground.models.AuthToken;
 import org.cuair.ground.models.ClientType;
 // TODO: Implement once auth has been finalized
-// import org.cuair.ground.util.AuthUtil;
+import org.cuair.ground.util.AuthUtil;
 import org.cuair.ground.util.Flags;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -71,12 +71,12 @@ public class AssignmentController {
         if (AUTH_ENABLED) {
             // TODO: Implement once auth has been finalized
             // grab user name
-            // AuthToken token = AuthUtil.Companion.getToken(headers);
-            // if (token != null) {
-            //     return ok(assignmentDao.getAllAfterId(id, token.getUsername()));
-            // } else {
-            //     return badRequest().body("Invalid username!");
-            // }
+            AuthToken token = AuthUtil.Companion.getToken(headers);
+            if (token != null) {
+                return ok(assignmentDao.getAllAfterId(id, token.getUsername()));
+            } else {
+                return badRequest().body("Invalid username!");
+            }
         } else {
             return ok(assignmentDao.getAllAfterId(id, DEFAULT_USER));
         }
@@ -108,12 +108,12 @@ public class AssignmentController {
         if (AUTH_ENABLED) {
             // TODO: Implement once auth has been finalized
             // grab user name and assign assignment to that username
-            // AuthToken token = AuthUtil.Companion.getToken(headers);
-            // if (token != null) {
-            //     a = assignmentDao.getWork(assignee, token.getUsername());
-            // } else {
-            //     return badRequest().body("Invalid username!");
-            // }
+            AuthToken token = AuthUtil.Companion.getToken(headers);
+            if (token != null) {
+                a = assignmentDao.getWork(assignee, token.getUsername());
+            } else {
+                return badRequest().body("Invalid username!");
+            }
         } else {
             a = assignmentDao.getWork(assignee, DEFAULT_USER);
         }
