@@ -30,6 +30,9 @@ public class Flags {
 	public static String CAM_GIM_MODE = "/api/mode";
 
 	public static String MISSION_INFO = "/api/missions";
+
+	public static int MISSION_ID = 1;
+
     // Flags
     public static boolean AUTH_ENABLED = false;
 

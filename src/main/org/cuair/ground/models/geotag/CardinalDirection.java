@@ -1,5 +1,7 @@
 package org.cuair.ground.models.geotag;
 
+import org.cuair.ground.protobuf.InteropApi.Odlc;
+
 /**
  * Represents one of the eight cardinal directions -> assumes radians is given from north counter
  * clockwise
@@ -92,5 +94,27 @@ public enum CardinalDirection {
     public static CardinalDirection getFromRadians(Double radian) {
         int index = (int) ((Radian.normalize(radian + Math.PI / 8)) / (Math.PI / 4));
         return CardinalDirection.values()[index];
+    }
+
+    public Odlc.Orientation asProtoOrientation() {
+        switch (this) {
+          case NORTH:
+            return Odlc.Orientation.N;
+          case NORTHEAST:
+            return Odlc.Orientation.NE;
+          case EAST:
+            return Odlc.Orientation.E;
+          case SOUTHEAST:
+            return Odlc.Orientation.SE;
+          case SOUTH:
+            return Odlc.Orientation.S;
+          case SOUTHWEST:
+            return Odlc.Orientation.SW;
+          case WEST:
+            return Odlc.Orientation.W;
+          case NORTHWEST:
+            return Odlc.Orientation.NW;
+        }
+        return null;
     }
 }

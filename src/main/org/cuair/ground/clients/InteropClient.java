@@ -18,6 +18,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.net.HttpCookie;
 
+import org.cuair.ground.models.plane.target.*;
+import org.cuair.ground.models.ClientType;
+import org.cuair.ground.models.geotag.*;
+
 /*
  * Client for interop communications
  */
@@ -38,6 +42,8 @@ public class InteropClient {
   public String PASSWORD = "testpass";
 
   public String MISSION_INFO = Flags.MISSION_INFO;
+
+  public int MISSION_ID = Flags.MISSION_ID;
 
   public String cookieValue = "";
 
@@ -93,11 +99,78 @@ public class InteropClient {
       // init airdrop
     };
 
-
     RequestUtil.futureCallback(missionURL, missionFuture, missionCallback);
   }
 
+  public Odlc createOdlcProto(Target target) {
+    Odlc.Builder odlcProto = Odlc.newBuilder();
+    if (target.getGeotag().getGpsLocation() != null) {
+      odlcProto
+        .setLatitude(target.getGeotag().getGpsLocation().getLatitude())
+        .setLongitude(target.getGeotag().getGpsLocation().getLongitude());
+    } else {
+      logger.error("Null gps location for target: " + target.toString());
+    }
+    odlcProto.setAutonomous(target.getCreator().equals(ClientType.ADLC));
+    odlcProto.setMission(MISSION_ID);
+    if (target.getTypeString().equals("Alphanum")) {
+      AlphanumTarget alphanumTarget = ((AlphanumTarget)target);
+      if (alphanumTarget.getAlpha() != null) {
+        odlcProto.setAlphanumeric(alphanumTarget.getAlpha());
+      }
+      if (alphanumTarget.getShape() != null) {
+        odlcProto.setShape(alphanumTarget.getShape().asProtoShape());
+      }
+      if (alphanumTarget.getAlphaColor() != null) {
+        odlcProto.setAlphanumericColor(alphanumTarget.getAlphaColor().asProtoColor());
+      }
+      if (alphanumTarget.getShapeColor() != null) {
+        odlcProto.setShapeColor(alphanumTarget.getShapeColor().asProtoColor());
+      }
+      if (alphanumTarget.getGeotag() != null) {
+        if (alphanumTarget.getGeotag().getRadiansFromNorth() != null) {
+          odlcProto.setOrientation(CardinalDirection.getFromRadians(alphanumTarget.getGeotag().getRadiansFromNorth()).asProtoOrientation());
+        }
+      } 
+      odlcProto.setType(Odlc.Type.STANDARD);
+    } else {
+      EmergentTarget emergentTarget = (EmergentTarget)target;
+      if (emergentTarget.getDescription() != null) {
+        odlcProto.setDescription(emergentTarget.getDescription());
+        odlcProto.setType(Odlc.Type.EMERGENT);
+      }
+    }
+    return odlcProto.build();
 
+
+    // if (null != target.geotag?.gpsLocation) {
+    //   odlcProto
+    //     .setLatitude(target.geotag.gpsLocation.latitude)
+    //     .setLongitude(target.geotag.gpsLocation.longitude)
+    // } else {
+    //   Logger.info("Null gps location for target: " + target.toString())
+    // }
+    // odlcProto.setAutonomous(target.creator.equals(ClientType.ADLC))
+    // odlcProto.setMission(MISSION_ID.toInt())
+
+
+
+    // if (target.typeString.equals("Alphanum")) {
+    //   val castedTarget = target as AlphanumTarget
+    //   val targetType = if (target.isOffaxis) Odlc.Type.OFF_AXIS else Odlc.Type.STANDARD
+    //   if (null != castedTarget.alpha) odlcProto.setAlphanumeric(castedTarget.alpha)
+    //   if (null != castedTarget.shape) odlcProto.setShape(castedTarget.shape.asProtoShape())
+    //   if (null != castedTarget.alphaColor) odlcProto.setAlphanumericColor(castedTarget.alphaColor.asProtoColor())
+    //   if (null != castedTarget.shapeColor) odlcProto.setShapeColor(castedTarget.shapeColor.asProtoColor())
+    //   if (null != castedTarget.geotag?.radiansFromNorth) odlcProto.setOrientation(CardinalDirection.getFromRadians(castedTarget.geotag.radiansFromNorth).asProtoOrientation())
+    //   odlcProto.setType(targetType)
+    // } else {
+    //   val castedTarget = target as EmergentTarget
+    //   if (null != castedTarget.description) odlcProto.setDescription(castedTarget.description)
+    //     .setType(Odlc.Type.EMERGENT)
+    // }
+    // return odlcProto.build()
+  }
 
   public void attemptLogin() {
 
