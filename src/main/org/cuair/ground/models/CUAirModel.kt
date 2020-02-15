@@ -5,7 +5,6 @@ import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.MappedSuperclass
-import javax.validation.constraints.NotNull
 
 /**
  * Base class for models in the CUAir system. All models should extend from this class. The model

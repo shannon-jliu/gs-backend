@@ -5,17 +5,19 @@ import java.util.Objects
 import javax.persistence.Entity
 import javax.persistence.OneToOne
 import javax.persistence.CascadeType
-import javax.persistence.Enumerated;
-import javax.validation.constraints.NotNull
+
+import io.ebean.annotation.EnumValue
+import com.fasterxml.jackson.annotation.JsonProperty
+import org.json.*;
 
 /** Represents an image and its corresponding metadata as sent down from the plane */
 @Entity
 class Image(
         /** The URL where clients can retrieve the image file  */
-        var imageUrl: String,
+        var imageUrl: String?,
         /** Closest Telemetry for when this Image was taken  */
         @OneToOne(cascade = [CascadeType.ALL])
-        var telemetry: Telemetry?,
+        var telemetry: Telemetry,
         /** The type of this image. Either FIXED, TRACKING, or OFFAXIS */
         var imgMode: ImgMode
 ) : TimestampModel() {
@@ -23,7 +25,7 @@ class Image(
     /** Secondary constructor that sets imgMode to FIXED by default */
     constructor(
             imageUrl: String,
-            telemetry: Telemetry?
+            telemetry: Telemetry
     ) : this(imageUrl, telemetry, ImgMode.FIXED)
 
     /** The filesystem path this image lives on relative to the server directory */
@@ -31,9 +33,13 @@ class Image(
 
     /** The possible image modes: fixed, tracking, and off-axis */
     enum class ImgMode (val mode: String) {
-        FIXED("fixed"),
-        TRACKING("tracking"),
-        OFFAXIS("off-axis")
+        @JsonProperty("fixed") @EnumValue("0") FIXED("fixed"),
+        @JsonProperty("tracking") @EnumValue("1") TRACKING("tracking"),
+        @JsonProperty("off-axis") @EnumValue("2") OFFAXIS("off-axis")
+    }
+
+    fun getLocations(): JSONObject {
+        return JSONObject();
     }
 
     /**

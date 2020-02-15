@@ -5,18 +5,6 @@ import javax.annotation.PreDestroy;
 import org.springframework.stereotype.Component;
 import org.cuair.ground.clients.ClientFactory;
 import org.cuair.ground.util.Flags;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import java.util.Collections;
-
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import java.util.concurrent.CompletableFuture;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,12 +20,12 @@ public class Lifecycle {
 		try {
 			ClientFactory.getInteropClient().attemptLogin();
 		} catch (Exception e) {
-			logger.error("Exception: " + e.getMessage());
+			logger.error("Startup exception: " + e.getMessage());
 		}
 	}
 
 	@PreDestroy
 	public void shutDown() {
-
+		
 	}
 }

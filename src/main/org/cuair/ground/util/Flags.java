@@ -1,14 +1,33 @@
 package org.cuair.ground.util;
 
-import org.springframework.beans.factory.annotation.Value;
 
 public class Flags {
-	
-	@Value("${cuair.plane.camera_gimbal}") public static String CUAIR_PLANE_CAMERA_GIMBAL;
 
-	@Value("${cuair.plane.airdrop}") public static String CUAIR_PLANE_AIRDROP;
+	public static String PLANE_IMAGE_DIR = "images/";
 
-	@Value("${cuair.plane.autopilot}") public static String CUAIR_PLANE_AUTOPILOT;
+	public static String AUTOPILOT_GROUND_IP = "192.168.0.22";
+	public static String AUTOPILOT_GROUND_PORT = "8001";
+	public static String AUTOPILOT_COVERAGE = "/ground/api/v3/distributed/geotag";
+	public static String AUTOPILOT_GROUND_MDLC_ROIS = "/ground/api/v3/distributed/mdlc";
+	public static String AUTOPILOT_GROUND_ADLC_ROIS = "/ground/api/v3/distributed/adlc";
 
-	@Value("${cuair.interop.destination}") public static String CUAIR_INTEROP_DESTINATION;
+	/* Plane servers IP */
+	public static String OBC_IP = "192.168.0.21";
+
+	public static boolean PRINT_CLIENT_LOGS = true;
+
+	// todo 
+
+	public static String CAM_GIM_PORT = "5000";
+
+	public static String AIR_API_PORT = "5001";
+
+	public static String AIRDROP_PORT = "5002";
+
+	/* CGS */
+
+	public static String CAM_GIM_MODE = "/api/mode";
+
+	public static String MISSION_INFO = "/api/missions";
+
 }

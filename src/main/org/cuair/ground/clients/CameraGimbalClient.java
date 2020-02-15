@@ -13,6 +13,8 @@ import java.net.URI;
 import org.json.*;
 import com.google.protobuf.util.JsonFormat; 
 import org.cuair.ground.models.plane.settings.*;
+import org.cuair.ground.util.Flags;
+import org.cuair.ground.util.RequestUtil;
 
 /*
  * Client for CGS communications
@@ -21,47 +23,27 @@ public class CameraGimbalClient {
 
   private AsyncRestTemplate template = new AsyncRestTemplate();
 
-  private String OBC_IP = "192.168.0.21";
+  private String OBC_IP = Flags.OBC_IP;
 
-  private String OBC_PORT = "5005";
+  private String CAM_GIM_PORT = Flags.CAM_GIM_PORT;
 
-  private String CGS_MODE_ROUTE = "/api/mode";
+  private String CAM_GIM_MODE = Flags.CAM_GIM_MODE;
 
-  public void changeCamGimMode() {
+  public void changeCamGimMode(CameraGimbalSettings.CameraGimbalMode camGimMode) {
+    String camGimModeURL = "http://" + OBC_IP + ":" + CAM_GIM_PORT + CAM_GIM_MODE;
 
-    URI cgsModeURI = URI.create("http://" + OBC_IP + ":" + OBC_PORT + CGS_MODE_ROUTE);
+    URI cgsModeURI = URI.create(camGimModeURL);
 
     HttpHeaders headers = new HttpHeaders();
 
     headers.setContentType(MediaType.APPLICATION_JSON);
 
-    try {
-      CameraGimbalSettings cgs = new CameraGimbalSettings(CameraGimbalSettings.CameraGimbalMode.FIXED);
+    CameraGimbalSettings cgs = new CameraGimbalSettings(camGimMode);
+    HttpEntity<CameraGimbalSettings> requestEntity = new HttpEntity<CameraGimbalSettings>(cgs, headers);
+    ListenableFuture<ResponseEntity<String>> csgModeFuture = template.exchange(
+      cgsModeURI, HttpMethod.POST, requestEntity, String.class);
+    RequestUtil.futureCallback(camGimModeURL, csgModeFuture);
 
-      HttpEntity<CameraGimbalSettings> requestEntity = new HttpEntity<CameraGimbalSettings>(cgs, headers);
-      ListenableFuture<ResponseEntity<String>> future1 = template.exchange(
-        cgsModeURI, HttpMethod.POST, requestEntity, String.class);
-
-      future1.addCallback(new ListenableFutureCallback<ResponseEntity<String>>() {
-
-          @Override
-          public void onSuccess(ResponseEntity<String> result) {
-            System.out.println("cam on success");
-              // todo
-          }
-
-          @Override
-          public void onFailure(Throwable ex) {
-              // todo
-            System.out.println("cam on failure");
-          }
-
-      });
-    } catch (Exception e) {
-
-    }
   }
-
-
 
 }
