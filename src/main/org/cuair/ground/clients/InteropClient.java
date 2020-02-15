@@ -97,41 +97,6 @@ public class InteropClient {
     RequestUtil.futureCallback(missionURL, missionFuture, missionCallback);
   }
 
-  public Odlc createOdlcProto(Target target) {
-    Odlc.Builder odlcProto = Odlc.newBuilder();
-    if (target.)
-
-
-
-    if (null != target.geotag?.gpsLocation) {
-      odlcProto
-        .setLatitude(target.geotag.gpsLocation.latitude)
-        .setLongitude(target.geotag.gpsLocation.longitude)
-    } else {
-      Logger.info("Null gps location for target: " + target.toString())
-    }
-    odlcProto.setAutonomous(target.creator.equals(ClientType.ADLC))
-    odlcProto.setMission(MISSION_ID.toInt())
-
-    if (target.typeString.equals("Alphanum")) {
-      val castedTarget = target as AlphanumTarget
-      val targetType = if (target.isOffaxis) Odlc.Type.OFF_AXIS else Odlc.Type.STANDARD
-      if (null != castedTarget.alpha) odlcProto.setAlphanumeric(castedTarget.alpha)
-      if (null != castedTarget.shape) odlcProto.setShape(castedTarget.shape.asProtoShape())
-      if (null != castedTarget.alphaColor) odlcProto.setAlphanumericColor(castedTarget.alphaColor.asProtoColor())
-      if (null != castedTarget.shapeColor) odlcProto.setShapeColor(castedTarget.shapeColor.asProtoColor())
-      if (null != castedTarget.geotag?.radiansFromNorth) odlcProto.setOrientation(CardinalDirection.getFromRadians(castedTarget.geotag.radiansFromNorth).asProtoOrientation())
-      odlcProto.setType(targetType)
-    } else {
-      val castedTarget = target as EmergentTarget
-      if (null != castedTarget.description) odlcProto.setDescription(castedTarget.description)
-        .setType(Odlc.Type.EMERGENT)
-    }
-    return odlcProto.build()
-  }
-
-  public void 
-
 
   public void attemptLogin() {
 
