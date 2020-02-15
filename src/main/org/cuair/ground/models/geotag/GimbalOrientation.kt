@@ -13,8 +13,8 @@ class GimbalOrientation
     /**
      * Creates a new GimbalOrientation given the pitch and roll in degrees
      *
-     * @param pitch The pitch of the gimbal in degrees. 0 is pointing down and positive is pointing forward
-     * @param roll The roll of the gimbal in degrees. 0 is pointing down and positive is pointing to the right
+     * @param pitch The pitch of the gimbal in degrees. 0 is pointing down and positive is pointing backwards
+     * @param roll The roll of the gimbal in degrees. 0 is pointing down and positive is pointing to the left
      */
     constructor(
         @field:Basic(optional = true)
