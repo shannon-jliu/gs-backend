@@ -1,11 +1,16 @@
 package org.cuair.ground.models
 
 import org.cuair.ground.models.geotag.Telemetry
+import org.cuair.ground.models.geotag.Geotag
 import java.util.Objects
 import javax.persistence.Entity
 import javax.persistence.OneToOne
 import javax.persistence.CascadeType
-
+import javax.persistence.Enumerated
+import javax.validation.constraints.NotNull
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.databind.node.ObjectNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.ebean.annotation.EnumValue
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.json.*;
@@ -38,8 +43,36 @@ class Image(
         @JsonProperty("off-axis") @EnumValue("2") OFFAXIS("off-axis")
     }
 
-    fun getLocations(): JSONObject {
-        return JSONObject();
+
+    /**
+     * Internal method for finding geotags for a given image id
+     *
+     * @return ObjectNode
+     */
+    @Suppress("DEPRECATION")
+    @JsonIgnore fun getLocations(): ObjectNode? {
+        val imageTelemetry = this.telemetry
+        val imageGPS = imageTelemetry.getGps()
+        val centerLatitude = imageGPS.getLatitude()
+        val centerLongitude = imageGPS.getLongitude()
+        val planeYawRadians = imageTelemetry.getPlaneYaw().times(Math.PI/180)
+        val altitude = imageTelemetry.getAltitude()
+
+        // TOOD: !! vs ?. --> And should this be done in the declarations above?
+        val topLeft = Geotag.getPixelCoordinates(centerLatitude, centerLongitude, altitude, 0.0, 0.0, planeYawRadians)
+        val topRight = Geotag.getPixelCoordinates(centerLatitude, centerLongitude, altitude, Geotag.IMAGE_WIDTH, 0.0, planeYawRadians)
+        val bottomLeft = Geotag.getPixelCoordinates(centerLatitude, centerLongitude, altitude, 0.0, Geotag.IMAGE_HEIGHT, planeYawRadians)
+        val bottomRight = Geotag.getPixelCoordinates(centerLatitude, centerLongitude, altitude, Geotag.IMAGE_WIDTH, Geotag.IMAGE_HEIGHT, planeYawRadians)
+
+        val mapper = ObjectMapper()
+        val locs = mapper.createObjectNode() as ObjectNode
+        locs.put("topLeft", mapper.writeValueAsString(topLeft))
+        locs.put("topRight", mapper.writeValueAsString(topRight))
+        locs.put("bottomLeft", mapper.writeValueAsString(bottomLeft))
+        locs.put("bottomRight", mapper.writeValueAsString(bottomRight))
+        locs.put("orientation", mapper.writeValueAsString(planeYawRadians))
+        locs.put("url", this.imageUrl)
+        return locs
     }
 
     /**

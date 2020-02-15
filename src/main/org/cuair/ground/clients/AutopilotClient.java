@@ -15,6 +15,7 @@ import com.google.protobuf.util.JsonFormat;
 import org.cuair.ground.models.plane.settings.*;
 import org.cuair.ground.util.Flags;
 import org.cuair.ground.models.Image;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.cuair.ground.util.RequestUtil;
 
 /*
@@ -55,11 +56,11 @@ public class AutopilotClient {
     URI coverageURI = URI.create(coverageURL);
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
-    JSONObject imageLocations = image.getLocations();
-    HttpEntity<JSONObject> requestEntity = new HttpEntity<JSONObject>(imageLocations, headers);
-    ListenableFuture<ResponseEntity<String>> coverageFuture = template.exchange(
-      coverageURI, HttpMethod.POST, requestEntity, String.class);
-    RequestUtil.futureCallback(coverageURL, coverageFuture);
+    // ObjectNode imageLocations = image.getLocations();
+    // HttpEntity<JSONObject> requestEntity = new HttpEntity<JSONObject>(imageLocations, headers);
+    // ListenableFuture<ResponseEntity<String>> coverageFuture = template.exchange(
+    //   coverageURI, HttpMethod.POST, requestEntity, String.class);
+    // RequestUtil.futureCallback(coverageURL, coverageFuture);
   }
 
 }

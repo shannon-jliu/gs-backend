@@ -1,12 +1,22 @@
 package org.cuair.ground.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.concurrent.CompletableFuture;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.regex.Pattern;
+
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.badRequest;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +30,10 @@ import org.apache.commons.io.FileUtils;
 import org.cuair.ground.daos.DAOFactory;
 import org.cuair.ground.daos.TimestampDatabaseAccessor;
 import org.cuair.ground.models.Image;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.cuair.ground.models.geotag.GpsLocation;
 import org.cuair.ground.models.geotag.Telemetry;
 import org.cuair.ground.models.exceptions.InvalidGpsLocationException;
@@ -30,12 +44,29 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.multipart.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+
+import org.springframework.web.multipart.support.*;
+import org.springframework.web.multipart.*;
+import org.springframework.util.MultiValueMap;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
+import org.apache.commons.io.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import org.springframework.http.CacheControl;
+
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.beans.factory.annotation.Value;
 import org.cuair.ground.util.Flags;
 
@@ -100,6 +131,38 @@ public class ImageController {
     }
 
     /**
+     * Constructs an HTTP response with the given filename.
+     *
+     * @param file String filename for the requested image file
+     * @return HTTP response
+     */
+    @RequestMapping(value = "/file/{file}", method = RequestMethod.GET)
+    public ResponseEntity getFile(@PathVariable String file) {
+        File image = FileUtils.getFile(PLANE_IMAGE_DIR + file);
+        if (image.exists()) {
+            HttpHeaders headers = new HttpHeaders();
+            InputStream in = null;
+            try {
+                in = new FileInputStream(PLANE_IMAGE_DIR + file);
+            } catch (FileNotFoundException e) {
+                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File not found: " + PLANE_IMAGE_DIR + file);
+            }
+
+            byte[] media = null;
+            try {
+                media = IOUtils.toByteArray(in);
+            } catch (IOException e) {
+                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error reading file: " + PLANE_IMAGE_DIR + file);
+            }
+            headers.setCacheControl(CacheControl.noCache().getHeaderValue());
+
+            ResponseEntity<byte[]> responseEntity = new ResponseEntity<>(media, headers, HttpStatus.OK);
+            return responseEntity;
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    /**
      * Gets the JSON of a verified body. Precondition is that the body is valid (see above method).
      *
      * @param jsonString the valid JSON body represented as a string
@@ -110,6 +173,9 @@ public class ImageController {
     }
 
     /**
+     * Gets the JSON of a verified body. Precondition is that the body is valid (see above method).
+     *
+     * @param jsonString the valid JSON body represented as a string
      * Gets the imageFile from a valid body in the form of a File object.
      *
      * @param file the MultipartFile array of files
@@ -329,4 +395,19 @@ public class ImageController {
         return ok(i);
     }
 
+    /**
+     * Returns JSON of gps locations of the four corners of an image based on Geotag index 0 - top
+     * left; index 1 - top right; index 2 - bottom left; index 3 - bottom right;
+     *
+     * @return an HTTP response
+     */
+    @RequestMapping(value = "/geotag/{id}", method = RequestMethod.GET)
+    public ResponseEntity getGeotagCoordinates(@PathVariable Long id) {
+        if (id == null) return badRequest().body("Image ID is null");
+        Image i = (Image) imageDao.get(id);
+        if (i != null) {
+            return ok(i.getLocations());
+        }
+        return noContent().build();
+    }
 }

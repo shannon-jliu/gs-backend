@@ -73,6 +73,8 @@ class Telemetry(
         this.planeYaw = planeYaw;
     }
 
+    // TODO: Add the rest of the methods
+
     /**
      * Determines if the given object is logically equal to this Telemetry
      *
