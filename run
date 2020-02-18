@@ -1,2 +1,2 @@
 #!/bin/bash
-gradle build && gradle bootRun
+gradle build -x test && gradle bootRun
