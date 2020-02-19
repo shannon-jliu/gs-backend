@@ -8,10 +8,10 @@ import org.cuair.ground.models.TimestampModel
 import org.cuair.ground.models.plane.target.AlphanumTarget
 import org.cuair.ground.models.plane.target.AlphanumTargetSighting
 import org.cuair.ground.models.plane.target.TargetSighting
+import org.cuair.ground.models.Username
 
 /** Factory for creating an managing DAO instances */
 class DAOFactory {
-
   /** Enumeration of all database accessor types that are not parametrized on a model */
   enum class ModellessDAOType {
     ASSIGNMENT_DATABASE_ACCESSOR {
@@ -27,6 +27,11 @@ class DAOFactory {
     MGT_IMAGE_DATABASE_ACCESSOR {
         override fun createInstance(): DatabaseAccessor<*> {
             return MGTImageDatabaseAccessor()
+        }
+    },
+    USERNAME_DATABASE_ACCESSOR {
+        override fun createInstance(): DatabaseAccessor<*> {
+            return UsernameDatabaseAccessor()
         }
     };
 

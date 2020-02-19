@@ -76,10 +76,6 @@ public class AlphanumTargetController extends TargetController<AlphanumTarget> {
             return ResponseEntity.noContent().build();
         }
 
-        // TODO: Figure out why these off-axis-related lines of code are here
-        if (other.isOffaxis() != null) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Don't pass offaxis for target creates");
-        }
         return super.update(id, t, other);
     }
 
