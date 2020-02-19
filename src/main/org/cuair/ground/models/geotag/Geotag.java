@@ -5,9 +5,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import javax.validation.constraints.NotNull;
+
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+
 import org.cuair.ground.daos.AssignmentDatabaseAccessor;
 import org.cuair.ground.daos.ClientCreatableDatabaseAccessor;
 import org.cuair.ground.daos.DAOFactory;
@@ -22,28 +23,24 @@ import org.cuair.ground.models.plane.target.EmergentTargetSighting;
 import org.cuair.ground.models.plane.target.Target;
 import org.cuair.ground.models.plane.target.TargetSighting;
 import org.cuair.ground.models.exceptions.InvalidGpsLocationException;
+import org.cuair.ground.Flags;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 
 /** Represents the position and orientation of an object on the ground */
 @Entity
 public class Geotag extends CUAirModel {
 
-    // TODO: Fix this initialization issue to use the properties file properly
     /** Field of view of camera horizontally and vertically */
-    // @Value("${cuair.geotag.fov_horizontal_radians}") private static double FOV_HORIZONTAL_RADIANS;
-    private static double FOV_HORIZONTAL_RADIANS = 0.7328394987;
+    private double FOV_HORIZONTAL_RADIANS = Flags.FOV_HORIZONTAL_RADIANS;
 
-    // @Value("${cuair.geotag.fov_vertical_radians}") private static double FOV_VERTICAL_RADIANS;
-    private static double FOV_VERTICAL_RADIANS = 0.560476881;
+    private double FOV_VERTICAL_RADIANS = Flags.FOV_VERTICAL_RADIANS;
 
     /** Width of height and image in pixels */
-    // @Value("${cuair.geotag.image_width}") public static double IMAGE_WIDTH;
-    public static double IMAGE_WIDTH = 4912.0;
+    public double IMAGE_WIDTH = Flags.IMAGE_WIDTH;
 
-    // @Value("${cuair.geotag.image_height}") public static double IMAGE_HEIGHT;
-    public static double IMAGE_HEIGHT = 3684.0;
+    public double IMAGE_HEIGHT = Flags.IMAGE_HEIGHT;
 
     /** A logger */
     private static final Logger logger = LoggerFactory.getLogger(GpsLocation.class);
