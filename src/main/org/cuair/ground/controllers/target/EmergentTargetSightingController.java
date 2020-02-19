@@ -77,6 +77,9 @@ public class EmergentTargetSightingController extends TargetSightingController<E
      */
     @RequestMapping(value = "/assignment/{id}", method = RequestMethod.POST)
     public ResponseEntity create(@PathVariable Long id, @RequestBody EmergentTargetSighting ts) {
+        // TODO: Fix: This threw a NullPointerException when moving a target sighting to a target. Neither were emergent though
+        // The console on the frontend also threw an error: "index.js:1437 Warning: Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in the componentWillUnmount method.
+        // in MergeSightingPreview (at mergeTarget.js:314)""
         EmergentTarget t = eTargetDao.getAll().get(0);
         if (ts.getCreator() != ClientType.MDLC) {
             return badRequest().body("Only MDLC should be creating Emergent Target Sightings");
