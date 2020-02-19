@@ -6,10 +6,10 @@ public class Flags {
 	public static String PLANE_IMAGE_DIR = "images/";
 
     // Constants
-    private static double FOV_HORIZONTAL_RADIANS = 0.7328394987;
-    private static double FOV_VERTICAL_RADIANS = 0.560476881;
-    private static double IMAGE_WIDTH = 4912.0;
-    private static double IMAGE_HEIGHT = 3684.0;
+    public static double FOV_HORIZONTAL_RADIANS = 0.7328394987;
+    public static double FOV_VERTICAL_RADIANS = 0.560476881;
+    public static double IMAGE_WIDTH = 4912.0;
+    public static double IMAGE_HEIGHT = 3684.0;
 
     // Flags
     public static boolean AUTH_ENABLED = false;

@@ -23,7 +23,7 @@ import org.cuair.ground.models.plane.target.EmergentTargetSighting;
 import org.cuair.ground.models.plane.target.Target;
 import org.cuair.ground.models.plane.target.TargetSighting;
 import org.cuair.ground.models.exceptions.InvalidGpsLocationException;
-import org.cuair.ground.Flags;
+import org.cuair.ground.util.Flags;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,14 +33,14 @@ import org.slf4j.LoggerFactory;
 public class Geotag extends CUAirModel {
 
     /** Field of view of camera horizontally and vertically */
-    private double FOV_HORIZONTAL_RADIANS = Flags.FOV_HORIZONTAL_RADIANS;
+    private static double FOV_HORIZONTAL_RADIANS = Flags.FOV_HORIZONTAL_RADIANS;
 
-    private double FOV_VERTICAL_RADIANS = Flags.FOV_VERTICAL_RADIANS;
+    private static double FOV_VERTICAL_RADIANS = Flags.FOV_VERTICAL_RADIANS;
 
     /** Width of height and image in pixels */
-    public double IMAGE_WIDTH = Flags.IMAGE_WIDTH;
+    public static double IMAGE_WIDTH = Flags.IMAGE_WIDTH;
 
-    public double IMAGE_HEIGHT = Flags.IMAGE_HEIGHT;
+    public static double IMAGE_HEIGHT = Flags.IMAGE_HEIGHT;
 
     /** A logger */
     private static final Logger logger = LoggerFactory.getLogger(GpsLocation.class);
