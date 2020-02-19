@@ -1,24 +1,34 @@
 package org.cuair.ground.daos
 
+import org.cuair.ground.models.ClientCreatable
 import org.cuair.ground.models.CUAirModel
 import org.cuair.ground.models.TimestampModel
+import org.cuair.ground.models.plane.target.AlphanumTarget
+import org.cuair.ground.models.plane.target.AlphanumTargetSighting
+import org.cuair.ground.models.plane.target.TargetSighting
 import org.cuair.ground.models.Username
 
 /** Factory for creating an managing DAO instances */
 class DAOFactory {
-    enum class ModellessDAOType {
-        USERNAME_DATABASE_ACCESSOR {
-            override fun createInstance(): DatabaseAccessor<*> {
-                return UsernameDatabaseAccessor()
-            }
-        };
+  /** Enumeration of all database accessor types that are not parametrized on a model */
+  enum class ModellessDAOType {
+    ASSIGNMENT_DATABASE_ACCESSOR {
+        override fun createInstance(): DatabaseAccessor<*> {
+            return AssignmentDatabaseAccessor()
+        }
+    },
+    USERNAME_DATABASE_ACCESSOR {
+        override fun createInstance(): DatabaseAccessor<*> {
+            return UsernameDatabaseAccessor()
+        }
+    };
 
-        /**
-         * Creates an instance of the database accessor
-         *
-         * @return the DAO instance
-         */
-        abstract fun createInstance() : DatabaseAccessor<*>
+    /**
+     * Creates an instance of the database accessor
+     *
+     * @return the DAO instance
+     */
+    abstract fun createInstance() : DatabaseAccessor<*>
   }
 
   /** Enumeration of all database accessor types that are parametrized on a model */
@@ -26,6 +36,31 @@ class DAOFactory {
     DATABASE_ACCESSOR {
       override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
         return DatabaseAccessor(clazz)
+      }
+    },
+    ALPHANUM_TARGET_DATABASE_ACCESSOR {
+      override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
+        return AlphanumTargetDatabaseAccessor(clazz.asSubclass(AlphanumTarget::class.java))
+      }
+    },
+    ALPHANUM_TARGET_SIGHTINGS_DATABASE_ACCESSOR {
+      override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
+        return AlphanumTargetSightingsDatabaseAccessor(clazz.asSubclass(AlphanumTargetSighting::class.java))
+      }
+    },
+    CLIENT_CREATABLE_DATABASE_ACCESSOR {
+      override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
+        return ClientCreatableDatabaseAccessor(clazz.asSubclass(ClientCreatable::class.java))
+      }
+    },
+    TARGET_DATABASE_ACCESSOR {
+      override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
+        return TargetDatabaseAccessor(clazz.asSubclass(org.cuair.ground.models.plane.target.Target::class.java))
+      }
+    },
+    TARGET_SIGHTINGS_DATABASE_ACCESSOR {
+      override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
+        return TargetSightingsDatabaseAccessor(clazz.asSubclass(TargetSighting::class.java))
       }
     },
     TIMESTAMP_DATABASE_ACCESSOR {
@@ -57,7 +92,6 @@ class DAOFactory {
      * DAOs that are not parametrized on models
      */
     private val daoWithoutModelMap = hashMapOf<ModellessDAOType, DatabaseAccessor<*>>()
-
 
     /**
      * Gets a DAO instance given a ModellessDAOType
