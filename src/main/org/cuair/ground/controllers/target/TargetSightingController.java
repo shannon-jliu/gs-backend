@@ -83,6 +83,7 @@ public abstract class TargetSightingController<T extends TargetSighting> {
      * @return ResponseEntity containing the newly created target sighting as json
      */
     public ResponseEntity create(Long assignmentId, T ts) {
+        System.out.println("target sighting create");
         Assignment a = assignmentDao.get(assignmentId);
         if (a == null) {
             return ResponseEntity.noContent().build();

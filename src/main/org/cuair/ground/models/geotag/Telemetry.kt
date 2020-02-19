@@ -4,6 +4,7 @@ import java.util.Objects
 import javax.persistence.Entity
 import javax.persistence.Embedded
 import org.cuair.ground.models.CUAirModel
+import org.cuair.ground.models.geotag.GimbalOrientation
 
 /** Represents telemetry of an object
     gps will contain latitude and longitude
@@ -15,7 +16,9 @@ class Telemetry(
         @Embedded
         private var gps: GpsLocation,
         private var altitude: Double,
-        private var planeYaw: Double
+        private var planeYaw: Double,
+        private var pitch: Double,
+        private var roll: Double
 ) : CUAirModel() {
     // TODO: Add the rest of the methods
 
@@ -27,6 +30,10 @@ class Telemetry(
     fun getGps(): GpsLocation {
         return gps;
     }
+
+    // fun getGimbalOrientation(): GimbalOrientation {
+    //     return gimbalOrientation;
+    // }
 
     /**
      * Get the altitude of this Telemetry instance
@@ -44,6 +51,10 @@ class Telemetry(
      */
     fun getPlaneYaw(): Double {
         return planeYaw;
+    }
+
+    fun getPitch(): Double {
+        return pitch;
     }
 
     /**
@@ -64,6 +75,10 @@ class Telemetry(
         this.altitude = altitude;
     }
 
+    fun setPitch(pitch: Double) {
+        this.pitch = pitch;
+    }
+
     /**
      * Change the planeYaw of this Telemetry instance
      *
@@ -72,6 +87,10 @@ class Telemetry(
     fun setPlaneYaw(planeYaw: Double) {
         this.planeYaw = planeYaw;
     }
+
+    // fun setGimbalOrientation(gimbalOrientation: GimbalOrientation) {
+    //     this.gimbalOrientation = gimbalOrientation;
+    // }
 
     // TODO: Add the rest of the methods
 
@@ -86,6 +105,7 @@ class Telemetry(
 
         if (this.altitude != other.altitude) return false
         if (this.planeYaw != other.planeYaw) return false
+        //if (this.gimbalOrientation != other.gimbalOrientation) return false
         if (!Objects.equals(this.gps, other.gps)) return false
         return true
     }

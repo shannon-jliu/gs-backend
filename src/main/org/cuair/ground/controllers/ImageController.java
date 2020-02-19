@@ -70,6 +70,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.beans.factory.annotation.Value;
 import org.cuair.ground.util.Flags;
 
+import org.cuair.ground.models.geotag.GimbalOrientation;
+
 /** Contains all the callbacks for all the public api endpoints for the Image  */
 @CrossOrigin
 @RestController
@@ -199,6 +201,7 @@ public class ImageController {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity upload(@RequestPart("json") String jsonString,
                                  @RequestPart("files") MultipartFile file) {
+        System.out.println("eep");
         if (file == null || file.isEmpty()) {
           return badRequest().body("Missing image file");
         }
@@ -305,6 +308,7 @@ public class ImageController {
         }
 
         i.setImageUrl("/api/v1/image/file/" + imageFileName);
+        System.out.println(i.getTelemetry().getPitch() + "pitch");
 
         imageDao.create(i);
 
@@ -327,7 +331,7 @@ public class ImageController {
         Double DEFAULT_PLANE_YAW = 0.0;
 
         if (i.getTelemetry() == null) {
-            Telemetry t = new Telemetry(new GpsLocation(DEFAULT_LATITUDE, DEFAULT_LONGITUDE), DEFAULT_ALTITUDE, DEFAULT_PLANE_YAW);
+            Telemetry t = new Telemetry(new GpsLocation(DEFAULT_LATITUDE, DEFAULT_LONGITUDE), DEFAULT_ALTITUDE, DEFAULT_PLANE_YAW, 669, 769);
             i.setTelemetry(t);
         } else {
             Telemetry t = i.getTelemetry();
@@ -351,6 +355,7 @@ public class ImageController {
             if ((Double) t.getPlaneYaw() == null) {
                 t.setPlaneYaw(DEFAULT_PLANE_YAW);
             }
+            //t.setGimbalOrientation(new GimbalOrientation(79, 79));
         }
 
         return i;

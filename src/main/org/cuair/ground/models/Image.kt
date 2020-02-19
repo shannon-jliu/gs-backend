@@ -13,7 +13,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.ebean.annotation.EnumValue
 import com.fasterxml.jackson.annotation.JsonProperty
-import org.json.*;
+import org.json.*
+import org.cuair.ground.models.geotag.GimbalOrientation
 
 /** Represents an image and its corresponding metadata as sent down from the plane */
 @Entity
@@ -23,6 +24,7 @@ class Image(
         /** Closest Telemetry for when this Image was taken  */
         @OneToOne(cascade = [CascadeType.ALL])
         var telemetry: Telemetry,
+        //@OneToOne(cascade = arrayOf(CascadeType.ALL))
         /** The type of this image. Either FIXED, TRACKING, or OFFAXIS */
         var imgMode: ImgMode
 ) : TimestampModel() {

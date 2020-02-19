@@ -45,6 +45,7 @@ public class AuthController {
      */
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity get(@RequestHeader HttpHeaders headers) {
+        System.out.println("auth controller");
         AuthToken confirmationToken = AuthUtil.Companion.getToken(headers);
 
         if (confirmationToken != null) {
@@ -73,15 +74,18 @@ public class AuthController {
                 }
 
                 boolean reserved = CUAIR_AUTH_OVERWRITABLE_USERNAMES.contains(username.get(0));
+                System.out.println("username here");
 
                 String confirmationTokenUsername = (confirmationToken != null) ? confirmationToken.getUsername() : null;
 
                 if (AuthUtil.Companion.userExists(username.get(0)) && confirmationTokenUsername != username.get(0) && !reserved) {
+                    System.out.println("username here 1");
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username is already taken");
                 }
 
                 String hash = AuthUtil.Companion.hashPassword(password.get(0));
-                if (hash == CUAIR_AUTH_USER_PASSWORD_HASH) {
+                System.out.println(hash);
+                if (hash == CUAIR_AUTH_USER_PASSWORD_HASH || true) { // todo get rid of this here
                     if (reserved) {
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username is reserved");
                     }
@@ -102,11 +106,13 @@ public class AuthController {
                     }
                     return ResponseEntity.ok(AuthUtil.Companion.createToken(username.get(0), true));
                 }
+                System.out.println("username here 2");
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid password");
             } else {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Missing \"Username\" header");
             }
         } else {
+            System.out.println("username here 3");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Missing \"Authorization\" header");
         }
     }

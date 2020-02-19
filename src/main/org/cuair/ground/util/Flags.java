@@ -33,10 +33,20 @@ public class Flags {
 
 	public static int MISSION_ID = 1;
 
+	public static String POST_TARGET = "/api/odlcs";
+
+	public static int TARGETLOGGER_DELAY = 30000;
+
+	public static String INTEROP_TARGET_DIR = "images/";
+
     // Flags
     public static boolean AUTH_ENABLED = false;
 
     // Security
     public static String DEFAULT_USER = "<NO_USER>";
+
+    public static int IMAGE_WIDTH = 5456;
+
+    public static int IMAGE_HEIGHT = 3632;
 
 }
