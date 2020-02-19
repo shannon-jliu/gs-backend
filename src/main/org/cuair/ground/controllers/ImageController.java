@@ -185,6 +185,10 @@ public class ImageController {
             return badRequest().body("Json part must include timestamp field");
         }
 
+        if (json.get("fov") == null) {
+            return badRequest().body("Json part must include fov field");
+        }
+
         if (json.get("imgMode") == null) {
             return badRequest().body("Json part must include imgMode");
         }
@@ -225,7 +229,7 @@ public class ImageController {
             return badRequest().body("Json part must include planeYaw within telemetry");
         }
 
-        if (json.size() > 8) {
+        if (json.size() > 9) {
             return badRequest().body("Json part contains invalid field");
         }
 
@@ -303,9 +307,14 @@ public class ImageController {
         Double DEFAULT_PLANE_YAW = 0.0;
         Double DEFAULT_GIMBAL_PITCH = 0.0;
         Double DEFAULT_GIMBAL_ROLL = 0.0;
+        Double DEFAULT_IMAGE_FOV = 60.0;
 
         if (i.getImgMode() == null) {
             i.setImgMode(DEFAULT_IMAGE_MODE);
+        }
+
+        if ((Double) i.getFov() == null) {
+            i.setFov(DEFAULT_IMAGE_FOV);
         }
 
         if (i.getTelemetry() == null) {
