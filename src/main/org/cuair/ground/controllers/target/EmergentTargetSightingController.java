@@ -13,15 +13,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import static org.springframework.http.ResponseEntity.ok;
+import static org.springframework.http.ResponseEntity.badRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import java.io.IOException;
 
 /** Controller to handle Emergent Target sightings model objects */
 @CrossOrigin
@@ -74,29 +70,16 @@ public class EmergentTargetSightingController extends TargetSightingController<E
     }
 
     /**
-     * Constructs an HTTP response with a TargetSighting given an id.
-     *
-     * @param id Long id of TargetSighting
-     * @return HTTP response with json of desired target sighting
-     */
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseEntity get(@PathVariable Long id) {
-        return super.get(id);
-    }
-
-    /**
      * Creates a target sighting in this assigned image
      *
      * @param id the id of the assignment for which to create target sighting
      * @return Result containing the newly created target sighting as json
      */
-    // TODO: Figure out if this is necessary
-    // @ValidateJson(EmergentTargetSighting.class)
     @RequestMapping(value = "/assignment/{id}", method = RequestMethod.POST)
     public ResponseEntity create(@PathVariable Long id, @RequestBody EmergentTargetSighting ts) {
         EmergentTarget t = eTargetDao.getAll().get(0);
         if (ts.getCreator() != ClientType.MDLC) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Only MDLC should be creating Emergent Target Sightings");
+            return badRequest().body("Only MDLC should be creating Emergent Target Sightings");
         }
         ts.setTarget(t);
         return super.create(id, ts);
@@ -108,16 +91,14 @@ public class EmergentTargetSightingController extends TargetSightingController<E
      * @param id Long id of target sighting
      * @return HTTP response with json of updated target sighting
      */
-    // TODO: Figure out if this is necessary
-    // @ValidateJson(EmergentTargetSighting.class)
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public ResponseEntity update(@PathVariable Long id, @RequestBody EmergentTargetSighting other) {
         if (other.getTarget() != null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Don't pass targets for emergent target sighting update");
+            return badRequest().body("Don't pass targets for emergent target sighting update");
         }
         EmergentTargetSighting ts = eSightingDao.get(id);
         if (ts == null) {
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         return updateFromTargetSighting(ts, other);
     }
@@ -133,7 +114,7 @@ public class EmergentTargetSightingController extends TargetSightingController<E
         EmergentTargetSighting ts = eSightingDao.get(id);
 
         if (ts == null) {
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         if (ts.getTarget() != null && ts.getTarget().getthumbnail_tsid() == id) {

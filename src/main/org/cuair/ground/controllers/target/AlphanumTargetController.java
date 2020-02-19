@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
+import static org.springframework.http.ResponseEntity.ok;
+import static org.springframework.http.ResponseEntity.badRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 
@@ -42,18 +44,6 @@ public class AlphanumTargetController extends TargetController<AlphanumTarget> {
     }
 
     /**
-     * Get Target by id
-     *
-     * @param id Long id of the desired target
-     * @return the Target as JSON
-     */
-    @Override
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseEntity get(@PathVariable Long id) {
-        return super.get(id);
-    }
-
-    /**
      * Create Target
      *
      * @return the created Target as JSON
@@ -73,10 +63,10 @@ public class AlphanumTargetController extends TargetController<AlphanumTarget> {
     public ResponseEntity update(@PathVariable Long id, @RequestBody AlphanumTarget other) {
         AlphanumTarget t = targetDao.get(id);
         if (t == null) {
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        return super.update(id, t, other);
+        return super.update(t, other);
     }
 
     /**

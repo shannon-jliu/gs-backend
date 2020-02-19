@@ -2,13 +2,18 @@ package org.cuair.ground.controllers.target;
 
 import java.util.LinkedList;
 import java.util.List;
-import org.cuair.ground.daos.*;
+
+import org.cuair.ground.daos.AlphanumTargetSightingsDatabaseAccessor;
+import org.cuair.ground.daos.AlphanumTargetDatabaseAccessor;
+import org.cuair.ground.daos.TargetSightingsDatabaseAccessor;
+import org.cuair.ground.daos.DAOFactory;
 import org.cuair.ground.models.Assignment;
 import org.cuair.ground.models.ClientCreatable;
 import org.cuair.ground.models.ClientType;
 import org.cuair.ground.models.Image;
 import org.cuair.ground.models.plane.target.AlphanumTarget;
 import org.cuair.ground.models.plane.target.AlphanumTargetSighting;
+import org.cuair.ground.util.Flags;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,24 +21,20 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import static org.springframework.http.ResponseEntity.ok;
+import static org.springframework.http.ResponseEntity.badRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Enumeration;
 
 /** Controller to handle Alphanumeric Target sightings model objects */
 @CrossOrigin
 @RestController
 @RequestMapping(value = "/alphanum_target_sighting")
 public class AlphanumTargetSightingController extends TargetSightingController<AlphanumTargetSighting> {
+
+    private boolean CUAIR_INTEROP_REQUESTS = Flags.CUAIR_INTEROP_REQUESTS;
 
     private static final AlphanumTargetSightingsDatabaseAccessor<AlphanumTargetSighting> alphaDao =
         (AlphanumTargetSightingsDatabaseAccessor<AlphanumTargetSighting>)
@@ -46,21 +47,8 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
             DAOFactory.getDAO(
                 DAOFactory.ModelDAOType.ALPHANUM_TARGET_DATABASE_ACCESSOR, AlphanumTarget.class);
 
-    /** The database access object for the image table */
-    private static final TimestampDatabaseAccessor<Image> imageDao =
-        (TimestampDatabaseAccessor<Image>)
-            DAOFactory.getDAO(DAOFactory.ModelDAOType.TIMESTAMP_DATABASE_ACCESSOR, Image.class);
-
-    /** The database access object for the assignment table */
-    private static final AssignmentDatabaseAccessor assignmentDao =
-        (AssignmentDatabaseAccessor)
-            DAOFactory.getDAO(DAOFactory.ModellessDAOType.ASSIGNMENT_DATABASE_ACCESSOR);
-
-    /** An object mapper */
-    private static final ObjectMapper mapper = new ObjectMapper();
-
     /**
-     * Gets the TargetSightingDatabaseAccessor object for this target sighting
+     * Gets the TargetSightingsDatabaseAccessor object for this target sighting
      *
      * @return the target sighting database accessor object
      */
@@ -107,13 +95,14 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
         for (AlphanumTarget targ : targets) {
             targ.setCreator(ClientType.MDLC);
             alphaTargetDao.update(targ);
+            // TODO: Add back in once client code is complete
             // interopClient.updateTarget(targ);
         }
 
         List<ClientCreatable> targetsAndSightings = new LinkedList<>();
         targetsAndSightings.addAll(ts);
         targetsAndSightings.addAll(targets);
-        return ResponseEntity.ok(targetsAndSightings);
+        return ok(targetsAndSightings);
     }
 
     /**
@@ -122,13 +111,12 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
      * @param id the id of the assignment for which to create target sighting
      * @return ResponseEntity containing the newly created target sighting as json
      */
-    // TODO: Figure out if this is necessary
-    // @ValidateJson(AlphanumTargetSighting.class)
     @RequestMapping(value = "/assignment/{id}", method = RequestMethod.POST)
     public ResponseEntity create(@PathVariable Long id, @RequestBody AlphanumTargetSighting ts) {
         if (ts.isOffaxis() != null && ts.isOffaxis()) {
+            // TODO: Figure out if this is necessary
             if (ts.getTarget() != null)
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Don't pass targets for off-axis sighting creates");
+                badRequest().body("Don't pass targets for off-axis sighting creates");
             ts.setTarget(alphaTargetDao.getOffaxisTarget());
         }
 
@@ -136,7 +124,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
 
         if (retval.getStatusCodeValue() == 200) {
             if (ts.getCreator() == ClientType.ADLC) {
-                // TODO: Implement client code
+                // TODO: Add back in once client code is complete
                 // autopilotClient.sendAdlcRoi(alphaDao.getTopAdlcLocations(5));
 
                 // Sets new target thumbnail
@@ -144,8 +132,8 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
                     AlphanumTarget t = alphaTargetDao.get(ts.getTarget().getId());
                     t.setthumbnail_tsid(ts.getId());
                     alphaTargetDao.update(t);
-                    // TODO: Implement flags (used to be PlayConfig.CUAIR_INTEROP_REQUESTS)
-                    if (false) {
+                    if (CUAIR_INTEROP_REQUESTS) {
+                        // TODO: Add back in once client code is complete
                         // interopClient.updateTargetImage(ts);
                     }
                 }
@@ -160,21 +148,21 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
      * @param id Long id of target sighting
      * @return HTTP response with json of updated target sighting
      */
-    // TODO: Figure out if this is necessary
-    // @ValidateJson(AlphanumTargetSighting.class)
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public ResponseEntity update(@PathVariable Long id, @RequestBody AlphanumTargetSighting other) {
         AlphanumTargetSighting ts = alphaDao.get(id);
         if (ts == null) {
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
+        // TODO: Figure out if this is necessary. Also the Boolean.TRUE expression is odd
         // checks if the target is offaxis or updated to offaxis and if a target is set
         if (((ts.isOffaxis() && other.isOffaxis() == null) || (Boolean.TRUE.equals(other.isOffaxis())))
                 && other.getTarget() != null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Don't pass targets for off-axis sighting updates");
+            return badRequest().body("Don't pass targets for off-axis sighting updates");
         }
 
+        // TODO: Can this just be other.isOffaxis()?
         if (Boolean.TRUE.equals(other.isOffaxis())) {
             other.setTarget(alphaTargetDao.getOffaxisTarget());
         }
@@ -211,8 +199,8 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
                     if (newThumb != null) {
                         newThumb.setTarget(tToEraseFrom);
                         tToEraseFrom.setthumbnail_tsid(newThumb.getId());
-                        // TODO: Implement flags (used to be PlayConfig.CUAIR_INTEROP_REQUESTS)
-                        if (false) {
+                        if (CUAIR_INTEROP_REQUESTS) {
+                            // TODO: Add back in once client code is complete
                             // interopClient.updateTargetImage(newThumb);
                         }
                     } else {
@@ -224,7 +212,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
             }
 
             if (ts.getCreator() == ClientType.ADLC) {
-                // TODO: Implement client code
+                // TODO: Add back in once client code is complete
                 // autopilotClient.sendAdlcRoi(alphaDao.getTopAdlcLocations(5));
 
                 // Sets new thumbnail for updated target
@@ -232,8 +220,8 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
                     AlphanumTarget t = alphaTargetDao.get(ts.getTarget().getId());
                     t.setthumbnail_tsid(ts.getId());
                     alphaTargetDao.update(t);
-                    // TODO: Implement flags (used to be PlayConfig.CUAIR_INTEROP_REQUESTS)
-                    if (false) {
+                    if (CUAIR_INTEROP_REQUESTS) {
+                        // TODO: Add back in once client code is complete
                         // interopClient.updateTargetImage(ts);
                   }
                 }
@@ -253,7 +241,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
         AlphanumTargetSighting ts = alphaDao.get(id);
 
         if (ts == null) {
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         final ResponseEntity retval = super.delete(ts);
@@ -268,8 +256,8 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
                 AlphanumTargetSighting newThumb = alphaDao.getLastSightingForTarget(ts.getTarget().getId());
                 if (newThumb != null) {
                     ts.getTarget().setthumbnail_tsid(newThumb.getId());
-                    // TODO: Implement flags (used to be PlayConfig.CUAIR_INTEROP_REQUESTS)
-                    if (false) {
+                    if (CUAIR_INTEROP_REQUESTS) {
+                        // TODO: Add back in once client code is complete
                         // interopClient.updateTargetImage(newThumb);
                     }
                 } else {
