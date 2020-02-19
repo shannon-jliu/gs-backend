@@ -2,9 +2,24 @@ package org.cuair.ground.daos
 
 import org.cuair.ground.models.CUAirModel
 import org.cuair.ground.models.TimestampModel
+import org.cuair.ground.models.Username
 
 /** Factory for creating an managing DAO instances */
 class DAOFactory {
+    enum class ModellessDAOType {
+        USERNAME_DATABASE_ACCESSOR {
+            override fun createInstance(): DatabaseAccessor<*> {
+                return UsernameDatabaseAccessor()
+            }
+        };
+
+        /**
+         * Creates an instance of the database accessor
+         *
+         * @return the DAO instance
+         */
+        abstract fun createInstance() : DatabaseAccessor<*>
+  }
 
   /** Enumeration of all database accessor types that are parametrized on a model */
   enum class ModelDAOType {
@@ -36,6 +51,31 @@ class DAOFactory {
      * DAOs already exist for DAOs that need a Model to be passed.
      */
     private val daoWithModelMap = hashMapOf<ModelDAOType, MutableMap<Class<CUAirModel>, DatabaseAccessor<*>>>()
+
+    /**
+     * Mapping from ModellessDAOType to DAO to keep track of which DAO instancess already exist for
+     * DAOs that are not parametrized on models
+     */
+    private val daoWithoutModelMap = hashMapOf<ModellessDAOType, DatabaseAccessor<*>>()
+
+
+    /**
+     * Gets a DAO instance given a ModellessDAOType
+     *
+     * @param daoType the ModellessDAOType
+     * @return the DAO instance
+     */
+    @JvmStatic
+    fun getDAO(daoType: ModellessDAOType): DatabaseAccessor<*> {
+        synchronized(daoType) {
+            var dao: DatabaseAccessor<*>? = daoWithoutModelMap[daoType]
+            if (dao === null) {
+                dao = daoType.createInstance()
+                daoWithoutModelMap.put(daoType, dao)
+            }
+            return dao
+        }
+    }
 
     /**
      * Gets a DAO instance given a ModelDAOType and the model class
