@@ -49,8 +49,7 @@ public abstract class TargetSighting extends ClientCreatable {
 
     /**
      * The orientation of the target sighting with respect to the top of the image. This means that
-     * the vector below is 0 and the radians increase ************************************** * ^ * * |
-     * * * | * * * * * * * ************************************** counterclockwise.
+     * the vector below is 0 and the radians increase in a counterclockwise fashion.
      */
     private Double radiansFromTop;
 
