@@ -124,9 +124,6 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
 
         if (retval.getStatusCodeValue() == 200) {
             if (ts.getCreator() == ClientType.ADLC) {
-                // TODO: Add back in once client code is complete
-                // autopilotClient.sendAdlcRoi(alphaDao.getTopAdlcLocations(5));
-
                 // Sets new target thumbnail
                 if (ts.getTarget() != null) {
                     AlphanumTarget t = alphaTargetDao.get(ts.getTarget().getId());

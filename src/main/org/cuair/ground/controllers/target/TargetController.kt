@@ -66,8 +66,6 @@ abstract class TargetController<T : Target> {
         //         }
         //     }
         // }
-        // TODO: Add client code
-        // judgesViewClient.updateJVTargets()
         return ok(t)
     }
 
@@ -107,8 +105,6 @@ abstract class TargetController<T : Target> {
         //     }
         //     interopClient.updateTarget(getTargetDao().get(t.id))
         // }
-
-        // judgesViewClient.updateJVTargets()
         return ok(t)
     }
 
@@ -133,8 +129,6 @@ abstract class TargetController<T : Target> {
 
         targetSightingDao.unassociateAllTargetSightingsForTarget(id)
         getTargetDao().delete(id)
-        // TODO: Add client code
-        // judgesViewClient.updateJVTargets()
         return ok(t)
     }
 
@@ -142,8 +136,6 @@ abstract class TargetController<T : Target> {
         // TODO: Add client code
         /** The interop client for communication with the competition server */
         // private val interopClient = ClientFactory.getInteropClient()
-
-        // private val judgesViewClient = ClientFactory.getJudgesViewClient()
 
         /** A logger */
         private val logger = LoggerFactory.getLogger(TargetSighting::class.java)
