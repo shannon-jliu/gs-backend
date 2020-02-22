@@ -2,6 +2,7 @@ package org.cuair.ground.controllers.target;
 
 // TODO: Add back in once client code is complete
 // import org.cuair.ground.clients.ClientFactory;
+// import org.cuair.ground.clients.AutopilotClient;
 // import org.cuair.ground.clients.InteropClient;
 import org.cuair.ground.daos.AssignmentDatabaseAccessor;
 import org.cuair.ground.daos.DAOFactory;
@@ -34,6 +35,9 @@ public abstract class TargetSightingController<T extends TargetSighting> {
 
     /** Gets the database accessor object for this target sighting */
     abstract TargetSightingsDatabaseAccessor<T> getTargetSightingDao();
+
+    // TODO: Add back in once client code is complete
+    // protected static final AutopilotClient autopilotClient = ClientFactory.getAutopilotClient();
 
     /**
      * Constructs an HTTP response with all the target sightings
@@ -171,6 +175,9 @@ public abstract class TargetSightingController<T extends TargetSighting> {
                 // interopClient.updateTarget(ts.getTarget());
             }
         }
+        // TODO: Add back in once client code is complete
+        // if (ts.getCreator() == ClientType.MDLC)
+            // autopilotClient.sendMdlcRoi(AllTargetSightingController.Companion.getConfidenceGeotags());
         return ok(ts);
     }
 }
