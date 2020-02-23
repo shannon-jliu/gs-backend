@@ -19,10 +19,10 @@ class Image(
         var telemetry: Telemetry,
         /** The type of this image. Either FIXED, TRACKING, or OFFAXIS */
         var imgMode: ImgMode,
-        /** True if has atleast one associated assignment, otherwise false. */
-        var hasAssignment: Boolean = false,
         /** The horizontal field of fiew of this image in degrees. */
-        var fov: Double
+        var fov: Double,
+        /** True if has atleast one associated assignment, otherwise false. */
+        var hasAssignment: Boolean = false
 ) : TimestampModel() {
 
     /** Secondary constructor that sets imgMode to FIXED by default */
@@ -30,7 +30,7 @@ class Image(
             imageUrl: String,
             telemetry: Telemetry,
             fov: Double
-    ) : this(imageUrl, telemetry, ImgMode.FIXED, false)
+    ) : this(imageUrl, telemetry, ImgMode.FIXED, fov,false)
 
     /** The filesystem path this image lives on relative to the server directory */
     @Transient var localImageUrl: String? = null
