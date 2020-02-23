@@ -7,6 +7,16 @@ import org.cuair.ground.models.Username
 /** Factory for creating an managing DAO instances */
 class DAOFactory {
     enum class ModellessDAOType {
+        ASSIGNMENT_DATABASE_ACCESSOR {
+            override fun createInstance(): DatabaseAccessor<*> {
+                return AssignmentDatabaseAccessor()
+            }
+        },
+        IMAGE_DATABASE_ACCESSOR {
+            override fun createInstance(): DatabaseAccessor<*> {
+                return ImageDatabaseAccessor()
+            }
+        },
         USERNAME_DATABASE_ACCESSOR {
             override fun createInstance(): DatabaseAccessor<*> {
                 return UsernameDatabaseAccessor()
