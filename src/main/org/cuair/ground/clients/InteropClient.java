@@ -28,7 +28,12 @@ import org.cuair.ground.models.geotag.*;
 import org.cuair.ground.models.plane.target.*;
 import org.cuair.ground.daos.ClientCreatableDatabaseAccessor;
 import org.cuair.ground.daos.DAOFactory;
+import org.cuair.ground.daos.AlphanumTargetSightingsDatabaseAccessor;
 import java.lang.Runnable;
+import org.apache.commons.io.IOUtils;
+import java.net.URL;
+import java.io.InputStream;
+import java.io.FileInputStream;
 
 /*
  * Client for interop communications
@@ -42,6 +47,12 @@ public class InteropClient {
 
   private ClientCreatableDatabaseAccessor<AlphanumTarget> alphaTargetDao = (ClientCreatableDatabaseAccessor<AlphanumTarget>)DAOFactory.getDAO(
         DAOFactory.ModelDAOType.CLIENT_CREATABLE_DATABASE_ACCESSOR, AlphanumTarget.class);
+
+  private static final AlphanumTargetSightingsDatabaseAccessor<AlphanumTargetSighting> alphaTargetSightingDao =
+        (AlphanumTargetSightingsDatabaseAccessor<AlphanumTargetSighting>)
+            DAOFactory.getDAO(
+                DAOFactory.ModelDAOType.ALPHANUM_TARGET_SIGHTINGS_DATABASE_ACCESSOR,
+                AlphanumTargetSighting.class);
 
   private AsyncRestTemplate template = new AsyncRestTemplate();
 
@@ -126,16 +137,20 @@ public class InteropClient {
   }
 
   public void attemptUpdateImage(Target target) {
-    String updateImageURL = "http://" + INTEROP_IP + ":" + INTEROP_PORT + POST_TARGET;
+    String updateImageURL = "http://" + INTEROP_IP + ":" + INTEROP_PORT + POST_TARGET + "/" + target.getJudgeTargetId() + "/image";
     System.out.println(updateImageURL);
     URI updateImageURI = URI.create(updateImageURL);
     HttpHeaders headers = new HttpHeaders();
     System.out.println(cookieValue);
     headers.add("Cookie", String.format("sessionid=%s", cookieValue));
+    headers.setContentType(MediaType.IMAGE_JPEG);
     try {
-      HttpEntity<File> requestEntity = new HttpEntity<File>(getTargetInteropImage(target), headers);
+      System.out.println("HERE 1");
+      HttpEntity<byte[]> requestEntity = new HttpEntity<byte[]>(IOUtils.toByteArray(getIS(target)), headers);
+      System.out.println("HERE 2");
       ListenableFuture<ResponseEntity<String>> updateImageFuture = template.exchange(
           updateImageURI, HttpMethod.POST, requestEntity, String.class);
+      System.out.println("HERE 3");
 
       // todo printing error messages when success callback is bad
       RequestUtil.SuccessCallback<String> updateImageCallback = (ResponseEntity<String> result)-> {
@@ -144,7 +159,7 @@ public class InteropClient {
 
       RequestUtil.futureCallback(updateImageURL, updateImageFuture, updateImageCallback);
     } catch (Exception e) {
-      System.out.println("EXCEPTION HERE: " + e.getMessage());
+      System.out.println("EXCEPTION  here HERE: " + e.getMessage());
     }
   }
 
@@ -170,7 +185,9 @@ public class InteropClient {
             try {
               Thread.sleep(Flags.TARGETLOGGER_DELAY); // todo
             } catch (InterruptedException e) {}
-            this.target = emergentTargetDao.get(this.targetSighting.getTarget().getId());
+            // todo emergent vs alpha
+
+            this.target = alphaTargetDao.get(this.targetSighting.getTarget().getId());
           }
           if (this.target.getJudgeTargetId() == null) {
             logger.error("Can't update target thumbnail: Target does not exist on the competition server");
@@ -194,6 +211,7 @@ public class InteropClient {
    */
   public void updateTargetImage(TargetSighting targetSighting) {
     //enabledVoid {
+    System.out.println("update target image");
 
     if (targetSighting instanceof EmergentTargetSighting) {
       EmergentTarget target = emergentTargetDao.get(targetSighting.getTarget().getId());
@@ -256,13 +274,17 @@ public class InteropClient {
 
 
 
-    /**
+  /**
    * Saves a thumbnail of a target sighting for a target
    *
    * @param targetSighting TargetSighting of the Target
    */
   private BufferedImage saveTargetThumbnailFile(TargetSighting targetSighting) {
-    File imgFile = new File(targetSighting.getAssignment().getImage().getLocalImageUrl());
+    System.out.println(targetSighting.getAssignment());
+    System.out.println(targetSighting.getAssignment().getImage());
+    System.out.println(targetSighting.getAssignment().getImage().getImageUrl());
+    String actual = "images/" + targetSighting.getAssignment().getImage().getImageUrl().substring(19);
+    File imgFile = new File(actual);
     BufferedImage in = null;
 
     try {
@@ -275,6 +297,7 @@ public class InteropClient {
     int topLeftY = Math.max(0, targetSighting.getpixel_y() - targetSighting.getHeight() / 2);
     int width = Math.min((IMAGE_WIDTH - topLeftX), targetSighting.getWidth());
     int height = Math.min((IMAGE_HEIGHT - topLeftY), targetSighting.getHeight());
+    System.out.println(topLeftX + " and toplefty " + topLeftY + " a " + width + " and h " + height);
     BufferedImage newImage = in.getSubimage(topLeftX, topLeftY, width, height);
 
     if (targetSighting instanceof EmergentTargetSighting) {
@@ -302,10 +325,41 @@ public class InteropClient {
   }
 
   public File getTargetInteropImage(Target t) {
-    File file = new File("$targetDirectory${t.judgeTargetId}.jpg");
+    //System.out.println("target interop image " + t.getJudgeTargetId());
+    // todo wait if judge target id is not there yet?
+    File file = new File(targetDirectory + t.getJudgeTargetId() + ".jpg");
+    try {
+      file.createNewFile();
+    } catch (Exception e) {}
+    // creates target directory if it doesn't exist already
+    //file.getParentFile().mkdirs();
+    return file;
+  }
+
+  public InputStream getIS(Target t) {
+    // InputStream input = null;
+    // try {
+    //   input = new URL(targetDirectory + t.getJudgeTargetId() + ".jpg").openStream();
+    // } catch (Exception e) { // todo
+    //   System.out.println("HERE error 5 " + e.getMessage());
+    //   return null;
+    // }
+    AlphanumTargetSighting alphaTargetSighting = alphaTargetSightingDao.get(t.getthumbnail_tsid());
+    String imageUrl = alphaTargetSighting.getAssignment().getImage().getImageUrl();
+    String actual = "images/" + imageUrl.substring(19);
+    System.out.println("actual url " + actual);
+
+    //File file = new File(targetDirectory + t.getJudgeTargetId() + ".jpg"); // todo
+    File file = new File(actual); // todo
     // creates target directory if it doesn't exist already
     file.getParentFile().mkdirs();
-    return file;
+    InputStream targetStream = null; //todo
+    try {
+      targetStream = new FileInputStream(file);
+    } catch (Exception e) {
+      System.out.println("getis error " + e.getMessage());
+    }
+    return targetStream;
   }
 
   public Odlc createOdlcProto(Target target) {
@@ -347,7 +401,18 @@ public class InteropClient {
     return odlcProto.build();
   }
 
+  public Odlc getOdlcDataAsProto(String odlcInfo) {
+    Odlc.Builder odlcBuilder = Odlc.newBuilder();
+    try {
+      JsonFormat.parser().merge(odlcInfo, odlcBuilder);
+    } catch (Exception e) { // todo InvalidProtocolBufferException
+
+    }
+    return odlcBuilder.build();
+  }
+
   public void attemptSend(Target target) {
+    System.out.println("attemptSend");
 
     Odlc odlcProto = createOdlcProto(target);
 
@@ -364,7 +429,14 @@ public class InteropClient {
 
       // todo printing error messages when success callback is bad
       RequestUtil.SuccessCallback<String> postOdlcCallback = (ResponseEntity<String> result)-> {
-        System.out.println("HERE SUCCESS");
+        Odlc odlcInfo = getOdlcDataAsProto(result.getBody());
+
+        System.out.println("HERE SUCCESS attemptsend " + odlcInfo.getId());
+        target.setJudgeTargetId(Long.valueOf(odlcInfo.getId()));
+        if (target instanceof AlphanumTarget) {
+          alphaTargetDao.update((AlphanumTarget)target);
+        }
+
         // Mission.Builder missionBuilder = Mission.newBuilder();
         // //System.out.println(Mission.newBuilder().getClass());
         

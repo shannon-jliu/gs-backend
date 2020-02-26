@@ -1,38 +1,74 @@
 package org.cuair.ground.models.geotag
 
 import java.util.Objects
+import javax.persistence.Basic
 import javax.persistence.Embeddable
 import javax.validation.constraints.NotNull
+import org.cuair.ground.models.exceptions.InvalidGpsLocationException
 import kotlin.math.abs
 
-/**
- * Orientation of the gimbal. Includes roll and pitch in degrees, but not yaw. 0,0 is pointing down
- * Roll: Positive is to the left side of the plane
- * Pitch: Positive is towards the tail of the plane
- */
+/** Represents the orientation of the gimbal */
 @Embeddable
-class GimbalOrientation(var roll: Double, var pitch: Double) {
+class GimbalOrientation
+    /**
+     * Creates a new GimbalOrientation given the pitch and roll in degrees
+     *
+     * @param pitch The pitch of the gimbal in degrees. 0 is pointing down and positive is pointing forward
+     * @param roll The roll of the gimbal in degrees. 0 is pointing down and positive is pointing to the right
+     */
+    constructor(
+        @field:Basic(optional = true)
+        private var pitch: Double,
+        @field:Basic(optional = true)
+        private var roll: Double
+    ) {
+
+    /**
+     * Get the pitch of this GimbalOrientation
+     *
+     * @return the pitch of this GimbalOrientation
+     */
+    fun getPitch(): Double {
+        return pitch
+    }
+
+    /**
+     * Change the pitch of this GimbalOrientation
+     *
+     * @param pitch The new pitch for this GimbalOrientation
+     */
+    fun setPitch(pitch: Double) {
+        this.pitch = pitch
+    }
+
+    /**
+     * Get the roll of this GimbalOrientation
+     *
+     * @return the roll of this GimbalOrientation
+     */
+    fun getRoll(): Double {
+        return roll
+    }
+
+    /**
+     * Change the roll of this GimbalOrientation
+     *
+     * @param roll The new roll for this GimbalOrientation
+     */
+    fun setRoll(roll: Double) {
+        this.roll = roll
+    }
 
     /**
      * Determines if the given object is logically equal to this GimbalOrientation
      *
      * @param other The object to compare
-     * @return true if the object equals this GimbalOrientation
+     * @return True if the object equals this GimbalOrientation
      */
-    override fun equals(@NotNull other: Any?): Boolean {
-        if (other !is GimbalOrientation) return false
-
-        if ((this.roll != other.roll) && abs(this.roll - other.roll) > ACCEPTABLE_ERROR) {
-            return false
-        }
-        if ((this.pitch != other.pitch) && abs(this.pitch - other.pitch) > ACCEPTABLE_ERROR) {
-            return false
-        }
+    override fun equals(other: Any?):Boolean {
+        if(other !is GimbalOrientation) return false
+        if (this.pitch != other.pitch) return false
+        if (this.roll != other.roll) return false
         return true
-    }
-
-    companion object {
-        /** Acceptable threshold of error for equals() method */
-        const val ACCEPTABLE_ERROR = 10E-5
     }
 }

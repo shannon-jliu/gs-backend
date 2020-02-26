@@ -10,6 +10,7 @@ import org.cuair.ground.models.ClientType;
 // TODO: Implement once auth has been finalized
 // import org.cuair.ground.util.AuthUtil;
 import org.cuair.ground.util.Flags;
+import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -53,6 +54,7 @@ public class AssignmentController {
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseEntity<Assignment> get(@PathVariable Long id) {
+        System.out.println("ASSIGNEMTNET HERE 4");
         Assignment a = assignmentDao.get(id);
         if (a == null) {
             ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -68,6 +70,7 @@ public class AssignmentController {
      */
     @RequestMapping(value = "/after/{id}", method = RequestMethod.GET)
     public ResponseEntity getAfterId(@RequestHeader HttpHeaders headers, @PathVariable Long id) {
+        System.out.println("ASSIGNEMTNET HERE 3");
         if (AUTH_ENABLED) {
             // TODO: Implement once auth has been finalized
             // grab user name
@@ -78,7 +81,9 @@ public class AssignmentController {
             //     return badRequest().body("Invalid username!");
             // }
         }
-        return ok(assignmentDao.getAllAfterId(id, DEFAULT_USER));
+        List<Assignment> listAss = assignmentDao.getAllAfterId(id, DEFAULT_USER);
+        System.out.println("after list" + listAss.size());
+        return ok(listAss);
         
     }
 
@@ -101,6 +106,7 @@ public class AssignmentController {
      */
     @RequestMapping(value = "/work/{type}", method = RequestMethod.POST)
     public ResponseEntity createWork(@RequestHeader HttpHeaders headers, @PathVariable String type) {
+        System.out.println("ASSIGNEMTNET HERE 2");
         ClientType assignee = ClientType.valueOf(type);
         Assignment a = null; // todo
 
@@ -132,6 +138,7 @@ public class AssignmentController {
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public ResponseEntity update(@PathVariable Long id, @RequestBody Assignment deserialized) {
+        System.out.println("ASSIGNEMTNET HERE 1");
         Assignment a = assignmentDao.get(id);
         if (a == null) {
             return noContent().build();

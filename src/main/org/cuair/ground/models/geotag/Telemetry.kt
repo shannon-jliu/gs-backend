@@ -10,6 +10,7 @@ import org.cuair.ground.models.geotag.GimbalOrientation
     gps will contain latitude and longitude
     altitude is in meters
     planeYaw is in degrees with 0 at north and increasing in the clockwise direction
+    gimOrt is the gimbal orientation with pitch and roll
     */
 @Entity
 class Telemetry(
@@ -30,10 +31,6 @@ class Telemetry(
     fun getGps(): GpsLocation {
         return gps;
     }
-
-    // fun getGimbalOrientation(): GimbalOrientation {
-    //     return gimbalOrientation;
-    // }
 
     /**
      * Get the altitude of this Telemetry instance
@@ -57,6 +54,19 @@ class Telemetry(
         return pitch;
     }
 
+    fun getRoll(): Double {
+        return roll;
+    }
+
+    /**
+     * Get the gimbal orientation of this Telemetry instance
+     *
+     * @return the gimbal orientation of this Telemetry instance
+     */
+    // fun getGimOrt(): GimbalOrientation {
+    //     return gimOrt;
+    // }
+
     /**
      * Change the gps of this Telemetry instance
      *
@@ -79,6 +89,10 @@ class Telemetry(
         this.pitch = pitch;
     }
 
+    fun setRoll(roll: Double) {
+        this.roll = roll;
+    }
+
     /**
      * Change the planeYaw of this Telemetry instance
      *
@@ -95,6 +109,15 @@ class Telemetry(
     // TODO: Add the rest of the methods
 
     /**
+     * Change the gimbal orientation of this Telemetry instance
+     *
+     * @param gimOrt The new gimbal orientation for this Telemetry instance
+     */
+    // fun setGimOrt(gimOrt: GimbalOrientation) {
+    //     this.gimOrt = gimOrt;
+    // }
+
+    /**
      * Determines if the given object is logically equal to this Telemetry
      *
      * @param other The object to compare
@@ -107,6 +130,7 @@ class Telemetry(
         if (this.planeYaw != other.planeYaw) return false
         //if (this.gimbalOrientation != other.gimbalOrientation) return false
         if (!Objects.equals(this.gps, other.gps)) return false
+        //if (!Objects.equals(this.gimOrt, other.gimOrt)) return false
         return true
     }
 }

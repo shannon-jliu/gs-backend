@@ -1,6 +1,2 @@
-#<<<<<<< HEAD
-./gradlew clean build -x test && java -jar build/libs/ground-server-0.0.1-SNAPSHOT.jar
-#=======
 #!/bin/bash
-#gradle build && gradle bootRun
-#>>>>>>> master
+gradle build && gradle bootRun

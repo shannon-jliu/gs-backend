@@ -85,9 +85,12 @@ public abstract class TargetSightingController<T extends TargetSighting> {
     public ResponseEntity create(Long assignmentId, T ts) {
         System.out.println("target sighting create");
         Assignment a = assignmentDao.get(assignmentId);
+
         if (a == null) {
+            System.out.println("no assignment");
             return ResponseEntity.noContent().build();
         }
+        System.out.println(ts.getpixel_x());
 
         if (ts.getId() != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Don't pass in ids for creates");
@@ -114,6 +117,7 @@ public abstract class TargetSightingController<T extends TargetSighting> {
         }
 
         mgtimageDao.setHasTarget(a.getImage());
+        System.out.println("returning in ts controller");
         // if (ts.getCreator() == ClientType.MDLC)
         //     autopilotClient.sendMdlcRoi(AllTargetSightingController.Companion.getConfidenceGeotags());
         return ResponseEntity.ok(ts);

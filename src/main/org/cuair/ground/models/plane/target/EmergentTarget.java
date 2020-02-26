@@ -31,8 +31,8 @@ public class EmergentTarget extends Target {
             Geotag geotag,
             String description,
             Long judgeTargetId,
-            Long thumbnail_tsid) {
-        super(creator, geotag, judgeTargetId, thumbnail_tsid);
+            Long thumbnailtsid) {
+        super(creator, geotag, judgeTargetId, thumbnailtsid);
         this.description = description;
     }
 

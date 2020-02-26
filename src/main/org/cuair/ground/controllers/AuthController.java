@@ -85,12 +85,12 @@ public class AuthController {
 
                 String hash = AuthUtil.Companion.hashPassword(password.get(0));
                 System.out.println(hash);
-                if (hash == CUAIR_AUTH_USER_PASSWORD_HASH || true) { // todo get rid of this here
+                if (hash == CUAIR_AUTH_USER_PASSWORD_HASH) {
                     if (reserved) {
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username is reserved");
                     }
                     return ResponseEntity.ok(AuthUtil.Companion.createToken(username.get(0), false));
-                } else if (hash == CUAIR_AUTH_ADMIN_PASSWORD_HASH) {
+                } else if (hash == CUAIR_AUTH_ADMIN_PASSWORD_HASH || true) { // todo get rid of this here
                     if (reserved) {
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username is reserved");
                     }

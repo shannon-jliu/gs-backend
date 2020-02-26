@@ -2,6 +2,8 @@ package org.cuair.ground.controllers.target;
 
 import java.util.LinkedList;
 import java.util.List;
+import org.cuair.ground.clients.ClientFactory;
+import org.cuair.ground.clients.InteropClient;
 import org.cuair.ground.daos.*;
 import org.cuair.ground.models.Assignment;
 import org.cuair.ground.models.ClientCreatable;
@@ -58,6 +60,8 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
 
     /** An object mapper */
     private static final ObjectMapper mapper = new ObjectMapper();
+
+    private InteropClient interopClient = ClientFactory.getInteropClient();
 
     /**
      * Gets the TargetSightingDatabaseAccessor object for this target sighting
@@ -126,11 +130,13 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
     // @ValidateJson(AlphanumTargetSighting.class)
     @RequestMapping(value = "/assignment/{id}", method = RequestMethod.POST)
     public ResponseEntity create(@PathVariable Long id, @RequestBody AlphanumTargetSighting ts) {
+        System.out.println("alpha create");
         if (ts.isOffaxis() != null && ts.isOffaxis()) {
             if (ts.getTarget() != null)
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Don't pass targets for off-axis sighting creates");
             ts.setTarget(alphaTargetDao.getOffaxisTarget());
         }
+        System.out.println("alpha create before super");
 
         final ResponseEntity retval = super.create(id, ts);
 
@@ -145,12 +151,13 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
                     t.setthumbnail_tsid(ts.getId());
                     alphaTargetDao.update(t);
                     // TODO: Implement flags (used to be PlayConfig.CUAIR_INTEROP_REQUESTS)
-                    if (false) {
-                        // interopClient.updateTargetImage(ts);
+                    if (true) {
+                        interopClient.updateTargetImage(ts);
                     }
                 }
             }
         }
+        System.out.println("about to return");
         return retval;
     }
 
@@ -164,6 +171,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
     // @ValidateJson(AlphanumTargetSighting.class)
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public ResponseEntity update(@PathVariable Long id, @RequestBody AlphanumTargetSighting other) {
+        System.out.println("update alphanum target sighting controller");
         AlphanumTargetSighting ts = alphaDao.get(id);
         if (ts == null) {
             return ResponseEntity.noContent().build();
@@ -189,8 +197,10 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
                 // TODO: Fix: This threw a NullPointerException when moving a target sighting from its correct target to another one
                 // The console on the frontend also threw an error: "index.js:1437 Warning: Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in the componentWillUnmount method.
                 // in MergeSightingPreview (at mergeTarget.js:314)""
-                && ts.getTarget().getthumbnail_tsid().equals(ts.getId());
+                && ts.getTarget() != null && ts.getTarget().getthumbnail_tsid() != null && (ts.getTarget().getthumbnail_tsid().equals(ts.getId()));
         AlphanumTarget tToEraseFrom = ts.getTarget();
+
+        System.out.println("t to erase from" + tToEraseFrom);
         // checks whether new thumb for new target should be updated
         boolean updateNewThumb =
             other.getTarget() != null
@@ -200,10 +210,12 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
         final ResponseEntity retval = updateFromTargetSighting(ts, other);
 
         if (retval.getStatusCodeValue() == 200) {
+            System.out.println("to erase thumb " + toEraseThumb);
             if (toEraseThumb) {
                 if (ts.getCreator() == ClientType.MDLC) {
                     // If MDLC, set thumb for original target to default value
                     tToEraseFrom.setthumbnail_tsid(0L);
+                    System.out.println("set 0");
                     // TODO (mariasam1): delete thumbnail through interop
                 } else {
                     // If ADLC, set thumb for original target to most recent ts (or default if none)
@@ -212,14 +224,15 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
                         newThumb.setTarget(tToEraseFrom);
                         tToEraseFrom.setthumbnail_tsid(newThumb.getId());
                         // TODO: Implement flags (used to be PlayConfig.CUAIR_INTEROP_REQUESTS)
-                        if (false) {
-                            // interopClient.updateTargetImage(newThumb);
+                        if (true) {
+                            interopClient.updateTargetImage(newThumb);
                         }
                     } else {
                         tToEraseFrom.setthumbnail_tsid(0L);
                         // TODO (mariasam1): delete thumbnail through interop
                     }
                 }
+                System.out.println("udpate alpha dao");
                 alphaTargetDao.update(tToEraseFrom);
             }
 

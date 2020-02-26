@@ -313,7 +313,7 @@ public class Geotag extends CUAirModel {
         if (gps == null && (Double) telemetry.getAltitude() == null) {
             return false;
         }
-        return true;
+        return false; // TODO
     }
 
     public static void updateGeotagForTargetSightings(Image img) {

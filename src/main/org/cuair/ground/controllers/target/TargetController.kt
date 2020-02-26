@@ -1,6 +1,6 @@
 package org.cuair.ground.controllers.target
 
-// import org.cuair.ground.clients.ClientFactory
+import org.cuair.ground.clients.ClientFactory
 import org.cuair.ground.daos.ClientCreatableDatabaseAccessor
 import org.cuair.ground.daos.DAOFactory
 import org.cuair.ground.daos.TargetSightingsDatabaseAccessor
@@ -85,6 +85,7 @@ abstract class TargetController<T : Target> {
         if (t.id != null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Don't pass ids for creates")
         if (t.creator == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Create request should have creator");
         getTargetDao().create(t)
+        interopClient.attemptSend(getTargetDao().get(t.id));
         // TODO: Add interop code
         // if (PlayConfig.CUAIR_INTEROP_REQUESTS) {
         //     interopClient.createTarget(getTargetDao().get(t.id))
@@ -111,6 +112,11 @@ abstract class TargetController<T : Target> {
      */
     @Suppress("UNUSED_PARAMETER")
     fun update(id: Long?, t: T, other: T): ResponseEntity<Any> {
+        logger.info("update in targetcontroller");
+        // if (t.thumbnail_tsid != null) {
+        //     logger.info(t.thumbnail_tsid.toString())
+        // }
+
         val targetSightingDao = DAOFactory.getDAO(
             DAOFactory.ModelDAOType.TARGET_SIGHTINGS_DATABASE_ACCESSOR,
             t.fetchAssociatedTargetSightingClass()) as TargetSightingsDatabaseAccessor<out TargetSighting>
@@ -121,8 +127,17 @@ abstract class TargetController<T : Target> {
         if (other.creator !== null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Don't pass creator for updates")
         }
-
+        // logger.info("hereee");
+        // logger.info(t.getthumbnail_tsid());
+        // logger.info(other.getthumbnail_tsid());
         val isTSIdUpdated = t.getthumbnail_tsid() != other.getthumbnail_tsid()
+        logger.info(isTSIdUpdated.toString())
+        if (t.getthumbnail_tsid() != null) {
+            logger.info(t.getthumbnail_tsid().toString());
+        }
+        if (other.getthumbnail_tsid() != null) {
+            logger.info(other.getthumbnail_tsid().toString());
+        }
 
         t.updateFromTarget(other)
         if (other.geotag !== null) {
@@ -131,6 +146,10 @@ abstract class TargetController<T : Target> {
                 .forEach { it.geotag?.isManualGeotag = true }
         }
         getTargetDao().update(t)
+        if (isTSIdUpdated) {
+            interopClient.updateTargetImage(targetSightingDao.get(t.getthumbnail_tsid()))
+        }
+        //interopClient.updateTarget(getTargetDao().get(t.id))
 
         // TODO: Add client code
         // if (PlayConfig.CUAIR_INTEROP_REQUESTS) {
@@ -178,6 +197,7 @@ abstract class TargetController<T : Target> {
         // private val judgesViewClient = ClientFactory.getJudgesViewClient()
 
         /** A logger */
-        private val logger = LoggerFactory.getLogger(TargetSighting::class.java)
+        private val interopClient = ClientFactory.getInteropClient();
+        private val logger = LoggerFactory.getLogger(TargetController::class.java)
     }
 }

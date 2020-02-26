@@ -35,6 +35,10 @@ public class AlphanumTarget extends Target {
     /** True if the target is the off axis target, false otherwise */
     private Boolean offaxis;
 
+    //private Long thumbnail_tsid;
+
+   // private Long thumbnail_tsid;
+
     /**
      * Creates an AlphanumTarget
      *
@@ -58,12 +62,14 @@ public class AlphanumTarget extends Target {
             Geotag geotag,
             Long judgeTargetId,
             Long thumbnail_tsid) {
+
         super(creator, geotag, judgeTargetId, thumbnail_tsid);
         this.shape = shape;
         this.shapeColor = shapeColor;
         this.alpha = alpha;
         this.alphaColor = alphaColor;
         this.offaxis = offaxis;
+        //this.thumbnail_tsid = thumbnail_tsid; // dont need
     }
 
     /**
@@ -230,6 +236,10 @@ public class AlphanumTarget extends Target {
     @JsonIgnore
     public String getTypeString() {
         return "Alphanum";
+    }
+
+    public String toString() {
+        return (offaxis.toString()) + "";
     }
 
     /**
