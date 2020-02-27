@@ -154,30 +154,12 @@ public abstract class TargetSighting extends ClientCreatable {
     }
 
     /**
-     * Sets the x pixel coordinate of the TargetSighting
-     *
-     * @param pixel_x Integer x pixel coordinate
-     */
-    public void setpixel_x(Integer pixel_x) {
-        this.pixel_x = pixel_x;
-    }
-
-    /**
      * Gets the y pixel coordinate of the TargetSighting
      *
      * @return Integer y pixel coordinate
      */
     public Integer getpixel_y() {
         return pixel_y;
-    }
-
-    /**
-     * Sets the y pixel coordinate of the TargetSighting
-     *
-     * @param pixel_y Integer y pixel coordinate
-     */
-    public void setpixel_y(Integer pixel_y) {
-        this.pixel_y = pixel_y;
     }
 
     /**
@@ -190,48 +172,12 @@ public abstract class TargetSighting extends ClientCreatable {
     }
 
     /**
-     * Sets the width of the TargetSighting in pixels
-     *
-     * @param width Integer pixel width
-     */
-    public void setWidth(Integer width) {
-        this.width = width;
-    }
-
-    /**
      * Gets the height of the TargetSighting in pixels
      *
      * @return height Integer pixel height
      */
     public Integer getHeight() {
         return height;
-    }
-
-    /**
-     * Gets the width of the TargetSighting in pixels
-     *
-     * @param height Integer pixel height
-     */
-    public void setHeight(Integer height) {
-        this.height = height;
-    }
-
-    /**
-     * Gets the upper left x coordinate of the TargetSighting
-     *
-     * @return Integer x pixel coordinate
-     */
-    public Integer calculateUpperLeftX() {
-        return pixel_x - getWidth() / 2;
-    }
-
-    /**
-     * Gets the upper left y coordinate of the TargetSighting
-     *
-     * @return Integer y pixel coordinate
-     */
-    public Integer calculateUpperLeftY() {
-        return pixel_y - getHeight() / 2;
     }
 
     /**
@@ -280,15 +226,6 @@ public abstract class TargetSighting extends ClientCreatable {
     }
 
     /**
-     * Sets the orientation of this target sighting from the top of the image
-     *
-     * @param radiansFromTop radian representing the orientation of the sighting
-     */
-    public void setRadiansFromTop(Double radiansFromTop) {
-        this.radiansFromTop = radiansFromTop;
-    }
-
-    /**
      * Gets the confidence the vision system has in the target orientation classification
      *
      * @return Double representing the target orientation confidence
@@ -313,15 +250,6 @@ public abstract class TargetSighting extends ClientCreatable {
      */
     public Confidence getMdlcClassConf() {
         return mdlcClassConf;
-    }
-
-    /**
-     * Sets the confidence we have in the classification accuracy
-     *
-     * @return mdlcClassConf Confidence representing the classification confidence
-     */
-    public void setMdlcClassConf(Confidence mdlcClassConf) {
-        this.mdlcClassConf = mdlcClassConf;
     }
 
     /**

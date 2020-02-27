@@ -396,25 +396,6 @@ public class AlphanumTargetSighting extends TargetSighting {
         return alphaColorConfidence;
     }
 
-    /**
-     * Sets the confidence the vision system has in the alphanumeric color classification
-     *
-     * @param alphaColorConfidence Double representing the alphanumeric color confidence
-     */
-    public void setAlphaColorConfidence(Double alphaColorConfidence) {
-        this.alphaColorConfidence = alphaColorConfidence;
-        updateAdlcClassConf();
-    }
-
-    /**
-     * Gets the overall confidence the vision system has in the three most confident classifications
-     *
-     * @return Double representing the overall confidence
-     */
-    public Double getAdlcClassConf() {
-      return adlcClassConf;
-    }
-
     @Override
     public void setOrientationConfidence(Double orientationConfidence) {
         super.setOrientationConfidence(orientationConfidence);
