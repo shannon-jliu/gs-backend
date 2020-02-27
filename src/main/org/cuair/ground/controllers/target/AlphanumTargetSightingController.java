@@ -67,8 +67,6 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
         return super.getAll();
     }
 
-    // TODO: Abstract out object to/from json conversion
-
     /**
      * Constructs an HTTP response with all target sightings that are associated with a given creator
      * type
@@ -155,14 +153,13 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        // TODO: Figure out if this is necessary. Also the Boolean.TRUE expression is odd
+        // TODO: Figure out if the offaxis checks are necessary
         // checks if the target is offaxis or updated to offaxis and if a target is set
         if (((ts.isOffaxis() && other.isOffaxis() == null) || (Boolean.TRUE.equals(other.isOffaxis())))
                 && other.getTarget() != null) {
             return badRequest().body("Don't pass targets for off-axis sighting updates");
         }
 
-        // TODO: Can this just be other.isOffaxis()?
         if (Boolean.TRUE.equals(other.isOffaxis())) {
             other.setTarget(alphaTargetDao.getOffaxisTarget());
         }
