@@ -18,7 +18,7 @@ class Assignment : TimestampModel {
     var done: Boolean
 
     /** Represents the user assigned to this assignment  */
-    var username: String?
+    var username: Username?
 
     /**
      * Creates an unprocessed Assignment object
@@ -40,7 +40,7 @@ class Assignment : TimestampModel {
      * @param assignee the type of client this assignment is assigning to
      * @param username the username of the client this assignment is assigning to
      */
-    constructor(image: Image?, assignee: ClientType, username: String?) {
+    constructor(image: Image?, assignee: ClientType, username: Username?) {
         this.image = image
         this.assignee = assignee
         this.done = false

@@ -21,7 +21,7 @@ class Image(
         var imgMode: ImgMode,
         /** The horizontal field of fiew of this image in degrees. */
         var fov: Double,
-        /** True if has atleast one associated assignment, otherwise false. */
+        /** True if has at least one associated assignment, otherwise false. */
         var hasAssignment: Boolean = false
 ) : TimestampModel() {
 

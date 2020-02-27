@@ -6,6 +6,7 @@ import java.util.List;
 import org.cuair.ground.models.Assignment;
 import org.cuair.ground.models.ClientType;
 import org.cuair.ground.models.Image;
+import org.cuair.ground.models.Username;
 
 import org.cuair.ground.util.Flags;
 import org.slf4j.Logger;
@@ -45,22 +46,27 @@ public class AssignmentDatabaseAccessor extends TimestampDatabaseAccessor<Assign
      *
      * @param clientType the type of client that is requesting work
      * @username the username of the user this is to be assigned to
-     * @return an assignment that assigns the unprocessed image to the given client type
+     * @return an assignment that assigns the unprocessed image to the given client type.
+     * If there is no such image to assign, returns null.
      */
-    public Assignment getWork(ClientType clientType, String username) {
+    public Assignment getWork(ClientType clientType, Username username) {
         List<Image> i_list = Ebean.find(Image.class)
                 .where()
                 .eq("hasAssignment", false)
                 .orderBy()
                 .asc("id")
                 .findList();
+
         if (i_list.isEmpty()) {
             return null;
         }
-        Assignment a = new Assignment(i_list.get(0), clientType, username);
+
+        Image i = i_list.get(0);
+
+        Assignment a = new Assignment(i, clientType, username);
         a.setTimestamp(new java.sql.Timestamp(new java.util.Date().getTime()));
         this.create(a);
-        imageDao.setImageHasAssignment(i_list.get(0));
+        imageDao.setImageHasAssignment(i);
         return a;
     }
 
@@ -78,10 +84,10 @@ public class AssignmentDatabaseAccessor extends TimestampDatabaseAccessor<Assign
      * Retrieves all instances of Assignments that are assigned to a user. Returns empty list if the
      * user either does not exist or has no assignments
      *
-     * @param user a String containing the username
+     * @param user a Username object representing the user
      * @return List<T> of all instances that are assigned to the user
      */
-    public List<Assignment> getAllForUser(String user) {
+    public List<Assignment> getAllForUser(Username user) {
         return Ebean.find(getModelClass()).where().eq("username", user).findList();
     }
 
@@ -90,11 +96,11 @@ public class AssignmentDatabaseAccessor extends TimestampDatabaseAccessor<Assign
      * is disabled. This will be MDLC only.
      *
      * @param id the id to find all assignments greater than
-     * @param user the username to search for
+     * @param user a Username object representing the user
      * @return a list of assignments whose ids are greater than the given id. Empty list if there are
      *     none.
      */
-    public List<Assignment> getAllAfterId(Long id, String user) {
+    public List<Assignment> getAllAfterId(Long id, Username user) {
         return Ebean.find(getModelClass())
                 .where(Expr.and(Expr.eq("username", user), Expr.gt("id", id)))
                 .findList();
