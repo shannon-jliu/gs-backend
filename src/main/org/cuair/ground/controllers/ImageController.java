@@ -27,7 +27,6 @@ import org.cuair.ground.models.Image;
 import org.cuair.ground.models.geotag.GpsLocation;
 import org.cuair.ground.models.geotag.GimbalOrientation;
 import org.cuair.ground.models.geotag.Telemetry;
-import org.cuair.ground.models.exceptions.InvalidGpsLocationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -43,7 +42,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.CacheControl;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.cuair.ground.util.Flags;
 
 /** Contains all the callbacks for all the public api endpoints for the Image  */
@@ -127,7 +125,7 @@ public class ImageController {
             byte[] media = null;
             try {
                 media = IOUtils.toByteArray(in);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error reading file: " + PLANE_IMAGE_DIR + file);
             }
             headers.setCacheControl(CacheControl.noCache().getHeaderValue());
@@ -319,8 +317,8 @@ public class ImageController {
 
         if (i.getTelemetry() == null) {
             Telemetry t = new Telemetry(
-                new GpsLocation(DEFAULT_LATITUDE, DEFAULT_LONGITUDE), 
-                DEFAULT_ALTITUDE, 
+                new GpsLocation(DEFAULT_LATITUDE, DEFAULT_LONGITUDE),
+                DEFAULT_ALTITUDE,
                 DEFAULT_PLANE_YAW,
                 new GimbalOrientation(DEFAULT_GIMBAL_PITCH, DEFAULT_GIMBAL_ROLL)
             );

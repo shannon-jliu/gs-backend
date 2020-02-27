@@ -40,7 +40,7 @@ public class EmergentTargetSightingController extends TargetSightingController<E
     /**
      * Returns the TargetSightingDatabaseAccessor for this target sighting
      *
-     * @return
+     * @return the target sighting database accessor object
      */
     @Override
     TargetSightingsDatabaseAccessor<EmergentTargetSighting> getTargetSightingDao() {
