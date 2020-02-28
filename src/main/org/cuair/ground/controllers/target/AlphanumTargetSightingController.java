@@ -31,6 +31,8 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
 
+import org.cuair.ground.util.Flags;
+
 /** Controller to handle Alphanumeric Target sightings model objects */
 @CrossOrigin
 @RestController
@@ -62,6 +64,8 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
     private static final ObjectMapper mapper = new ObjectMapper();
 
     private InteropClient interopClient = ClientFactory.getInteropClient();
+
+    private static boolean CUAIR_INTEROP_REQUESTS = Flags.CUAIR_INTEROP_REQUESTS;
 
     /**
      * Gets the TargetSightingDatabaseAccessor object for this target sighting
@@ -151,7 +155,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
                     t.setthumbnail_tsid(ts.getId());
                     alphaTargetDao.update(t);
                     // TODO: Implement flags (used to be PlayConfig.CUAIR_INTEROP_REQUESTS)
-                    if (true) {
+                    if (CUAIR_INTEROP_REQUESTS) {
                         interopClient.updateTargetImage(ts);
                     }
                 }
@@ -224,7 +228,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
                         newThumb.setTarget(tToEraseFrom);
                         tToEraseFrom.setthumbnail_tsid(newThumb.getId());
                         // TODO: Implement flags (used to be PlayConfig.CUAIR_INTEROP_REQUESTS)
-                        if (true) {
+                        if (CUAIR_INTEROP_REQUESTS) {
                             interopClient.updateTargetImage(newThumb);
                         }
                     } else {
@@ -246,9 +250,9 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
                     t.setthumbnail_tsid(ts.getId());
                     alphaTargetDao.update(t);
                     // TODO: Implement flags (used to be PlayConfig.CUAIR_INTEROP_REQUESTS)
-                    if (false) {
+                    if (CUAIR_INTEROP_REQUESTS) {
                         // interopClient.updateTargetImage(ts);
-                  }
+                    }
                 }
             }
         }
@@ -282,7 +286,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
                 if (newThumb != null) {
                     ts.getTarget().setthumbnail_tsid(newThumb.getId());
                     // TODO: Implement flags (used to be PlayConfig.CUAIR_INTEROP_REQUESTS)
-                    if (false) {
+                    if (CUAIR_INTEROP_REQUESTS) {
                         // interopClient.updateTargetImage(newThumb);
                     }
                 } else {

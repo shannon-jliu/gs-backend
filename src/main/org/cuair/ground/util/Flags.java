@@ -49,4 +49,8 @@ public class Flags {
 
     public static int IMAGE_HEIGHT = 3632;
 
+    public static boolean CUAIR_INTEROP_REQUESTS = true;
+
+    public static String DEFAULT_EMERGENT_TARGET_DESC = "Lost hiker laying down on ground.";
+
 }

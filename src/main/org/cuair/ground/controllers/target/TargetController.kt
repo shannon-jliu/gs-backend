@@ -7,6 +7,7 @@ import org.cuair.ground.daos.TargetSightingsDatabaseAccessor
 import org.cuair.ground.models.ClientType
 import org.cuair.ground.models.plane.target.Target
 import org.cuair.ground.models.plane.target.TargetSighting
+import org.cuair.ground.util.Flags;
 
 import org.springframework.http.ResponseEntity
 import org.springframework.http.HttpEntity
@@ -87,7 +88,7 @@ abstract class TargetController<T : Target> {
         getTargetDao().create(t)
         interopClient.attemptSend(getTargetDao().get(t.id));
         // TODO: Add interop code
-        // if (PlayConfig.CUAIR_INTEROP_REQUESTS) {
+        // if (CUAIR_INTEROP_REQUESTS) {
         //     interopClient.createTarget(getTargetDao().get(t.id))
         //     thread {
         //         Thread.sleep(PlayConfig.TARGETLOGGER_DELAY)
@@ -112,11 +113,6 @@ abstract class TargetController<T : Target> {
      */
     @Suppress("UNUSED_PARAMETER")
     fun update(id: Long?, t: T, other: T): ResponseEntity<Any> {
-        logger.info("update in targetcontroller");
-        // if (t.thumbnail_tsid != null) {
-        //     logger.info(t.thumbnail_tsid.toString())
-        // }
-
         val targetSightingDao = DAOFactory.getDAO(
             DAOFactory.ModelDAOType.TARGET_SIGHTINGS_DATABASE_ACCESSOR,
             t.fetchAssociatedTargetSightingClass()) as TargetSightingsDatabaseAccessor<out TargetSighting>
@@ -127,17 +123,8 @@ abstract class TargetController<T : Target> {
         if (other.creator !== null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Don't pass creator for updates")
         }
-        // logger.info("hereee");
-        // logger.info(t.getthumbnail_tsid());
-        // logger.info(other.getthumbnail_tsid());
+
         val isTSIdUpdated = t.getthumbnail_tsid() != other.getthumbnail_tsid()
-        logger.info(isTSIdUpdated.toString())
-        if (t.getthumbnail_tsid() != null) {
-            logger.info(t.getthumbnail_tsid().toString());
-        }
-        if (other.getthumbnail_tsid() != null) {
-            logger.info(other.getthumbnail_tsid().toString());
-        }
 
         t.updateFromTarget(other)
         if (other.geotag !== null) {
@@ -146,13 +133,13 @@ abstract class TargetController<T : Target> {
                 .forEach { it.geotag?.isManualGeotag = true }
         }
         getTargetDao().update(t)
-        if (isTSIdUpdated) {
+        if (isTSIdUpdated && CUAIR_INTEROP_REQUESTS) {
             interopClient.updateTargetImage(targetSightingDao.get(t.getthumbnail_tsid()))
         }
         //interopClient.updateTarget(getTargetDao().get(t.id))
 
         // TODO: Add client code
-        // if (PlayConfig.CUAIR_INTEROP_REQUESTS) {
+        // if (CUAIR_INTEROP_REQUESTS) {
         //     if (isTSIdUpdated) {
         //         interopClient.updateTargetImage(targetSightingDao.get(t.thumbnail_tsid))
         //     }
@@ -180,7 +167,7 @@ abstract class TargetController<T : Target> {
             t.fetchAssociatedTargetSightingClass()) as TargetSightingsDatabaseAccessor<out TargetSighting>
 
         // TODO: Add client code
-        // if (PlayConfig.CUAIR_INTEROP_REQUESTS) interopClient.deleteTarget(t)
+        if (CUAIR_INTEROP_REQUESTS) interopClient.attemptDelete(t)
 
         targetSightingDao.unassociateAllTargetSightingsForTarget(id)
         getTargetDao().delete(id)
@@ -191,13 +178,14 @@ abstract class TargetController<T : Target> {
 
     companion object {
         // TODO: Add client code
-        /** The interop client for communication with the competition server */
-        // private val interopClient = ClientFactory.getInteropClient()
 
         // private val judgesViewClient = ClientFactory.getJudgesViewClient()
 
+        /** The interop client for communication with the competition server */
+        private val interopClient = ClientFactory.getInteropClient()
+
         /** A logger */
-        private val interopClient = ClientFactory.getInteropClient();
         private val logger = LoggerFactory.getLogger(TargetController::class.java)
+        private val CUAIR_INTEROP_REQUESTS = Flags.CUAIR_INTEROP_REQUESTS;
     }
 }

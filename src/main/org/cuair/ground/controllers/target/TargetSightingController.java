@@ -18,6 +18,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.cuair.ground.util.Flags;
 
 /** Controller to handle TargetSighting model objects */
 public abstract class TargetSightingController<T extends TargetSighting> {
@@ -31,6 +32,8 @@ public abstract class TargetSightingController<T extends TargetSighting> {
     private static final MGTImageDatabaseAccessor mgtimageDao =
         (MGTImageDatabaseAccessor)
             DAOFactory.getDAO(DAOFactory.ModellessDAOType.MGT_IMAGE_DATABASE_ACCESSOR);
+
+    private static boolean CUAIR_INTEROP_REQUESTS = Flags.CUAIR_INTEROP_REQUESTS;
 
     // TODO: Implement all client code
     /** The interop client for communication with the competition server */
@@ -111,7 +114,7 @@ public abstract class TargetSightingController<T extends TargetSighting> {
             Geotag.updateGeotag(ts.getTarget(), ts);
 
             // TODO: Implement flags (used to be PlayConfig.CUAIR_INTEROP_REQUESTS)
-            if (false) {
+            if (CUAIR_INTEROP_REQUESTS) {
                 // interopClient.updateTarget(ts.getTarget());
             }
         }
@@ -171,7 +174,7 @@ public abstract class TargetSightingController<T extends TargetSighting> {
 
         if (geotagChanged && other.getTarget() != null) {
             Geotag.updateGeotag(ts.getTarget(), null);
-            // if (PlayConfig.CUAIR_INTEROP_REQUESTS) {
+            // if (CUAIR_INTEROP_REQUESTS) {
                 // interopClient.updateTarget(ts.getTarget());
             // }
         }
@@ -207,7 +210,7 @@ public abstract class TargetSightingController<T extends TargetSighting> {
         if (ts.getTarget() != null) {
             Geotag.updateGeotag(ts.getTarget(), null);
             // TODO: Implement flags (used to be PlayConfig.CUAIR_INTEROP_REQUESTS)
-            if (false) {
+            if (CUAIR_INTEROP_REQUESTS) {
                 // interopClient.updateTarget(ts.getTarget());
             }
         }

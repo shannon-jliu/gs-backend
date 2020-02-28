@@ -100,20 +100,15 @@ public class AlphanumTargetController extends TargetController<AlphanumTarget> {
     // @ValidateJson(AlphanumTarget.class)
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public ResponseEntity update(@PathVariable Long id, @RequestBody AlphanumTarget other) {
-        System.out.println("alphanum target update");
         AlphanumTarget t = targetDao.get(id);
-        System.out.println(other.getthumbnail_tsid() + "");
         if (t == null) {
-            System.out.println("alphanum target null");
             return ResponseEntity.noContent().build();
         }
-        System.out.println("alphanum target after null");
 
         // TODO: Figure out why these off-axis-related lines of code are here
         if (other.isOffaxis() != null) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Don't pass offaxis for target creates");
         }
-        System.out.println("gonna do super update");
         return super.update(id, t, other);
     }
 
