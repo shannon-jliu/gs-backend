@@ -171,7 +171,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
                 // TODO: Fix: This threw a NullPointerException when moving a target sighting from its correct target to another one
                 // The console on the frontend also threw an error: "index.js:1437 Warning: Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in the componentWillUnmount method.
                 // in MergeSightingPreview (at mergeTarget.js:314)""
-                && ts.getTarget().getthumbnail_tsid().equals(ts.getId());
+                && ts.getTarget().getthumbnail_tsid() != null && ts.getTarget().getthumbnail_tsid().equals(ts.getId());
         AlphanumTarget tToEraseFrom = ts.getTarget();
         // checks whether new thumb for new target should be updated
         boolean updateNewThumb =
