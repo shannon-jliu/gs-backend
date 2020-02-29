@@ -33,7 +33,7 @@ public class Flags {
 
 	public static int MISSION_ID = 1;
 
-	public static String POST_TARGET = "/api/odlcs";
+	public static String TARGET_ROUTE = "/api/odlcs";
 
 	public static int TARGETLOGGER_DELAY = 30000;
 

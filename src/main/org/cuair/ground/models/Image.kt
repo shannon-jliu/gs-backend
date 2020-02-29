@@ -19,6 +19,8 @@ import org.cuair.ground.models.geotag.GimbalOrientation
 /** Represents an image and its corresponding metadata as sent down from the plane */
 @Entity
 class Image(
+        /** The local image URL on the filesystem */
+        var localImageUrl: String?,
         /** The URL where clients can retrieve the image file  */
         var imageUrl: String?,
         /** Closest Telemetry for when this Image was taken  */
@@ -31,12 +33,13 @@ class Image(
 
     /** Secondary constructor that sets imgMode to FIXED by default */
     constructor(
+            localImageUrl: String,
             imageUrl: String,
             telemetry: Telemetry
-    ) : this(imageUrl, telemetry, ImgMode.FIXED)
+    ) : this(localImageUrl, imageUrl, telemetry, ImgMode.FIXED)
 
     /** The filesystem path this image lives on relative to the server directory */
-    @Transient var localImageUrl: String? = null
+    //@Transient var localImageUrl: String? = null
 
     /** The possible image modes: fixed, tracking, and off-axis */
     enum class ImgMode (val mode: String) {
@@ -86,6 +89,7 @@ class Image(
     override fun equals(other: Any?): Boolean {
         if (other !is Image) return false
 
+        if (this.localImageUrl != other.localImageUrl) return false
         if (this.imageUrl != other.imageUrl) return false
         if (this.imgMode != other.imgMode) return false
         if (!Objects.equals(this.telemetry, other.telemetry)) return false
