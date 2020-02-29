@@ -53,7 +53,7 @@ abstract class TargetController<T : Target> {
      */
     open fun create(t: T): ResponseEntity<Any> {
         if (t.id != null) return badRequest().body("Don't pass ids for creates")
-        if (t.creator == null) return badRequest().body("Create request should have creator");
+        if (t.creator == null) return badRequest().body("Create request should have creator")
         getTargetDao().create(t)
         // TODO: Add interop code
         // if (PlayConfig.CUAIR_INTEROP_REQUESTS) {
