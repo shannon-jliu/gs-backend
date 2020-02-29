@@ -2,6 +2,8 @@ package org.cuair.ground.controllers.target;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 import org.cuair.ground.daos.AlphanumTargetSightingsDatabaseAccessor;
 import org.cuair.ground.daos.AlphanumTargetDatabaseAccessor;
@@ -97,9 +99,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
             // interopClient.updateTarget(targ);
         }
 
-        List<ClientCreatable> targetsAndSightings = new LinkedList<>();
-        targetsAndSightings.addAll(ts);
-        targetsAndSightings.addAll(targets);
+        List<ClientCreatable> targetsAndSightings = Stream.concat(ts.stream(), targets.stream()) .collect(Collectors.toList());
         return ok(targetsAndSightings);
     }
 
