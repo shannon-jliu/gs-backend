@@ -7,8 +7,6 @@ import org.cuair.ground.models.Assignment;
 // TODO: Implement once auth has been finalized
 import org.cuair.ground.models.AuthToken;
 import org.cuair.ground.models.ClientType;
-// TODO: Implement once auth has been finalized
-import org.cuair.ground.util.AuthUtil;
 import org.cuair.ground.util.Flags;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -68,18 +66,8 @@ public class AssignmentController {
      */
     @RequestMapping(value = "/after/{id}", method = RequestMethod.GET)
     public ResponseEntity getAfterId(@RequestHeader HttpHeaders headers, @PathVariable Long id) {
-        if (AUTH_ENABLED) {
-            // TODO: Implement once auth has been finalized
-            // grab user name
-            AuthToken token = AuthUtil.Companion.getToken(headers);
-            if (token != null) {
-                return ok(assignmentDao.getAllAfterId(id, token.getUsername()));
-            } else {
-                return badRequest().body("Invalid username!");
-            }
-        } else {
-            return ok(assignmentDao.getAllAfterId(id, DEFAULT_USER));
-        }
+        // TODO: Implement auth once auth has been finalized
+        return ok(assignmentDao.getAllAfterId(id, DEFAULT_USER));
     }
 
     /** The flag to behave as if auth is enabled */
@@ -105,18 +93,8 @@ public class AssignmentController {
         Assignment a;
 
         // if auth disabled, continue with old behavior
-        if (AUTH_ENABLED) {
-            // TODO: Implement once auth has been finalized
-            // grab user name and assign assignment to that username
-            AuthToken token = AuthUtil.Companion.getToken(headers);
-            if (token != null) {
-                a = assignmentDao.getWork(assignee, token.getUsername());
-            } else {
-                return badRequest().body("Invalid username!");
-            }
-        } else {
-            a = assignmentDao.getWork(assignee, DEFAULT_USER);
-        }
+        // TODO: Implement auth once auth has been finalized
+        a = assignmentDao.getWork(assignee, DEFAULT_USER);
 
         if (a == null) return noContent().build();
 

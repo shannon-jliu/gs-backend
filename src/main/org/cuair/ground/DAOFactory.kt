@@ -55,19 +55,6 @@ class DAOFactory {
         return ClientCreatableDatabaseAccessor(clazz.asSubclass(ClientCreatable::class.java))
       }
     },
-// <<<<<<< HEAD
-//     PLANE_MODEL_DATABASE_ACCESSOR {
-//       override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
-//         return PlaneModelDatabaseAccessor(clazz.asSubclass(PlaneModel::class.java))
-//       }
-//     },
-//     PLANE_SETTINGS_MODEL_DATABASE_ACCESSOR {
-//       override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
-//         return PlaneSettingsModelDatabaseAccessor(clazz.asSubclass(PlaneSettingsModel::class.java))
-//       }
-//     },
-// =======
-// >>>>>>> 1a6e5053bb0464fdad7cb000739cb7c72290b091
     TARGET_DATABASE_ACCESSOR {
       override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
         return TargetDatabaseAccessor(clazz.asSubclass(org.cuair.ground.models.plane.target.Target::class.java))
