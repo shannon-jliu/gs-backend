@@ -5,7 +5,7 @@ import org.cuair.ground.daos.AssignmentDatabaseAccessor;
 import org.cuair.ground.daos.DAOFactory;
 import org.cuair.ground.models.Assignment;
 // TODO: Implement once auth has been finalized
-import org.cuair.ground.models.AuthToken;
+// import org.cuair.ground.models.AuthToken;
 import org.cuair.ground.models.ClientType;
 import org.cuair.ground.util.Flags;
 
