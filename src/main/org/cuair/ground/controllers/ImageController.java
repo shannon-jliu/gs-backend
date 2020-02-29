@@ -41,7 +41,6 @@ import org.slf4j.LoggerFactory;
 import org.cuair.ground.models.geotag.GpsLocation;
 import org.cuair.ground.models.geotag.GimbalOrientation;
 import org.cuair.ground.models.geotag.Telemetry;
-import org.cuair.ground.models.exceptions.InvalidGpsLocationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -72,7 +71,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.beans.factory.annotation.Value;
 import org.cuair.ground.util.Flags;
 
 /** Contains all the callbacks for all the public api endpoints for the Image  */
@@ -156,7 +154,7 @@ public class ImageController {
             byte[] media = null;
             try {
                 media = IOUtils.toByteArray(in);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error reading file: " + PLANE_IMAGE_DIR + file);
             }
             headers.setCacheControl(CacheControl.noCache().getHeaderValue());

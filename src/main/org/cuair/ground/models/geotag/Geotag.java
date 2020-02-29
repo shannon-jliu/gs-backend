@@ -234,23 +234,10 @@ public class Geotag extends CUAirModel {
     }
 
     /**
-     * Change the GPS coordinates of this geotag
+     * Change the manually-tagged flag of t of this geotag
      *
-     * @param gps The new GPS coordinates of this geotag
+     * @param isManualGeotag Whether or not this geotag was done manually
      */
-    public void setGpsLocation(GpsLocation gps) {
-        this.gpsLocation = gps;
-    }
-
-    /**
-     * Change the orientation of this geotag
-     *
-     * @param radiansFromNorth The new orientation of this geotag represented as radians from north
-     */
-    public void setRadiansFromNorth(Double radiansFromNorth) {
-        this.radiansFromNorth = radiansFromNorth;
-    }
-
     public void setIsManualGeotag(boolean isManualGeotag) {
         this.isManualGeotag = isManualGeotag;
     }
@@ -313,30 +300,6 @@ public class Geotag extends CUAirModel {
         return true;
     }
 
-    public static void updateGeotagForTargetSightings(Image img) {
-        List<Assignment> assignments = assignmentDao.getAllForImageId(img.getId());
-        List<TargetSighting> tsList = new ArrayList<>();
-        for (Assignment a : assignments) {
-            List<AlphanumTargetSighting> tsalpha =
-                alphaTargetSightingDao.getAllTargetSightingsForAssignment(a.getId());
-            List<EmergentTargetSighting> tsemergent =
-                emergentTargetSightingDao.getAllTargetSightingsForAssignment(a.getId());
-            tsList.addAll(tsalpha);
-            tsList.addAll(tsemergent);
-        }
-        HashSet<Target> uniqueTargets = new HashSet<>();
-        for (TargetSighting ts : tsList) {
-            ts.setGeotag(new Geotag(ts));
-            updateTargetSightingInDao(ts);
-            if (ts.getTarget() != null) {
-                uniqueTargets.add(ts.getTarget());
-            }
-        }
-        for (Target target : uniqueTargets) {
-            updateGeotag(target, null);
-        }
-    }
-
     /**
      * Updates the Geotag of a target based on the Geotag of its corresponding TargetSightings
      *
@@ -377,21 +340,6 @@ public class Geotag extends CUAirModel {
         }
         ts.setGeotag(new Geotag(ts));
         return true;
-    }
-
-    /**
-     * Update target sighting's dao
-     *
-     * @param ts
-     */
-    private static void updateTargetSightingInDao(TargetSighting ts) {
-        if (ts instanceof AlphanumTargetSighting) {
-            alphaTargetSightingDao.update((AlphanumTargetSighting) ts);
-        } else if (ts instanceof EmergentTargetSighting) {
-            emergentTargetSightingDao.update((EmergentTargetSighting) ts);
-        } else {
-            logger.warn("Target class is not Alphanum or Emergent");
-        }
     }
 
     /**

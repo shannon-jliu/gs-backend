@@ -96,15 +96,6 @@ public abstract class Target extends ClientCreatable {
     }
 
     /**
-     * Sets the id of this target on the competition server
-     *
-     * @param judgeTargetId Long new target id
-     */
-    public void setJudgeTargetId(Long judgeTargetId) {
-        this.judgeTargetId = judgeTargetId;
-    }
-
-    /**
      * Gets the id of the target sighting used for thumbnail
      *
      * @return Long thumnail target sighting id

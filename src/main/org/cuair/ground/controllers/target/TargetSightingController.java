@@ -1,12 +1,11 @@
 package org.cuair.ground.controllers.target;
 
 // TODO: Add back in once client code is complete
-// import org.cuair.ground.clients.AutopilotClient;
 // import org.cuair.ground.clients.ClientFactory;
+// import org.cuair.ground.clients.AutopilotClient;
 // import org.cuair.ground.clients.InteropClient;
 import org.cuair.ground.daos.AssignmentDatabaseAccessor;
 import org.cuair.ground.daos.DAOFactory;
-import org.cuair.ground.daos.MGTImageDatabaseAccessor;
 import org.cuair.ground.daos.TargetSightingsDatabaseAccessor;
 import org.cuair.ground.models.Assignment;
 import org.cuair.ground.models.ClientType;
@@ -29,11 +28,6 @@ public abstract class TargetSightingController<T extends TargetSighting> {
     private static final AssignmentDatabaseAccessor assignmentDao =
         (AssignmentDatabaseAccessor)
             DAOFactory.getDAO(DAOFactory.ModellessDAOType.ASSIGNMENT_DATABASE_ACCESSOR);
-
-    /** The database accessor object for the manual geotag image database */
-    private static final MGTImageDatabaseAccessor mgtimageDao =
-        (MGTImageDatabaseAccessor)
-            DAOFactory.getDAO(DAOFactory.ModellessDAOType.MGT_IMAGE_DATABASE_ACCESSOR);
 
     // TODO: Add back in once client code is complete
     /** The interop client for communication with the competition server */
@@ -102,7 +96,6 @@ public abstract class TargetSightingController<T extends TargetSighting> {
             }
         }
 
-        mgtimageDao.setHasTarget(a.getImage());
         // TODO: Add back in once client code is complete
         // if (ts.getCreator() == ClientType.MDLC)
             // autopilotClient.sendMdlcRoi(AllTargetSightingController.Companion.getConfidenceGeotags());
