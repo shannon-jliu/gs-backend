@@ -1,43 +1,37 @@
 package org.cuair.ground.clients;
 
-import org.springframework.web.client.AsyncRestTemplate;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpEntity;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.util.JsonFormat;
 import java.awt.image.BufferedImage;
-
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpCookie;
+import java.net.URI;
+import java.util.List;
+import javax.imageio.ImageIO;
+import org.apache.commons.io.IOUtils;
+import org.cuair.ground.daos.AlphanumTargetDatabaseAccessor;
+import org.cuair.ground.daos.AlphanumTargetSightingsDatabaseAccessor;
+import org.cuair.ground.daos.ClientCreatableDatabaseAccessor;
+import org.cuair.ground.daos.DAOFactory;
+import org.cuair.ground.models.ClientType;
+import org.cuair.ground.models.exceptions.InvalidGpsLocationException;
+import org.cuair.ground.models.geotag.*;
+import org.cuair.ground.models.plane.target.*;
+import org.cuair.ground.protobuf.InteropApi.*;
+import org.cuair.ground.util.*;
+import org.json.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.ListenableFutureCallback;
-import java.net.URI;
-import org.json.*;
-import org.cuair.ground.protobuf.InteropApi.*;
-import com.google.protobuf.util.JsonFormat; 
-import org.cuair.ground.util.*;
-import org.slf4j.Logger;
-import java.io.File;
-import java.io.IOException;
-import org.slf4j.LoggerFactory;
-import java.net.HttpCookie;
-import javax.imageio.ImageIO;
-import java.util.List;
-
-import org.cuair.ground.models.plane.target.*;
-import org.cuair.ground.models.ClientType;
-import org.cuair.ground.models.geotag.*;
-import org.cuair.ground.models.plane.target.*;
-import org.cuair.ground.daos.ClientCreatableDatabaseAccessor;
-import org.cuair.ground.daos.DAOFactory;
-import org.cuair.ground.daos.AlphanumTargetDatabaseAccessor;
-import org.cuair.ground.daos.AlphanumTargetSightingsDatabaseAccessor;
-import java.lang.Runnable;
-import org.apache.commons.io.IOUtils;
-import java.net.URL;
-import java.io.InputStream;
-import java.io.FileInputStream;
-import org.cuair.ground.models.exceptions.InvalidGpsLocationException;
-import com.google.protobuf.InvalidProtocolBufferException;
+import org.springframework.web.client.AsyncRestTemplate;
 
 /*
  * Client for interop communications
@@ -46,17 +40,22 @@ public class InteropClient {
 
   private static final Logger logger = LoggerFactory.getLogger(InteropClient.class);
 
-  private ClientCreatableDatabaseAccessor<EmergentTarget> emergentTargetDao = (ClientCreatableDatabaseAccessor<EmergentTarget>)DAOFactory.getDAO(
-        DAOFactory.ModelDAOType.CLIENT_CREATABLE_DATABASE_ACCESSOR, EmergentTarget.class);
+  private ClientCreatableDatabaseAccessor<EmergentTarget> emergentTargetDao =
+      (ClientCreatableDatabaseAccessor<EmergentTarget>)
+          DAOFactory.getDAO(
+              DAOFactory.ModelDAOType.CLIENT_CREATABLE_DATABASE_ACCESSOR, EmergentTarget.class);
 
-  private AlphanumTargetDatabaseAccessor<AlphanumTarget> alphaTargetDao = (AlphanumTargetDatabaseAccessor<AlphanumTarget>)DAOFactory.getDAO(
-        DAOFactory.ModelDAOType.ALPHANUM_TARGET_DATABASE_ACCESSOR, AlphanumTarget.class);
+  private AlphanumTargetDatabaseAccessor<AlphanumTarget> alphaTargetDao =
+      (AlphanumTargetDatabaseAccessor<AlphanumTarget>)
+          DAOFactory.getDAO(
+              DAOFactory.ModelDAOType.ALPHANUM_TARGET_DATABASE_ACCESSOR, AlphanumTarget.class);
 
-  private static final AlphanumTargetSightingsDatabaseAccessor<AlphanumTargetSighting> alphaTargetSightingDao =
-        (AlphanumTargetSightingsDatabaseAccessor<AlphanumTargetSighting>)
-            DAOFactory.getDAO(
-                DAOFactory.ModelDAOType.ALPHANUM_TARGET_SIGHTINGS_DATABASE_ACCESSOR,
-                AlphanumTargetSighting.class);
+  private static final AlphanumTargetSightingsDatabaseAccessor<AlphanumTargetSighting>
+      alphaTargetSightingDao =
+          (AlphanumTargetSightingsDatabaseAccessor<AlphanumTargetSighting>)
+              DAOFactory.getDAO(
+                  DAOFactory.ModelDAOType.ALPHANUM_TARGET_SIGHTINGS_DATABASE_ACCESSOR,
+                  AlphanumTargetSighting.class);
 
   private AsyncRestTemplate template = new AsyncRestTemplate();
 
@@ -128,39 +127,38 @@ public class InteropClient {
     attemptSend(emergentTarget);
   }
 
-  public void processAirdrop(Mission missionInfo) {
-
-  }
+  public void processAirdrop(Mission missionInfo) {}
 
   public void getMissionInfo() {
-    String missionURL = "http://" + INTEROP_IP + ":" + INTEROP_PORT + MISSION_INFO;
-    URI missionURI = URI.create(missionURL);
-    HttpHeaders headers = new HttpHeaders();
-    headers.add("Cookie", String.format("sessionid=%s", cookieValue));
+    URI missionURI = URI.create("http://" + INTEROP_IP + ":" + INTEROP_PORT + MISSION_INFO);
+    HttpHeaders headers = RequestUtil.getDefaultCookieHeaders(cookieValue);
     HttpEntity<String> requestEntity = new HttpEntity<String>(headers);
-    ListenableFuture<ResponseEntity<String>> missionFuture = template.exchange(
-        missionURI, HttpMethod.GET, requestEntity, String.class);
+    ListenableFuture<ResponseEntity<String>> missionFuture =
+        template.exchange(missionURI, HttpMethod.GET, requestEntity, String.class);
 
     // todo printing error messages when success callback is bad
-    RequestUtil.SuccessCallback<String> missionCallback = (ResponseEntity<String> result)-> {
-      System.out.println("GOT MISSION SUCCESS");
-      Mission.Builder missionBuilder = Mission.newBuilder();
-      try {
-        //int idd = result.getBody().getId();
-        JsonFormat.parser().merge(result.getBody().substring(1, result.getBody().length()), missionBuilder);
-        Mission missionInfo = missionBuilder.build();
-        processOffAxisPos(missionInfo);
-        processEmergent(missionInfo);
-        
-      } catch (Exception e) { // todo specific exception
-        logger.error("Error parsing mission information: " + e.getMessage());
-      }
+    RequestUtil.SuccessCallback<String> missionCallback =
+        (ResponseEntity<String> result) -> {
+          System.out.println("GOT MISSION SUCCESS");
+          Mission.Builder missionBuilder = Mission.newBuilder();
+          try {
+            // int idd = result.getBody().getId();
+            JsonFormat.parser()
+                .merge(result.getBody().substring(1, result.getBody().length()), missionBuilder);
+            Mission missionInfo = missionBuilder.build();
+            processOffAxisPos(missionInfo);
+            processEmergent(missionInfo);
 
-      // init emergent
-      // init off axis
-      // init airdrop
-    };
-    RequestUtil.futureCallback(missionURL, missionFuture, missionCallback);
+          } catch (Exception e) // todo specific exception
+          {
+            logger.error("Error parsing mission information: " + e.getMessage());
+          }
+
+          // init emergent
+          // init off axis
+          // init airdrop
+        };
+    RequestUtil.futureCallback(missionURI, missionFuture, missionCallback);
   }
 
   public EmergentTarget getEmergentTarget() {
@@ -170,125 +168,93 @@ public class InteropClient {
   }
 
   public void attemptUpdateImage(Target target) {
-    String updateImageURL = "http://" + INTEROP_IP + ":" + INTEROP_PORT + TARGET_ROUTE + "/" + target.getJudgeTargetId() + "/image";
-    URI updateImageURI = URI.create(updateImageURL);
+    URI updateImageURI =
+        URI.create(
+            "http://"
+                + INTEROP_IP
+                + ":"
+                + INTEROP_PORT
+                + TARGET_ROUTE
+                + "/"
+                + target.getJudgeTargetId()
+                + "/image");
     HttpHeaders headers = new HttpHeaders();
     headers.add("Cookie", String.format("sessionid=%s", cookieValue));
     headers.setContentType(MediaType.IMAGE_JPEG);
     try {
-      HttpEntity<byte[]> requestEntity = new HttpEntity<byte[]>(IOUtils.toByteArray(getIS(target)), headers);
-      ListenableFuture<ResponseEntity<String>> updateImageFuture = template.exchange(
-          updateImageURI, HttpMethod.POST, requestEntity, String.class);
-      RequestUtil.futureCallback(updateImageURL, updateImageFuture);
+      HttpEntity<byte[]> requestEntity =
+          new HttpEntity<byte[]>(IOUtils.toByteArray(getIS(target)), headers);
+      ListenableFuture<ResponseEntity<String>> updateImageFuture =
+          template.exchange(updateImageURI, HttpMethod.POST, requestEntity, String.class);
+      RequestUtil.futureCallback(updateImageURI, updateImageFuture);
     } catch (IOException e) {
       logger.error("Error when updating image: " + e.getMessage());
     }
   }
 
-
   class UpdateTarget implements Runnable {
 
-      Target target;
-      TargetSighting targetSighting;
+    Target target;
+    TargetSighting targetSighting;
 
-      public UpdateTarget(Target target, TargetSighting targetSighting) {
-        this.target = target;
-        this.targetSighting = targetSighting;
+    public UpdateTarget(Target target, TargetSighting targetSighting) {
+      this.target = target;
+      this.targetSighting = targetSighting;
+    }
+
+    public void run() {
+      System.out.println("Hello from a thread!");
+      // Try for approx. 90 sec.
+      int i = 0;
+      while (this.target.getJudgeTargetId() == null && i++ != 2) {
+        if (i == 1) {
+          logger.error("Pending update target thumbnail until JudgeTargetId");
+        }
+        try {
+          Thread.sleep(Flags.TARGETLOGGER_DELAY); // todo
+        } catch (InterruptedException e) {
+        }
+        // todo emergent vs alpha
+
+        this.target = alphaTargetDao.get(this.targetSighting.getTarget().getId());
       }
-
-      public void run() {
-          System.out.println("Hello from a thread!");
-          // Try for approx. 90 sec.
-          int i = 0;
-          while (this.target.getJudgeTargetId() == null && i++ != 2) {
-            if (i == 1) {
-              logger.error("Pending update target thumbnail until JudgeTargetId");
-            }
-            try {
-              Thread.sleep(Flags.TARGETLOGGER_DELAY); // todo
-            } catch (InterruptedException e) {}
-            // todo emergent vs alpha
-
-            this.target = alphaTargetDao.get(this.targetSighting.getTarget().getId());
-          }
-          if (this.target.getJudgeTargetId() == null) {
-            logger.error("Can't update target thumbnail: Target does not exist on the competition server");
-          }
-          if (this.targetSighting.getAssignment() == null || this.targetSighting.getAssignment().getImage() == null) {
-            logger.error("Can't update target thumbnail: TargetSighting doesn't have image");
-          }
-          saveTargetThumbnailFile(this.targetSighting);
-          attemptUpdateImage(this.target);
+      if (this.target.getJudgeTargetId() == null) {
+        logger.error(
+            "Can't update target thumbnail: Target does not exist on the competition server");
       }
+      if (this.targetSighting.getAssignment() == null
+          || this.targetSighting.getAssignment().getImage() == null) {
+        logger.error("Can't update target thumbnail: TargetSighting doesn't have image");
+      }
+      saveTargetThumbnailFile(this.targetSighting);
+      attemptUpdateImage(this.target);
+    }
   }
 
   /**
    * Updates a target's thumbnail image on the competition server
    *
-   * Precondition: target must be an entry in our database
+   * <p>Precondition: target must be an entry in our database
    *
    * @param targetSighting Sighting of target whose image will represent its target
    * @throws IllegalArgumentException if precondition isn't satisfied precondition: target must not
-   * be null and must have a judge target id, and must have an associated image
+   *     be null and must have a judge target id, and must have an associated image
    */
   public void updateTargetImage(TargetSighting targetSighting) {
+    Target target;
     if (targetSighting instanceof EmergentTargetSighting) {
-      EmergentTarget target = emergentTargetDao.get(targetSighting.getTarget().getId());
-      if (target == null) {
-        logger.info("Can't update target thumbnail: Target object is null");
-        return;
-      }
-      UpdateTarget updateTarget = new UpdateTarget(target, targetSighting);
-      Thread t = new Thread(updateTarget);
-      t.start();
-
-      // thread {
-      //   // Try for approx. 90 sec
-      //   while (target?.judgeTargetId == null && i++ != 2) {
-      //     if (i == 1) Logger.error("Pending update target thumbnail until JudgeTargetId")
-      //     Thread.sleep(PlayConfig.TARGETLOGGER_DELAY)
-      //     target = emergentTargetDao.get(targetSighting.getTarget().getId())
-      //   }
-
-      //   requireNotNull(target?.judgeTargetId) { "Can't update target thumbnail: Target does not exist on the competition server" }
-      //   requireNotNull(targetSighting.assignment?.image) { "Can't update target thumbnail: TargetSighting doesn't have image" }
-      //   this.saveTargetThumbnailFile(targetSighting)
-      //   queue.add(PostImageRunnable(target))
-      // }
-      
+      target = emergentTargetDao.get(targetSighting.getTarget().getId());
     } else {
-      int i = 0;
-      AlphanumTarget target = alphaTargetDao.get(targetSighting.getTarget().getId());
-      if (target == null) {
-        logger.info("Can't update target thumbnail: Target object is null");
-        return;
-      }
-      UpdateTarget updateTarget = new UpdateTarget(target, targetSighting);
-      Thread t = new Thread(updateTarget);
-      t.start();
-
-      // requireNotNull(target) { "Can't update target thumbnail: Target object is null" }
-      // thread {
-      //   // Try for approx. 90 sec
-      //   while (target?.judgeTargetId == null && i++ != 2) {
-      //     Logger.info("WAITING");
-      //     if (i == 1) Logger.error("Pending update target thumbnail until JudgeTargetId")
-      //     Thread.sleep(PlayConfig.TARGETLOGGER_DELAY)
-      //     target = alphaTargetDao.get(targetSighting.getTarget().getId())
-      //   }
-      //   Logger.info("here");
-
-      //   requireNotNull(target?.judgeTargetId) { "Can't update target thumbnail: Target does not exist on the competition server" }
-      //   requireNotNull(targetSighting.assignment?.image) { "Can't update target thumbnail: TargetSighting doesn't have image" }
-      //   this.saveTargetThumbnailFile(targetSighting)
-      //   queue.add(PostImageRunnable(target))
-      // }
+      target = alphaTargetDao.get(targetSighting.getTarget().getId());
     }
-      //targetSighting.typeString.equals("Alphanum") ? alphaTargetDao : emergentTargetDao
-    //}
+    if (target == null) {
+      logger.info("Can't update target thumbnail: Target object is null");
+      return;
+    }
+    UpdateTarget updateTarget = new UpdateTarget(target, targetSighting);
+    Thread t = new Thread(updateTarget);
+    t.start();
   }
-
-
 
   /**
    * Saves a thumbnail of a target sighting for a target
@@ -296,7 +262,8 @@ public class InteropClient {
    * @param targetSighting TargetSighting of the Target
    */
   private BufferedImage saveTargetThumbnailFile(TargetSighting targetSighting) {
-    String imageURL = "images/" + targetSighting.getAssignment().getImage().getImageUrl().substring(19);
+    String imageURL =
+        "images/" + targetSighting.getAssignment().getImage().getImageUrl().substring(19);
     File imgFile = new File(imageURL);
     BufferedImage in = null;
 
@@ -332,7 +299,7 @@ public class InteropClient {
       }
 
       logger.info("Target Image Export Successful");
-      return newImage;    
+      return newImage;
     }
   }
 
@@ -341,7 +308,8 @@ public class InteropClient {
     File file = new File(targetDirectory + t.getJudgeTargetId() + ".png");
     try {
       file.createNewFile();
-    } catch (IOException e) {}
+    } catch (IOException e) {
+    }
     return file;
   }
 
@@ -354,7 +322,7 @@ public class InteropClient {
     //   return null;
     // }
     File file = new File(targetDirectory + t.getJudgeTargetId() + ".png"); // todo
-    InputStream targetStream = null; //todo
+    InputStream targetStream = null; // todo
     try {
       targetStream = new FileInputStream(file);
     } catch (Exception e) {
@@ -367,15 +335,15 @@ public class InteropClient {
     Odlc.Builder odlcProto = Odlc.newBuilder();
     if (target.getGeotag() != null && target.getGeotag().getGpsLocation() != null) {
       odlcProto
-        .setLatitude(target.getGeotag().getGpsLocation().getLatitude())
-        .setLongitude(target.getGeotag().getGpsLocation().getLongitude());
+          .setLatitude(target.getGeotag().getGpsLocation().getLatitude())
+          .setLongitude(target.getGeotag().getGpsLocation().getLongitude());
     } else {
       logger.error("Null gps location for target: " + target.toString());
     }
     odlcProto.setAutonomous(target.getCreator().equals(ClientType.ADLC));
     odlcProto.setMission(MISSION_ID);
     if (target.getTypeString().equals("Alphanum")) {
-      AlphanumTarget alphanumTarget = ((AlphanumTarget)target);
+      AlphanumTarget alphanumTarget = ((AlphanumTarget) target);
       if (alphanumTarget.getAlpha() != null) {
         odlcProto.setAlphanumeric(alphanumTarget.getAlpha());
       }
@@ -388,12 +356,15 @@ public class InteropClient {
       if (alphanumTarget.getShapeColor() != null) {
         odlcProto.setShapeColor(alphanumTarget.getShapeColor().asProtoColor());
       }
-      if (alphanumTarget.getGeotag() != null && alphanumTarget.getGeotag().getRadiansFromNorth() != null) {
-        odlcProto.setOrientation(CardinalDirection.getFromRadians(alphanumTarget.getGeotag().getRadiansFromNorth()).asProtoOrientation());
-      } 
+      if (alphanumTarget.getGeotag() != null
+          && alphanumTarget.getGeotag().getRadiansFromNorth() != null) {
+        odlcProto.setOrientation(
+            CardinalDirection.getFromRadians(alphanumTarget.getGeotag().getRadiansFromNorth())
+                .asProtoOrientation());
+      }
       odlcProto.setType(Odlc.Type.STANDARD);
     } else {
-      EmergentTarget emergentTarget = (EmergentTarget)target;
+      EmergentTarget emergentTarget = (EmergentTarget) target;
       if (emergentTarget.getDescription() != null) {
         odlcProto.setDescription(emergentTarget.getDescription());
         odlcProto.setType(Odlc.Type.EMERGENT);
@@ -414,104 +385,113 @@ public class InteropClient {
 
   public void attemptSend(Target target) {
     Odlc odlcProto = createOdlcProto(target);
-    String postODLCURL = "http://" + INTEROP_IP + ":" + INTEROP_PORT + TARGET_ROUTE;
-    URI postODLCURI = URI.create(postODLCURL);
+    URI postODLCURI = URI.create("http://" + INTEROP_IP + ":" + INTEROP_PORT + TARGET_ROUTE);
     HttpHeaders headers = new HttpHeaders();
     headers.add("Cookie", String.format("sessionid=%s", cookieValue));
     System.out.println(cookieValue);
     try {
-      HttpEntity<String> requestEntity = new HttpEntity<String>(JsonFormat.printer().print(odlcProto), headers);
-      ListenableFuture<ResponseEntity<String>> postTargetFuture = template.exchange(
-          postODLCURI, HttpMethod.POST, requestEntity, String.class);
+      HttpEntity<String> requestEntity =
+          new HttpEntity<String>(JsonFormat.printer().print(odlcProto), headers);
+      ListenableFuture<ResponseEntity<String>> postTargetFuture =
+          template.exchange(postODLCURI, HttpMethod.POST, requestEntity, String.class);
 
       // todo printing error messages when success callback is bad
-      RequestUtil.SuccessCallback<String> postOdlcCallback = (ResponseEntity<String> result)-> {
-        Odlc odlcInfo = getOdlcDataAsProto(result.getBody());
-        target.setJudgeTargetId(Long.valueOf(odlcInfo.getId()));
-        if (target instanceof AlphanumTarget) {
-          alphaTargetDao.update((AlphanumTarget)target);
-        } else if (target instanceof EmergentTarget) {
-          emergentTargetDao.update((EmergentTarget)target);
-        }
+      RequestUtil.SuccessCallback<String> postOdlcCallback =
+          (ResponseEntity<String> result) -> {
+            Odlc odlcInfo = getOdlcDataAsProto(result.getBody());
+            target.setJudgeTargetId(Long.valueOf(odlcInfo.getId()));
+            if (target instanceof AlphanumTarget) {
+              alphaTargetDao.update((AlphanumTarget) target);
+            } else if (target instanceof EmergentTarget) {
+              emergentTargetDao.update((EmergentTarget) target);
+            }
 
-        // Mission.Builder missionBuilder = Mission.newBuilder();
-        // //System.out.println(Mission.newBuilder().getClass());
-        
-        // //System.out.println(result.getBody());
-        // try {
-        //   //int idd = result.getBody().getId();
-        //   //System.out.println(idd + " fs");
-        //   JsonFormat.parser().merge(result.getBody().substring(1, result.getBody().length()), missionBuilder);
-        //   System.out.println("heree");
-        //   Mission missionInfo = missionBuilder.build();
-        //   System.out.println(missionInfo.getOffAxisOdlcPos().getLatitude());
-        // } catch (Exception e) { // todo specific exception
-        //   System.out.println("ERROR " + e.getMessage());
-        // }
+            // Mission.Builder missionBuilder = Mission.newBuilder();
+            // //System.out.println(Mission.newBuilder().getClass());
 
-        // init emergent
-        // init off axis
-        // init airdrop
-      };
+            // //System.out.println(result.getBody());
+            // try {
+            //   //int idd = result.getBody().getId();
+            //   //System.out.println(idd + " fs");
+            //   JsonFormat.parser().merge(result.getBody().substring(1, result.getBody().length()),
+            // missionBuilder);
+            //   System.out.println("heree");
+            //   Mission missionInfo = missionBuilder.build();
+            //   System.out.println(missionInfo.getOffAxisOdlcPos().getLatitude());
+            // } catch (Exception e) { // todo specific exception
+            //   System.out.println("ERROR " + e.getMessage());
+            // }
 
-      RequestUtil.futureCallback(postODLCURL, postTargetFuture, postOdlcCallback);
+            // init emergent
+            // init off axis
+            // init airdrop
+          };
+
+      RequestUtil.futureCallback(postODLCURI, postTargetFuture, postOdlcCallback);
     } catch (InvalidProtocolBufferException e) {
       logger.error("Error when sending target: " + e.getMessage());
     }
   }
 
   public void attemptDelete(Target t) {
-    String deleteURL = "http://" + INTEROP_IP + ":" + INTEROP_PORT + TARGET_ROUTE + "/" + t.getJudgeTargetId(); // todo rename route
+    // String deleteURL = // todo rename route
     System.out.println(cookieValue);
-    URI deleteURI = URI.create(deleteURL);
-    HttpHeaders headers = new HttpHeaders();
-    headers.add("Cookie", String.format("sessionid=%s", cookieValue));
+    // todo combine all interop stuff
+    URI deleteURI =
+        URI.create(
+            "http://"
+                + INTEROP_IP
+                + ":"
+                + INTEROP_PORT
+                + TARGET_ROUTE
+                + "/"
+                + t.getJudgeTargetId());
+    HttpHeaders headers = RequestUtil.getDefaultCookieHeaders(cookieValue);
     HttpEntity<String> requestEntity = new HttpEntity<String>(headers);
-    ListenableFuture<ResponseEntity<String>> deleteFuture = template.exchange(
-        deleteURI, HttpMethod.DELETE, requestEntity, String.class);
+    ListenableFuture<ResponseEntity<String>> deleteFuture =
+        template.exchange(deleteURI, HttpMethod.DELETE, requestEntity, String.class);
 
-    RequestUtil.futureCallback(deleteURL, deleteFuture);
+    RequestUtil.futureCallback(deleteURI, deleteFuture);
   }
 
   public void attemptLogin() {
-    String loginURL = "http://" + INTEROP_IP + ":" + INTEROP_PORT + LOGIN;
-    System.out.println("attempting logni");
-
-    URI interopURI = URI.create(loginURL);
+    URI interopURI = URI.create("http://" + INTEROP_IP + ":" + INTEROP_PORT + LOGIN);
 
     HttpHeaders headers = new HttpHeaders();
 
     headers.setContentType(MediaType.APPLICATION_JSON);
 
-    Credentials credentials = Credentials.newBuilder()
-      .setUsername(USERNAME)
-      .setPassword(PASSWORD)
-      .build();
+    Credentials credentials =
+        Credentials.newBuilder().setUsername(USERNAME).setPassword(PASSWORD).build();
 
-    // todo with protobuf 
+    // todo with protobuf
     JSONObject personJsonObject = new JSONObject();
     personJsonObject.put("username", USERNAME);
     personJsonObject.put("password", PASSWORD);
 
     try {
-      HttpEntity<String> requestEntity = new HttpEntity<String>(JsonFormat.printer().print(credentials), headers);
-      ListenableFuture<ResponseEntity<String>> loginFuture = template.exchange(
-        interopURI, HttpMethod.POST, requestEntity, String.class);
-      RequestUtil.SuccessCallback<String> loginCallback = (ResponseEntity<String> result)-> {
-        System.out.println("SUCCESS LOGIN");
-        try {
-          String cookieString = result.getHeaders().get(HttpHeaders.SET_COOKIE).get(0);
-          cookieValue = HttpCookie.parse(cookieString).get(0).getValue();   //(HttpCookie.parse(result.getHeaders().get(HttpHeaders.SET_COOKIE).get(0)).get(0).getValue());
-        } catch (Exception e) {
-          logger.error("Error when parsing cookie: " + e.getMessage());
-        }
-        System.out.println(cookieValue);
-        getMissionInfo();
-      };
-      RequestUtil.futureCallback(loginURL, loginFuture, loginCallback);
+      HttpEntity<String> requestEntity =
+          new HttpEntity<String>(JsonFormat.printer().print(credentials), headers);
+      ListenableFuture<ResponseEntity<String>> loginFuture =
+          template.exchange(interopURI, HttpMethod.POST, requestEntity, String.class);
+      RequestUtil.SuccessCallback<String> loginCallback =
+          (ResponseEntity<String> result) -> {
+            System.out.println("SUCCESS LOGIN");
+            try {
+              String cookieString = result.getHeaders().get(HttpHeaders.SET_COOKIE).get(0);
+              cookieValue =
+                  HttpCookie.parse(cookieString)
+                      .get(0)
+                      .getValue(); // (HttpCookie.parse(result.getHeaders().get(HttpHeaders.SET_COOKIE).get(0)).get(0).getValue());
+            } catch (Exception e) {
+              logger.error("Error when parsing cookie: " + e.getMessage());
+            }
+            System.out.println(cookieValue);
+            getMissionInfo();
+          };
+      RequestUtil.futureCallback(interopURI, loginFuture, loginCallback);
     } catch (Exception e) {
       logger.error("Interop Client login: " + e.getMessage());
     }
   }
 }
-

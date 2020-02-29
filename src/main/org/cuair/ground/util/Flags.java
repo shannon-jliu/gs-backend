@@ -1,56 +1,60 @@
 package org.cuair.ground.util;
 
-
 public class Flags {
 
-    // Image directory
-	public static String PLANE_IMAGE_DIR = "images/";
+  /* Autopilot */
+  
+  public static String AUTOPILOT_GROUND_IP = "192.168.0.22";
 
-	public static String AUTOPILOT_GROUND_IP = "192.168.0.22";
-	public static String AUTOPILOT_GROUND_PORT = "8001";
-	public static String AUTOPILOT_COVERAGE = "/ground/api/v3/distributed/geotag";
-	public static String AUTOPILOT_GROUND_MDLC_ROIS = "/ground/api/v3/distributed/mdlc";
-	public static String AUTOPILOT_GROUND_ADLC_ROIS = "/ground/api/v3/distributed/adlc";
+  public static String AUTOPILOT_GROUND_PORT = "8001";
 
-	/* Plane servers IP */
-	public static String OBC_IP = "192.168.0.21";
+  public static String AUTOPILOT_COVERAGE = "/ground/api/v3/distributed/geotag";
 
-	public static boolean PRINT_CLIENT_LOGS = true;
+  public static String AUTOPILOT_GROUND_MDLC_ROIS = "/ground/api/v3/distributed/mdlc";
 
-	// todo 
+  public static String AUTOPILOT_GROUND_ADLC_ROIS = "/ground/api/v3/distributed/adlc";
 
-	public static String CAM_GIM_PORT = "5000";
+  /* Plane servers */
 
-	public static String AIR_API_PORT = "5001";
+  public static boolean PRINT_CLIENT_LOGS = true;
 
-	public static String AIRDROP_PORT = "5002";
+  public static String OBC_IP = "192.168.0.21";
 
-	/* CGS */
+  public static String CAM_GIM_PORT = "5000";
 
-	public static String CAM_GIM_MODE = "/api/mode";
+  public static String AIR_API_PORT = "5001";
 
-	public static String MISSION_INFO = "/api/missions";
+  public static String AIRDROP_PORT = "5002";
 
-	public static int MISSION_ID = 1;
+  public static String CAM_GIM_MODE = "/api/mode";
 
-	public static String TARGET_ROUTE = "/api/odlcs";
+  /* Interop */
 
-	public static int TARGETLOGGER_DELAY = 30000;
+  public static boolean CUAIR_INTEROP_REQUESTS = true;
 
-	public static String INTEROP_TARGET_DIR = "images/";
+  public static String MISSION_INFO = "/api/missions";
 
-    // Flags
-    public static boolean AUTH_ENABLED = false;
+  public static int MISSION_ID = 1;
 
-    // Security
-    public static String DEFAULT_USER = "<NO_USER>";
+  public static String TARGET_ROUTE = "/api/odlcs";
 
-    public static int IMAGE_WIDTH = 5456;
+  public static int TARGETLOGGER_DELAY = 30000;
 
-    public static int IMAGE_HEIGHT = 3632;
+  public static String INTEROP_TARGET_DIR = "images/";
 
-    public static boolean CUAIR_INTEROP_REQUESTS = true;
+  /* Auth */
 
-    public static String DEFAULT_EMERGENT_TARGET_DESC = "Lost hiker laying down on ground.";
+  public static boolean AUTH_ENABLED = false;
 
+  public static String DEFAULT_USER = "<NO_USER>";
+
+  /* Targets and Images */
+
+  public static String PLANE_IMAGE_DIR = "images/";
+
+  public static int IMAGE_WIDTH = 5456;
+
+  public static int IMAGE_HEIGHT = 3632;
+
+  public static String DEFAULT_EMERGENT_TARGET_DESC = "Lost hiker laying down on ground.";
 }
