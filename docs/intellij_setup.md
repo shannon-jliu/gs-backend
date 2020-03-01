@@ -38,5 +38,3 @@ Entering `Ctrl` + `Alt` + `Shift` + `/` (or `Command` + `Option` + `Shift` + `/`
 ![Image](img/compiler_automake_when_running.png)
 
 Then search for `compiler.automake.allow.when.app.running` and enable it.
-
-
