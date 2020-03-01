@@ -2,17 +2,17 @@ package org.cuair.ground.daos
 
 import org.cuair.ground.models.CUAirModel
 import org.cuair.ground.models.TimestampModel
-import org.cuair.ground.models.Username
+import org.cuair.ground.models.ODLCUser
+import org.cuair.ground.daos.ODLCUserDatabaseAccessor
 
 /** Factory for creating an managing DAO instances */
 class DAOFactory {
     enum class ModellessDAOType {
-        USERNAME_DATABASE_ACCESSOR {
+        ODLCUSER_DATABASE_ACCESSOR {
             override fun createInstance(): DatabaseAccessor<*> {
-                return UsernameDatabaseAccessor()
+                return ODLCUserDatabaseAccessor()
             }
         };
-
         /**
          * Creates an instance of the database accessor
          *
