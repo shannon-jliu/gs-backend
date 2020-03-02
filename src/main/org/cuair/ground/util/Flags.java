@@ -8,8 +8,12 @@ public class Flags {
 	/** Special username */
 	public static String MDLC_OPERATOR_USERNAME = "operator";
 
-	/**
-	 * Won't allow two users to have the same ip if set to true.
-	 */
+	/** Default username */
+	public static String DEFAULT_USERNAME = "<NO_USER>";
+
+	/** Won't allow two users to have the same ip if set to true */
 	public static boolean ENABLE_MULTIPLE_USERS_PER_IP = true;
+
+	/** Allows clients to create users if true. Otherwise, all will use default user */
+	public static boolean USERS_ENABLED = true;
 }
