@@ -41,7 +41,6 @@ import org.slf4j.LoggerFactory;
 import org.cuair.ground.models.geotag.GpsLocation;
 import org.cuair.ground.models.geotag.GimbalOrientation;
 import org.cuair.ground.models.geotag.Telemetry;
-import org.cuair.ground.models.exceptions.InvalidGpsLocationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -63,19 +62,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpHeaders;
-
 import org.springframework.http.CacheControl;
-
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 import org.apache.commons.io.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import org.springframework.http.CacheControl;
 
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.beans.factory.annotation.Value;
 import org.cuair.ground.util.Flags;
 
 import org.cuair.ground.models.geotag.GimbalOrientation;
@@ -161,7 +156,7 @@ public class ImageController {
             byte[] media = null;
             try {
                 media = IOUtils.toByteArray(in);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error reading file: " + PLANE_IMAGE_DIR + file);
             }
             headers.setCacheControl(CacheControl.noCache().getHeaderValue());
@@ -220,6 +215,10 @@ public class ImageController {
             return badRequest().body("Json part must include timestamp field");
         }
 
+        if (json.get("fov") == null) {
+            return badRequest().body("Json part must include fov field");
+        }
+
         if (json.get("imgMode") == null) {
             return badRequest().body("Json part must include imgMode");
         }
@@ -260,7 +259,7 @@ public class ImageController {
             return badRequest().body("Json part must include planeYaw within telemetry");
         }
 
-        if (json.size() > 8) {
+        if (json.size() > 9) {
             return badRequest().body("Json part contains invalid field");
         }
 
@@ -340,16 +339,21 @@ public class ImageController {
         Double DEFAULT_PLANE_YAW = 0.0;
         Double DEFAULT_GIMBAL_PITCH = 0.0;
         Double DEFAULT_GIMBAL_ROLL = 0.0;
+        Double DEFAULT_IMAGE_FOV = 60.0;
 
         if (i.getImgMode() == null) {
             i.setImgMode(DEFAULT_IMAGE_MODE);
         }
 
+        if ((Double) i.getFov() == null) {
+            i.setFov(DEFAULT_IMAGE_FOV);
+        }
+
         if (i.getTelemetry() == null) {
 
             Telemetry t = new Telemetry(
-                new GpsLocation(DEFAULT_LATITUDE, DEFAULT_LONGITUDE), 
-                DEFAULT_ALTITUDE, 
+                new GpsLocation(DEFAULT_LATITUDE, DEFAULT_LONGITUDE),
+                DEFAULT_ALTITUDE,
                 DEFAULT_PLANE_YAW,
                 DEFAULT_GIMBAL_PITCH,
                 DEFAULT_GIMBAL_ROLL

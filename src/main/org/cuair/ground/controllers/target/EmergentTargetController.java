@@ -11,15 +11,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
+import static org.springframework.http.ResponseEntity.ok;
+import static org.springframework.http.ResponseEntity.badRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpHeaders;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import java.io.IOException;
 
 /** Controller to handle creation/retrieval of Emergent Target model objects */
 @CrossOrigin
@@ -31,9 +26,6 @@ public class EmergentTargetController extends TargetController<EmergentTarget> {
     private static final ClientCreatableDatabaseAccessor<EmergentTarget> targetDao =
         (ClientCreatableDatabaseAccessor<EmergentTarget>) DAOFactory.getDAO(
             DAOFactory.ModelDAOType.CLIENT_CREATABLE_DATABASE_ACCESSOR, EmergentTarget.class);
-
-    /** An object mapper */
-    private ObjectMapper mapper = new ObjectMapper();
 
     /** Gets the database accessor object for this target */
     @Override
@@ -50,18 +42,6 @@ public class EmergentTargetController extends TargetController<EmergentTarget> {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity getAll() {
         return super.getAll();
-    }
-
-    /**
-     * Get Target by id
-     *
-     * @param id Long id of the desired target
-     * @return the Target as JSON
-     */
-    @Override
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseEntity get(@PathVariable Long id) {
-        return super.get(id);
     }
 
     /**
@@ -88,10 +68,10 @@ public class EmergentTargetController extends TargetController<EmergentTarget> {
     public ResponseEntity update(@PathVariable Long id, @RequestBody EmergentTarget other) {
         EmergentTarget t = targetDao.get(id);
         if (t == null) {
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        return super.update(id, t, other);
+        return super.update(t, other);
     }
 
     /**

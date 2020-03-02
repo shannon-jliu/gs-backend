@@ -1,11 +1,7 @@
 package org.cuair.ground.models.geotag
 
-import java.util.Objects
 import javax.persistence.Basic
 import javax.persistence.Embeddable
-import javax.validation.constraints.NotNull
-import org.cuair.ground.models.exceptions.InvalidGpsLocationException
-import kotlin.math.abs
 
 /** Represents the orientation of the gimbal */
 @Embeddable

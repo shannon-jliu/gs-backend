@@ -28,15 +28,18 @@ class Image(
         var telemetry: Telemetry,
         //@OneToOne(cascade = arrayOf(CascadeType.ALL))
         /** The type of this image. Either FIXED, TRACKING, or OFFAXIS */
-        var imgMode: ImgMode
+        var imgMode: ImgMode,
+        /** The horizontal field of fiew of this image in degrees. */
+        var fov: Double
 ) : TimestampModel() {
 
     /** Secondary constructor that sets imgMode to FIXED by default */
     constructor(
             localImageUrl: String,
             imageUrl: String,
-            telemetry: Telemetry
-    ) : this(localImageUrl, imageUrl, telemetry, ImgMode.FIXED)
+            telemetry: Telemetry,
+            fov: Double
+    ) : this(localImageUrl, imageUrl, telemetry, ImgMode.FIXED, fov)
 
     /** The filesystem path this image lives on relative to the server directory */
     //@Transient var localImageUrl: String? = null
@@ -93,7 +96,7 @@ class Image(
         if (this.imageUrl != other.imageUrl) return false
         if (this.imgMode != other.imgMode) return false
         if (!Objects.equals(this.telemetry, other.telemetry)) return false
-
+        if (this.fov != other.fov) return false
         return true
     }
 }

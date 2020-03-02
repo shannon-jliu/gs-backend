@@ -52,9 +52,18 @@ public class Flags {
 
   public static String PLANE_IMAGE_DIR = "images/";
 
-  public static int IMAGE_WIDTH = 5456;
-
-  public static int IMAGE_HEIGHT = 3632;
-
   public static String DEFAULT_EMERGENT_TARGET_DESC = "Lost hiker laying down on ground.";
+
+  /* Geotag */
+
+  public static double IMAGE_WIDTH = 4912.0;
+
+  public static double IMAGE_HEIGHT = 3684.0;
+
+  public static double FOV_HORIZONTAL_RADIANS = 0.7328394987;
+
+  public static double FOV_VERTICAL_RADIANS = 0.560476881;
+
+  public static boolean CUAIR_GEOTAG_MUTABLE = false;
+  
 }
