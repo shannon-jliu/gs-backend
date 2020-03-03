@@ -8,7 +8,7 @@ import org.cuair.ground.daos.AssignmentDatabaseAccessor;
 import org.cuair.ground.daos.DAOFactory;
 import org.cuair.ground.daos.TargetSightingsDatabaseAccessor;
 import org.cuair.ground.models.Assignment;
-import org.cuair.ground.models.ClientType;
+import org.cuair.ground.models.ODLCUser;
 import org.cuair.ground.models.geotag.Geotag;
 import org.cuair.ground.models.plane.target.TargetSighting;
 import org.cuair.ground.util.Flags;
@@ -46,18 +46,6 @@ public abstract class TargetSightingController<T extends TargetSighting> {
      */
     public ResponseEntity getAll() {
         return ok(getTargetSightingDao().getAll());
-    }
-
-    /**
-     * Constructs an HTTP response with all target sightings that are associated with a given creator
-     * type
-     *
-     * @return HTTP response with the json of all the target sightings associated with given creator
-     *     type
-     */
-    public ResponseEntity getAllForCreator(String type) {
-        ClientType creator = ClientType.valueOf(type);
-        return ok(getTargetSightingDao().getAllForCreator(creator));
     }
 
     /**

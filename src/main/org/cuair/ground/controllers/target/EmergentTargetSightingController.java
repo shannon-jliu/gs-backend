@@ -3,7 +3,7 @@ package org.cuair.ground.controllers.target;
 import org.cuair.ground.daos.DAOFactory;
 import org.cuair.ground.daos.TargetDatabaseAccessor;
 import org.cuair.ground.daos.TargetSightingsDatabaseAccessor;
-import org.cuair.ground.models.ClientType;
+import org.cuair.ground.models.ODLCUser;
 import org.cuair.ground.models.plane.target.EmergentTarget;
 import org.cuair.ground.models.plane.target.EmergentTargetSighting;
 
@@ -58,18 +58,6 @@ public class EmergentTargetSightingController extends TargetSightingController<E
     }
 
     /**
-     * Constructs an HTTP response with all target sightings that are associated with a given creator
-     * type
-     *
-     * @return HTTP response with the json of all the target sightings associated with given creator
-     *     type
-     */
-    @RequestMapping(value = "/creator/{type}", method = RequestMethod.GET)
-    public ResponseEntity getAllForCreator(@PathVariable String type) {
-        return super.getAllForCreator(type);
-    }
-
-    /**
      * Creates a target sighting in this assigned image
      *
      * @param id the id of the assignment for which to create target sighting
@@ -81,7 +69,7 @@ public class EmergentTargetSightingController extends TargetSightingController<E
         // The console on the frontend also threw an error: "index.js:1437 Warning: Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in the componentWillUnmount method.
         // in MergeSightingPreview (at mergeTarget.js:314)""
         EmergentTarget t = eTargetDao.getAll().get(0);
-        if (ts.getCreator() != ClientType.MDLC) {
+        if (ts.getCreator().getUserType() != ODLCUser.UserType.MDLCTAGGER && ts.getCreator().getUserType() != ODLCUser.UserType.MDLCOPERATOR) {
             return badRequest().body("Only MDLC should be creating Emergent Target Sightings");
         }
         ts.setTarget(t);

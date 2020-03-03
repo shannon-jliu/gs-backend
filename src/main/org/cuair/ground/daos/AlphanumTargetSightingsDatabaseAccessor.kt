@@ -1,7 +1,7 @@
 package org.cuair.ground.daos
 
 import io.ebean.Ebean
-import org.cuair.ground.models.ClientType
+import org.cuair.ground.models.ODLCUser
 import org.cuair.ground.models.geotag.GpsLocation
 import org.cuair.ground.models.plane.target.AlphanumTargetSighting
 
@@ -25,7 +25,7 @@ class AlphanumTargetSightingsDatabaseAccessor<T : AlphanumTargetSighting>(modelC
             .select("geotag")
             .where()
             .isNotNull("geotag")
-            .eq("creator", ClientType.ADLC)
+            .eq("creator", ODLCUser.UserType.ADLC)
             .order("adlc_class_conf DESC, id ASC")
             .setMaxRows(numTags)
             .findList()

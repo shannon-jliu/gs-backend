@@ -11,7 +11,7 @@ import org.cuair.ground.daos.TargetSightingsDatabaseAccessor;
 import org.cuair.ground.daos.DAOFactory;
 import org.cuair.ground.models.Assignment;
 import org.cuair.ground.models.ClientCreatable;
-import org.cuair.ground.models.ClientType;
+import org.cuair.ground.models.ODLCUser;
 import org.cuair.ground.models.Image;
 import org.cuair.ground.models.plane.target.AlphanumTarget;
 import org.cuair.ground.models.plane.target.AlphanumTargetSighting;
@@ -70,40 +70,6 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
     }
 
     /**
-     * Constructs an HTTP response with all target sightings that are associated with a given creator
-     * type
-     *
-     * @return HTTP response with the json of all the target sightings associated with given creator
-     *     type
-     */
-    @RequestMapping(value = "/creator/{type}", method = RequestMethod.GET)
-    public ResponseEntity getAllForCreator(@PathVariable String type) {
-        return super.getAllForCreator(type);
-    }
-
-    /** Changes all ADLC target sightings to MDLC */
-    @RequestMapping(value = "/MDLC", method = RequestMethod.PUT)
-    public ResponseEntity changeToMDLC() {
-        List<AlphanumTargetSighting> ts = alphaDao.getAllForCreator(ClientType.ADLC);
-        for (AlphanumTargetSighting t : ts) {
-            t.getAssignment().setAssignee(ClientType.MDLC);
-            t.setCreator(ClientType.MDLC);
-            alphaDao.update(t);
-        }
-
-        List<AlphanumTarget> targets = alphaTargetDao.getAllForCreator(ClientType.ADLC);
-        for (AlphanumTarget targ : targets) {
-            targ.setCreator(ClientType.MDLC);
-            alphaTargetDao.update(targ);
-            // TODO: Add back in once client code is complete
-            // interopClient.updateTarget(targ);
-        }
-
-        List<ClientCreatable> targetsAndSightings = Stream.concat(ts.stream(), targets.stream()) .collect(Collectors.toList());
-        return ok(targetsAndSightings);
-    }
-
-    /**
      * Creates an alphanumeric target sighting in this assigned image
      *
      * @param id the id of the assignment for which to create target sighting
@@ -121,7 +87,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
         final ResponseEntity retval = super.create(id, ts);
 
         if (retval.getStatusCodeValue() == 200) {
-            if (ts.getCreator() == ClientType.ADLC) {
+            if (ts.getCreator().getUserType() == ODLCUser.UserType.ADLC) {
                 // TODO: Add back in once client code is complete
                 // autopilotClient.sendAdlcRoi(alphaDao.getTopAdlcLocations(5));
 
@@ -186,7 +152,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
 
         if (retval.getStatusCodeValue() == 200) {
             if (toEraseThumb) {
-                if (ts.getCreator() == ClientType.MDLC) {
+                if (ts.getCreator().getUserType() == ODLCUser.UserType.MDLCTAGGER || ts.getCreator().getUserType() == ODLCUser.UserType.MDLCOPERATOR) {
                     // If MDLC, set thumb for original target to default value
                     tToEraseFrom.setthumbnail_tsid(0L);
                     // TODO (mariasam1): delete thumbnail through interop
@@ -208,7 +174,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
                 alphaTargetDao.update(tToEraseFrom);
             }
 
-            if (ts.getCreator() == ClientType.ADLC) {
+            if (ts.getCreator().getUserType() == ODLCUser.UserType.ADLC) {
                 // TODO: Add back in once client code is complete
                 // autopilotClient.sendAdlcRoi(alphaDao.getTopAdlcLocations(5));
 
@@ -244,7 +210,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
         final ResponseEntity retval = super.delete(ts);
 
         if (ts.getTarget() != null && ts.getTarget().getthumbnail_tsid().equals(id)) {
-            if (ts.getCreator() == ClientType.MDLC) {
+            if (ts.getCreator().getUserType() == ODLCUser.UserType.MDLCTAGGER || ts.getCreator().getUserType() == ODLCUser.UserType.MDLCOPERATOR) {
                 // If MDLC, set thumb for original target to default value
                 ts.getTarget().setthumbnail_tsid(0L);
                 // TODO (mariasam1): delete thumbnail through interop
@@ -264,7 +230,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
             alphaTargetDao.update(ts.getTarget());
         }
         // TODO: Implement client code
-        // if (ts.getCreator() == ClientType.ADLC)
+        // if (ts.getCreator().UserType == ODLCUser.UserType.ADLC)
         //     autopilotClient.sendAdlcRoi(alphaDao.getTopAdlcLocations(5));
         return retval;
     }

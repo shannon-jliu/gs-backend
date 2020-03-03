@@ -5,7 +5,7 @@ import javax.validation.constraints.NotNull;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import org.cuair.ground.models.Assignment;
-import org.cuair.ground.models.ClientType;
+import org.cuair.ground.models.ODLCUser;
 import org.cuair.ground.models.Confidence;
 import org.cuair.ground.models.geotag.Geotag;
 
@@ -21,7 +21,7 @@ public class EmergentTargetSighting extends TargetSighting {
 
     /** @param description description of the emergent target sighting */
     public EmergentTargetSighting(
-            ClientType creator,
+            ODLCUser creator,
             Integer pixel_x,
             Integer pixel_y,
             Integer width,

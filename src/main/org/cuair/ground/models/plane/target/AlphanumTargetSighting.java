@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import org.cuair.ground.models.Assignment;
-import org.cuair.ground.models.ClientType;
+import org.cuair.ground.models.ODLCUser;
 import org.cuair.ground.models.Color;
 import org.cuair.ground.models.Confidence;
 import org.cuair.ground.models.Shape;
@@ -56,7 +56,7 @@ public class AlphanumTargetSighting extends TargetSighting {
     /**
      * Creates an Alphanumeric Target Sighting
      *
-     * @param creator the ClientType of the Target Sighting
+     * @param creator the ODLCUser that created this Target Sighting
      * @param shape String description of the shape of the Target Sighting
      * @param shapeColor String color of the shape
      * @param alpha String alphanumeric of this Target Sighting
@@ -75,7 +75,7 @@ public class AlphanumTargetSighting extends TargetSighting {
      */
     @JsonCreator
     public AlphanumTargetSighting(
-            @JsonProperty("creator") ClientType creator,
+            @JsonProperty("creator") ODLCUser creator,
             @JsonProperty("shape") Shape shape,
             @JsonProperty("shapeColor") Color shapeColor,
             @JsonProperty("alpha") String alpha,
