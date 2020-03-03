@@ -8,7 +8,7 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 import org.cuair.ground.models.Assignment;
 import org.cuair.ground.models.ClientCreatable;
-import org.cuair.ground.models.ClientType;
+import org.cuair.ground.models.ODLCUser;
 import org.cuair.ground.models.Confidence;
 import org.cuair.ground.models.geotag.Geotag;
 
@@ -59,7 +59,7 @@ public abstract class TargetSighting extends ClientCreatable {
     /*
      * Creates a TargetSighting
      *
-     * @param creator        the ClientType of the Target Sighting
+     * @param creator        the ODLCUser that created this Target Sighting
      * @param geotag         Geotag of this Target Sighting
      * @param pixel_x         Integer x pixel coordinate of the center of the
      *                       target sighting in the specific Image
@@ -77,7 +77,7 @@ public abstract class TargetSighting extends ClientCreatable {
      *
      */
     public TargetSighting(
-            ClientType creator,
+            ODLCUser creator,
             Integer pixel_x,
             Integer pixel_y,
             Integer width,

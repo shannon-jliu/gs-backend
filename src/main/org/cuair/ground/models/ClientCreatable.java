@@ -9,14 +9,14 @@ import javax.persistence.MappedSuperclass;
 public abstract class ClientCreatable extends CUAirModel {
 
     /** Designates who created the model */
-    private ClientType creator;
+    private ODLCUser creator;
 
     /**
      * Creates a ClientCreatable
      *
      * @param creator the ClientType of the model
      */
-    public ClientCreatable(ClientType creator) {
+    public ClientCreatable(ODLCUser creator) {
         this.creator = creator;
     }
 
@@ -25,7 +25,7 @@ public abstract class ClientCreatable extends CUAirModel {
      *
      * @return ClientType
      */
-    public ClientType getCreator() {
+    public ODLCUser getCreator() {
         return creator;
     }
 
@@ -34,7 +34,7 @@ public abstract class ClientCreatable extends CUAirModel {
      *
      * @param creator new ClientType of this model
      */
-    public void setCreator(ClientType creator) {
+    public void setCreator(ODLCUser creator) {
         this.creator = creator;
     }
 

@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.Objects;
 import javax.validation.constraints.NotNull;
 import javax.persistence.Entity;
-import org.cuair.ground.models.ClientType;
+import org.cuair.ground.models.ODLCUser;
 import org.cuair.ground.models.Color;
 import org.cuair.ground.models.Shape;
 import org.cuair.ground.models.geotag.CardinalDirection;
@@ -49,7 +49,7 @@ public class AlphanumTarget extends Target {
      * @param thumbnail_tsid Long id of Target Sighting used for thumbnail
      */
     public AlphanumTarget(
-            ClientType creator,
+            ODLCUser creator,
             Shape shape,
             Color shapeColor,
             String alpha,
@@ -275,7 +275,7 @@ public class AlphanumTarget extends Target {
         if (this.alphaColor != null) {
             rootNode.put("alphanumeric_color", this.alphaColor.name().toLowerCase());
         }
-        rootNode.put("autonomous", this.getCreator() == ClientType.ADLC);
+        rootNode.put("autonomous", this.getCreator().getUserType() == ODLCUser.UserType.ADLC);
 
         return rootNode;
     }

@@ -5,7 +5,6 @@ package org.cuair.ground.controllers.target
 import org.cuair.ground.daos.DAOFactory
 import org.cuair.ground.daos.ClientCreatableDatabaseAccessor
 import org.cuair.ground.daos.TargetSightingsDatabaseAccessor
-import org.cuair.ground.models.ClientType
 import org.cuair.ground.models.plane.target.Target
 import org.cuair.ground.models.plane.target.TargetSighting
 
@@ -56,13 +55,13 @@ abstract class TargetController<T : Target> {
         if (t.creator == null) return badRequest().body("Create request should have creator")
         getTargetDao().create(t)
         // TODO: Add interop code
-        // if (PlayConfig.CUAIR_INTEROP_REQUESTS) {
+        // if (CUAIR_INTEROP_REQUESTS) {
         //     interopClient.createTarget(getTargetDao().get(t.id))
         //     thread {
-        //         Thread.sleep(PlayConfig.TARGETLOGGER_DELAY)
+        //         Thread.sleep(TARGETLOGGER_DELAY)
         //         while (getTargetDao().get(t.id).judgeTargetId == null) {
         //             logger.warn("${t.typeString} Target ${t.id} not sent to judges!")
-        //             Thread.sleep(PlayConfig.TARGETLOGGER_DELAY)
+        //             Thread.sleep(TARGETLOGGER_DELAY)
         //         }
         //     }
         // }
@@ -99,7 +98,7 @@ abstract class TargetController<T : Target> {
         getTargetDao().update(t)
 
         // TODO: Add client code
-        // if (PlayConfig.CUAIR_INTEROP_REQUESTS) {
+        // if (CUAIR_INTEROP_REQUESTS) {
         //     if (isTSIdUpdated) {
         //         interopClient.updateTargetImage(targetSightingDao.get(t.thumbnail_tsid))
         //     }
@@ -125,7 +124,7 @@ abstract class TargetController<T : Target> {
             t.fetchAssociatedTargetSightingClass()) as TargetSightingsDatabaseAccessor<out TargetSighting>
 
         // TODO: Add client code
-        // if (PlayConfig.CUAIR_INTEROP_REQUESTS) interopClient.deleteTarget(t)
+        // if (CUAIR_INTEROP_REQUESTS) interopClient.deleteTarget(t)
 
         targetSightingDao.unassociateAllTargetSightingsForTarget(id)
         getTargetDao().delete(id)

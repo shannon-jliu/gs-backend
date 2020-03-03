@@ -3,7 +3,7 @@ package org.cuair.ground.daos;
 import io.ebean.Ebean;
 import java.util.List;
 import org.cuair.ground.models.ClientCreatable;
-import org.cuair.ground.models.ClientType;
+import org.cuair.ground.models.ODLCUser;
 
 /**
  * Database Accessor object for Client Creatable
@@ -28,7 +28,11 @@ public class ClientCreatableDatabaseAccessor<T extends ClientCreatable>
      *
      * @return List<T> of all instances belonging to {@param creator}
      */
-    public List<T> getAllForCreator(ClientType creator) {
-        return Ebean.find(getModelClass()).where().eq("creator", creator).findList();
+    public List<T> getAllForCreator(ODLCUser creator) {
+        if (creator.getUserType() == ODLCUser.UserType.MDLCTAGGER || creator.getUserType() == ODLCUser.UserType.MDLCOPERATOR) {
+            return Ebean.find(getModelClass()).where().or().eq("creator", ODLCUser.UserType.MDLCTAGGER).eq("creator", ODLCUser.UserType.MDLCOPERATOR).endOr().findList();
+        } else {
+            return Ebean.find(getModelClass()).where().eq("creator", ODLCUser.UserType.ADLC).findList();
+        }
     }
 }

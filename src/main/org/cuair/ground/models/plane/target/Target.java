@@ -8,7 +8,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 import org.cuair.ground.models.ClientCreatable;
-import org.cuair.ground.models.ClientType;
+import org.cuair.ground.models.ODLCUser;
 import org.cuair.ground.models.geotag.Geotag;
 
 /** Model to represent the target, which is an object on the field. */
@@ -31,12 +31,12 @@ public abstract class Target extends ClientCreatable {
     /**
      * Creates a target
      *
-     * @param creator the ClientType of the Target
+     * @param creator the ODLCUser that created this Target
      * @param geotag Geotag of this Target
      * @param judgeTargetId Long id of this target on the competition server
      * @param thumbnail_tsid Long id of Target Sighting used for thumbnail
      */
-    public Target(ClientType creator, Geotag geotag, Long judgeTargetId, Long thumbnail_tsid) {
+    public Target(ODLCUser creator, Geotag geotag, Long judgeTargetId, Long thumbnail_tsid) {
         super(creator);
         this.geotag = geotag;
         this.judgeTargetId = judgeTargetId;

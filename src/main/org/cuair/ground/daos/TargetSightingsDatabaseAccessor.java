@@ -3,7 +3,7 @@ package org.cuair.ground.daos;
 import io.ebean.Ebean;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.cuair.ground.models.ClientType;
+import org.cuair.ground.models.ODLCUser;
 import org.cuair.ground.models.Confidence;
 import org.cuair.ground.models.geotag.GpsLocation;
 import org.cuair.ground.models.plane.target.TargetSighting;
@@ -80,7 +80,10 @@ public class TargetSightingsDatabaseAccessor<T extends TargetSighting>
         return Ebean.find(getModelClass())
             .select("geotag")
             .where()
-            .eq("creator", ClientType.MDLC)
+            .or()
+            .eq("creator", ODLCUser.UserType.MDLCTAGGER)
+            .eq("creator", ODLCUser.UserType.MDLCOPERATOR)
+            .endOr()
             .eq("mdlc_class_conf", classConf)
             .isNotNull("geotag")
             .findList()

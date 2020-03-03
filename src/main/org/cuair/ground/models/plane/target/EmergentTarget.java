@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.Objects;
 import javax.validation.constraints.NotNull;
 import javax.persistence.Entity;
-import org.cuair.ground.models.ClientType;
+import org.cuair.ground.models.ODLCUser;
 import org.cuair.ground.models.geotag.Geotag;
 
 /** Emergent Target that is associated with an Emergent Target Sighting. Has a description. */
@@ -21,13 +21,13 @@ public class EmergentTarget extends Target {
      * Creates an EmergentTarget
      *
      * @param description description of the emergent target sighting
-     * @param creator the Creator of the Target
+     * @param creator the ODLCUser who created this Target
      * @param geotag Geotag of this Target
      * @param judgeTargetId Long id of this Target on the competition server
      * @param thumbnail_tsid Long id of Target Sighting used for thumbnail
      */
     public EmergentTarget(
-            ClientType creator,
+            ODLCUser creator,
             Geotag geotag,
             String description,
             Long judgeTargetId,
@@ -123,7 +123,7 @@ public class EmergentTarget extends Target {
             }
         }
         rootNode.put("description", this.description);
-        rootNode.put("autonomous", this.getCreator() == ClientType.ADLC);
+        rootNode.put("autonomous", this.getCreator().getUserType() == ODLCUser.UserType.ADLC);
         return rootNode;
     }
 }
