@@ -1,12 +1,13 @@
 package org.cuair.ground.controllers;
 
 import java.io.IOException;
+import java.util.List;
 import org.cuair.ground.daos.AssignmentDatabaseAccessor;
 import org.cuair.ground.daos.DAOFactory;
+import org.cuair.ground.daos.ImageDatabaseAccessor;
+import org.cuair.ground.daos.ODLCUserDatabaseAccessor;
 import org.cuair.ground.models.Assignment;
-// TODO: Implement once auth has been finalized
-// import org.cuair.ground.models.AuthToken;
-import org.cuair.ground.models.ClientType;
+import org.cuair.ground.models.ODLCUser;
 import org.cuair.ground.util.Flags;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,10 +39,23 @@ import static org.springframework.http.ResponseEntity.badRequest;
 @RequestMapping(value = "/assignment")
 public class AssignmentController {
 
-    /** The database access object for the assignment database */
-    private static final AssignmentDatabaseAccessor assignmentDao =
+    /** The database accessor object for the assignment database */
+    private AssignmentDatabaseAccessor assignmentDao =
         (AssignmentDatabaseAccessor)
             DAOFactory.getDAO(DAOFactory.ModellessDAOType.ASSIGNMENT_DATABASE_ACCESSOR);
+
+    /** The database accessor object for the image database */
+    private ImageDatabaseAccessor imageDao =
+            (ImageDatabaseAccessor)
+            DAOFactory.getDAO(DAOFactory.ModellessDAOType.IMAGE_DATABASE_ACCESSOR);
+
+    /** The database accessor object for the username database */
+    private ODLCUserDatabaseAccessor odlcUserDao =
+            (ODLCUserDatabaseAccessor)
+                    DAOFactory.getDAO(DAOFactory.ModellessDAOType.ODLCUSER_DATABASE_ACCESSOR);
+
+    /** The flag to behave as if auth is enabled */
+    private static boolean USERS_ENABLED = Flags.USERS_ENABLED;
 
     /**
      * Gets an assignment given an id
@@ -53,53 +67,53 @@ public class AssignmentController {
     public ResponseEntity<Assignment> get(@PathVariable Long id) {
         Assignment a = assignmentDao.get(id);
         if (a == null) {
-            ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         return ok(a);
     }
 
     /**
-     * Gets all assignments whose id is greater than the given id.
+     * Generates an assignment for an unprocessed image and the given client if auth is disabled
      *
-     * @param id the id to find all assignments strictly greater than
-     * @return Result containing all relevant assignments as json
-     */
-    @RequestMapping(value = "/after/{id}", method = RequestMethod.GET)
-    public ResponseEntity getAfterId(@RequestHeader HttpHeaders headers, @PathVariable Long id) {
-        // TODO: Implement auth once auth has been finalized
-        return ok(assignmentDao.getAllAfterId(id, DEFAULT_USER));
-    }
-
-    /** The flag to behave as if auth is enabled */
-    private boolean AUTH_ENABLED = Flags.AUTH_ENABLED;
-
-    /** Default username if auth disabled */
-    private String DEFAULT_USER = Flags.DEFAULT_USER;
-
-    private ObjectMapper mapper = new ObjectMapper();
-
-    /**
-     * Generates an assignment for an unprocessed image and the given client type if auth is disabled
-     *
-     * <p>If clientType is MDLC and Auth is enabled, it will get the next image that the user is not
+     * If the client is MDLC and Auth is enabled, it will get the next image that the user is not
      * already assigned to
      *
-     * @param clientType the type of client to assign the image to
      * @return Result containing the generated assignment as json
      */
-    @RequestMapping(value = "/work/{type}", method = RequestMethod.POST)
-    public ResponseEntity createWork(@RequestHeader HttpHeaders headers, @PathVariable String type) {
-        ClientType assignee = ClientType.valueOf(type);
-        Assignment a;
-
-        // if auth disabled, continue with old behavior
-        // TODO: Implement auth once auth has been finalized
-        a = assignmentDao.getWork(assignee, DEFAULT_USER);
-
+    @RequestMapping(value = "/work", method = RequestMethod.POST)
+    public ResponseEntity createWork(@RequestHeader HttpHeaders headers) {
+        ODLCUser user;
+        if (USERS_ENABLED) {
+            user = this.extractUserFromHeaders(headers);
+            if (user == null) {
+                return badRequest().body("Provided username does not exist. Try logging in.");
+            }
+        } else {
+            user = odlcUserDao.getDefaltUser();
+        }
+        Assignment a = assignmentDao.getWork(user);
         if (a == null) return noContent().build();
-
-        assignmentDao.create(a);
         return ok(a);
+    }
+
+    /**
+     * Gets all assignments, whether completed or not, for a given user
+     *
+     * @return Result containing a list of assignments as json
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseEntity getAllForUser(@RequestHeader HttpHeaders headers) {
+        ODLCUser user;
+        if (USERS_ENABLED) {
+            user = this.extractUserFromHeaders(headers);
+            if (user == null) {
+                return badRequest().body("Provided username does not exist. Try logging in.");
+            }
+        } else {
+            user = odlcUserDao.getDefaltUser();
+        }
+        List<Assignment> a_list = assignmentDao.getAllForUser(user);
+        return ok(a_list);
     }
 
     /**
@@ -122,5 +136,16 @@ public class AssignmentController {
         a.setDone(true);
         assignmentDao.update(a);
         return ok(a);
+    }
+
+    /**
+     * Gets the username string from the header and returns the associated ODLCUser object
+     *
+     * @param headers the HttpHeaders object from the request
+     * @return ODLCUser corresponding to the username in the headers or null if none exists
+     */
+    private ODLCUser extractUserFromHeaders(HttpHeaders headers) {
+        String username = headers.getFirst("Username");
+        return odlcUserDao.getODLCUserFromUsername(username);
     }
 }

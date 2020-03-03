@@ -12,11 +12,11 @@ public class Lifecycle {
 
 	@PostConstruct
 	public void startUp() {
-		
+
 	}
 
 	@PreDestroy
 	public void shutDown() {
-		
+
 	}
 }

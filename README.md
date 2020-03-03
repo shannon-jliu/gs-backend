@@ -23,7 +23,7 @@ Ground Server for the Platform infrastructure, Spring-ified
 - `gradle`
 - Python 3 for `pre-commit`
 - PostgresSQL
-- IntelliJ
+- IntelliJ Ultimate
 
 ## Installation
 ### Mac OS
@@ -48,6 +48,7 @@ This assumes you already have some version of Java installed.
   - `pip install pre-commit`
   - `pre-commit install` to run `pre-commit` hooks to ensure your commits are nice
 2. Run `./setup` in order to create the dependencies.
+3. See [IntelliJ Setup](docs/intellij_setup.md).
 
 ## DISCLAIMER
 Native solutions are no longer being maintained. Using Docker to run the backend is highly recommended. If you must run/develop the backend natively, instructions are provided later on in the README.
@@ -90,6 +91,11 @@ Native solutions are no longer being maintained. Using Docker to run the backend
         CONNECTION LIMIT=-1;
         ```
 
+## Development guide
+
+When creating a new branch, please use the format of `<your-username>/<informative-branch-name>`. Do not commit to master (you shouldn't be able to anyway) and only squash PRs (you also shouldn't be able to do anything else either).
+
+
 ## Running (Native)
 Ensure that the following four files have the following four lines changed to below:
   - `application.properties`
@@ -102,9 +108,3 @@ Ensure that the following four files have the following four lines changed to be
       * `datasource.db.databaseUrl=jdbc:postgresql:groundservertest`
 
 Then run `./run` in order to start up the server on port `9000`!
-
-## Development guide
-
-See [IntelliJ Setup](docs/intellij_setup.md).
-
-When creating a new branch, please use the format of `<your-username>/<informative-branch-name>`. Do not commit to master (you shouldn't be able to anyway) and only squash PRs (you also shouldn't be able to do anything else either).
