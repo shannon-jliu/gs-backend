@@ -2,12 +2,24 @@ package org.cuair.ground.daos
 
 import org.cuair.ground.models.CUAirModel
 import org.cuair.ground.models.TimestampModel
+import org.cuair.ground.models.Image
 import org.cuair.ground.models.ODLCUser
 import org.cuair.ground.daos.ODLCUserDatabaseAccessor
+
 
 /** Factory for creating an managing DAO instances */
 class DAOFactory {
     enum class ModellessDAOType {
+        ASSIGNMENT_DATABASE_ACCESSOR {
+            override fun createInstance(): DatabaseAccessor<*> {
+                return AssignmentDatabaseAccessor()
+            }
+        },
+        IMAGE_DATABASE_ACCESSOR {
+            override fun createInstance(): DatabaseAccessor<*> {
+                return ImageDatabaseAccessor()
+            }
+        },
         ODLCUSER_DATABASE_ACCESSOR {
             override fun createInstance(): DatabaseAccessor<*> {
                 return ODLCUserDatabaseAccessor()
@@ -20,7 +32,7 @@ class DAOFactory {
          */
         abstract fun createInstance() : DatabaseAccessor<*>
   }
-
+    
   /** Enumeration of all database accessor types that are parametrized on a model */
   enum class ModelDAOType {
     DATABASE_ACCESSOR {

@@ -22,7 +22,7 @@ import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.cuair.ground.daos.DAOFactory;
-import org.cuair.ground.daos.TimestampDatabaseAccessor;
+import org.cuair.ground.daos.ImageDatabaseAccessor;
 import org.cuair.ground.models.Image;
 import org.cuair.ground.models.geotag.GpsLocation;
 import org.cuair.ground.models.geotag.GimbalOrientation;
@@ -52,7 +52,7 @@ import org.cuair.ground.util.Flags;
 @RequestMapping(value = "/image")
 public class ImageController {
     /** Database accessor object for image database */
-    private TimestampDatabaseAccessor imageDao = (TimestampDatabaseAccessor) DAOFactory.getDAO(DAOFactory.ModelDAOType.TIMESTAMP_DATABASE_ACCESSOR, Image.class);
+    private ImageDatabaseAccessor imageDao = (ImageDatabaseAccessor) DAOFactory.getDAO(DAOFactory.ModellessDAOType.IMAGE_DATABASE_ACCESSOR);
 
     /** String path to the folder where all the images are stored */
     private String PLANE_IMAGE_DIR = Flags.PLANE_IMAGE_DIR;
@@ -319,8 +319,8 @@ public class ImageController {
 
         if (i.getTelemetry() == null) {
             Telemetry t = new Telemetry(
-                new GpsLocation(DEFAULT_LATITUDE, DEFAULT_LONGITUDE), 
-                DEFAULT_ALTITUDE, 
+                new GpsLocation(DEFAULT_LATITUDE, DEFAULT_LONGITUDE),
+                DEFAULT_ALTITUDE,
                 DEFAULT_PLANE_YAW,
                 new GimbalOrientation(DEFAULT_GIMBAL_PITCH, DEFAULT_GIMBAL_ROLL)
             );

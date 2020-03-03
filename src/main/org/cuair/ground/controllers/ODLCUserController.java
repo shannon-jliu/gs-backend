@@ -45,7 +45,7 @@ public class ODLCUserController {
       }
     }
 
-    if (Flags.ENABLE_MULTIPLE_USERS_PER_IP) {
+    if (!Flags.ENABLE_MULTIPLE_USERS_PER_IP) {
       ODLCUser other = odlcUserDao.getODLCUserFromAddress(address);
       if (other != null) {
         return badRequest().body("User " + other.getUsername() + " already exists from this host: " + address);
@@ -60,13 +60,20 @@ public class ODLCUserController {
     return ok(username);
   }
 
-  @RequestMapping(value = "/create/adlc", method = RequestMethod.POST)
+  @RequestMapping(value = "/create/adlc", method = RequestMethod.GET)
   public ResponseEntity create(HttpServletRequest request) {
     if (odlcUserDao.getADLCUser() != null) {
       return badRequest().body("ADLC user already exists!");
     }
 
     String address = request.getRemoteAddr();
+    if (!Flags.ENABLE_MULTIPLE_USERS_PER_IP) {
+      ODLCUser other = odlcUserDao.getODLCUserFromAddress(address);
+      if (other != null) {
+        return badRequest().body("User " + other.getUsername() + " already exists from this host: " + address);
+      }
+    }
+
     odlcUserDao.create(new ODLCUser("adlc", address, ODLCUser.UserType.ADLC));
     return ok("adlc");
   }

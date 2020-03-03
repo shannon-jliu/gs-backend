@@ -1,5 +1,6 @@
 package org.cuair.ground.models
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import org.cuair.ground.models.geotag.Telemetry
 import java.util.Objects
 import javax.persistence.Entity
@@ -19,6 +20,10 @@ class Image(
         var telemetry: Telemetry,
         /** The type of this image. Either FIXED, TRACKING, or OFFAXIS */
         var imgMode: ImgMode,
+        /** True if has at least one associated MDLC assignment, otherwise false. */
+        @JsonIgnore var hasMdlcAssignment: Boolean = false,
+        /** True if has at least one associated ADLC assignment, otherwise false. */
+        @JsonIgnore var hasAdlcAssignment: Boolean = false,
         /** The horizontal field of fiew of this image in degrees. */
         var fov: Double
 ) : TimestampModel() {
@@ -28,7 +33,7 @@ class Image(
             imageUrl: String,
             telemetry: Telemetry,
             fov: Double
-    ) : this(imageUrl, telemetry, ImgMode.FIXED, fov)
+    ) : this(imageUrl, telemetry, ImgMode.FIXED, false, false, fov)
 
     /** The filesystem path this image lives on relative to the server directory */
     @Transient var localImageUrl: String? = null
