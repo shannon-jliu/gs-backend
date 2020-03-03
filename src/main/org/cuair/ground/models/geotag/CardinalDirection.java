@@ -86,7 +86,7 @@ public enum CardinalDirection {
     /**
      * Given an arbitrary radian value, determine which cardinal direction it should be classified as.
      *
-     * @param radian The radian value to bucket into a cardinal direction
+     * @param radian The radian value to bucket into a cardinal direction. Assumes radian is given from north counter clockwise.
      * @return The CardinalDirection the radian value falls under
      */
     public static CardinalDirection getFromRadians(Double radian) {
