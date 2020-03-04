@@ -19,10 +19,10 @@ public class EmergentTarget extends Target {
   /**
    * Creates an EmergentTarget
    *
-   * @param description    description of the emergent target sighting
-   * @param creator        the ODLCUser who created this Target
-   * @param geotag         Geotag of this Target
-   * @param judgeTargetId  Long id of this Target on the competition server
+   * @param description   description of the emergent target sighting
+   * @param creator       the ODLCUser who created this Target
+   * @param geotag        Geotag of this Target
+   * @param judgeTargetId Long id of this Target on the competition server
    * @param thumbnailTsid Long id of Target Sighting used for thumbnail
    */
   public EmergentTarget(

@@ -96,7 +96,7 @@ public class Geotag extends CUAirModel {
   /**
    * Creates a new geotag with the target sighting
    *
-   * @param sighting      The TargetSighting of this geotag
+   * @param sighting The TargetSighting of this geotag
    */
   public Geotag(TargetSighting sighting) {
     if (sighting == null) {
@@ -202,8 +202,8 @@ public class Geotag extends CUAirModel {
   /**
    * Calculate the orientation of this geotag as radians from north
    *
-   * @param planeYaw        The yaw of the plane in radians
-   * @param radiansFromTop  The radians from the top of the image TODO: DEFINE
+   * @param planeYaw       The yaw of the plane in radians
+   * @param radiansFromTop The radians from the top of the image TODO: DEFINE
    * @return The orientation of this geotag
    */
   public static Double calculateRadiansFromNorth(double planeYaw, double radiansFromTop) {

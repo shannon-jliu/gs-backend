@@ -31,9 +31,9 @@ public abstract class Target extends ClientCreatable {
   /**
    * Creates a target
    *
-   * @param creator        the ODLCUser that created this Target
-   * @param geotag         Geotag of this Target
-   * @param judgeTargetId  Long id of this target on the competition server
+   * @param creator       the ODLCUser that created this Target
+   * @param geotag        Geotag of this Target
+   * @param judgeTargetId Long id of this target on the competition server
    * @param thumbnailTsid Long id of Target Sighting used for thumbnail
    */
   public Target(ODLCUser creator, Geotag geotag, Long judgeTargetId, Long thumbnailTsid) {

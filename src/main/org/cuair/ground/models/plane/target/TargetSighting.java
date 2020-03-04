@@ -52,22 +52,19 @@ public abstract class TargetSighting extends ClientCreatable {
   /**
    * Creates a TargetSighting
    *
-   * @param creator        the ODLCUser that created this Target Sighting
-   * @param geotag         Geotag of this Target Sighting
-   * @param pixelX         Integer x pixel coordinate of the center of the
-   *                       target sighting in the specific Image
-   * @param pixelY         Integer y pixel coordinate of the center of the
-   *                       target sighting in the specific Image
-   * @param radiansFromTop the orientation of the Target Sighting
-   * @param
-   * orientationConfidence the confidence the vision system has in the
-   *                           target orientation identification
-   * @param mdlcClassConf
-   *                       the confidence MDLC taggers have in the target classification
-   * @param assignment     the assignment that created this TargetSighting
-   * @param width          the horizontal pixel width of the TargetSighting
-   * @param height         the vertical pixel height of the TargetSighting
-   *
+   * @param creator               the ODLCUser that created this Target Sighting
+   * @param geotag                Geotag of this Target Sighting
+   * @param pixelX                Integer x pixel coordinate of the center of the
+   *                              target sighting in the specific Image
+   * @param pixelY                Integer y pixel coordinate of the center of the
+   *                              target sighting in the specific Image
+   * @param radiansFromTop        the orientation of the Target Sighting
+   * @param orientationConfidence the confidence the vision system has in the
+   *                              target orientation identification
+   * @param mdlcClassConf         the confidence MDLC taggers have in the target classification
+   * @param assignment            the assignment that created this TargetSighting
+   * @param width                 the horizontal pixel width of the TargetSighting
+   * @param height                the vertical pixel height of the TargetSighting
    */
   public TargetSighting(
       ODLCUser creator,

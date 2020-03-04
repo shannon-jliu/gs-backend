@@ -37,14 +37,14 @@ public class AlphanumTarget extends Target {
   /**
    * Creates an AlphanumTarget
    *
-   * @param creator        the Creator of the Target
-   * @param shape          String description of the shape of the Target
-   * @param shapeColor     String color of the shape
-   * @param alpha          String alphanumeric of this Target
-   * @param alphaColor     String color of the alphanumeric
-   * @param offaxis        Boolean of whether the target is off-axis
-   * @param geotag         Geotag of this Target
-   * @param judgeTargetId  Long id of this Target on the competition server
+   * @param creator       the Creator of the Target
+   * @param shape         String description of the shape of the Target
+   * @param shapeColor    String color of the shape
+   * @param alpha         String alphanumeric of this Target
+   * @param alphaColor    String color of the alphanumeric
+   * @param offaxis       Boolean of whether the target is off-axis
+   * @param geotag        Geotag of this Target
+   * @param judgeTargetId Long id of this Target on the competition server
    * @param thumbnailTsid Long id of Target Sighting used for thumbnail
    */
   public AlphanumTarget(
