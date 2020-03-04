@@ -19,11 +19,15 @@ public class EmergentTargetSighting extends TargetSighting {
   /** Description of the emergent target sighting */
   private String description;
 
-  /** @param description description of the emergent target sighting */
+  /**
+   * Creates a new EmergentTargetSighting with the given fields
+   *
+   * @param description description of the emergent target sighting
+   */
   public EmergentTargetSighting(
       ODLCUser creator,
-      Integer pixel_x,
-      Integer pixel_y,
+      Integer pixelX,
+      Integer pixelY,
       Integer width,
       Integer height,
       Geotag geotag,
@@ -35,8 +39,8 @@ public class EmergentTargetSighting extends TargetSighting {
       Assignment assignment) {
     super(
         creator,
-        pixel_x,
-        pixel_y,
+        pixelX,
+        pixelY,
         width,
         height,
         geotag,

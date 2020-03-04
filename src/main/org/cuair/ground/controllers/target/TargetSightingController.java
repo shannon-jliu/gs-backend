@@ -25,11 +25,10 @@ public abstract class TargetSightingController<T extends TargetSighting> {
   private static final AssignmentDatabaseAccessor assignmentDao =
       (AssignmentDatabaseAccessor)
           DAOFactory.getDAO(DAOFactory.ModellessDAOType.ASSIGNMENT_DATABASE_ACCESSOR);
-  private boolean CUAIR_INTEROP_REQUESTS = Flags.CUAIR_INTEROP_REQUESTS;
-  private boolean CUAIR_GEOTAG_MUTABLE = Flags.CUAIR_GEOTAG_MUTABLE;
+  private boolean cuairInteropRequests = Flags.CUAIR_INTEROP_REQUESTS;
+  private boolean cuairGeotagMutable = Flags.CUAIR_GEOTAG_MUTABLE;
 
-  // TODO: Add back in once client code is complete
-  /** The interop client for communication with the competition server */
+  // TODO: Add back in once client code is complete, and add back the documentation
   // static InteropClient interopClient = ClientFactory.getInteropClient();
 
   /** Gets the database accessor object for this target sighting */
@@ -77,7 +76,7 @@ public abstract class TargetSightingController<T extends TargetSighting> {
       // Updates target in dao
       Geotag.updateGeotag(ts.getTarget(), ts);
 
-      if (CUAIR_INTEROP_REQUESTS) {
+      if (cuairInteropRequests) {
         // TODO: Add back in once client code is complete
         // interopClient.updateTarget(ts.getTarget());
       }
@@ -129,13 +128,13 @@ public abstract class TargetSightingController<T extends TargetSighting> {
     }
     ts.updateFromTargetSighting(other);
 
-    boolean geotagChanged = CUAIR_GEOTAG_MUTABLE && Geotag.attemptSetGeotagForTargetSighting(ts);
+    boolean geotagChanged = cuairGeotagMutable && Geotag.attemptSetGeotagForTargetSighting(ts);
 
     getTargetSightingDao().update(ts);
 
     if (geotagChanged && other.getTarget() != null) {
       Geotag.updateGeotag(ts.getTarget(), null);
-      if (CUAIR_INTEROP_REQUESTS) {
+      if (cuairInteropRequests) {
         // TODO: Add back in once client code is complete
         // interopClient.updateTarget(ts.getTarget());
       }
@@ -157,7 +156,7 @@ public abstract class TargetSightingController<T extends TargetSighting> {
 
     if (ts.getTarget() != null) {
       Geotag.updateGeotag(ts.getTarget(), null);
-      if (CUAIR_INTEROP_REQUESTS) {
+      if (cuairInteropRequests) {
         // TODO: Add back in once client code is complete
         // interopClient.updateTarget(ts.getTarget());
       }

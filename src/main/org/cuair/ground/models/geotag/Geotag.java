@@ -93,6 +93,11 @@ public class Geotag extends CUAirModel {
     this.radiansFromNorth = radiansFromNorth;
   }
 
+  /**
+   * Creates a new geotag with the target sighting
+   *
+   * @param sighting      The TargetSighting of this geotag
+   */
   public Geotag(TargetSighting sighting) {
     if (sighting == null) {
       return;
@@ -119,21 +124,31 @@ public class Geotag extends CUAirModel {
       altitude = telemetry.getAltitude();
     }
 
-    double pixel_x = sighting.getpixel_x();
-    double pixel_y = sighting.getpixel_y();
+    double pixelX = sighting.getpixel_x();
+    double pixelY = sighting.getpixel_y();
     double planeYaw = telemetry.getPlaneYaw() * Math.PI / 180;
     double centerLongitude = telemetry.getGps().getLongitude();
     double centerLatitude = telemetry.getGps().getLatitude();
-    this.gpsLocation = getPixelCoordinates(centerLatitude, centerLongitude, altitude, pixel_x, pixel_y, planeYaw);
+    this.gpsLocation = getPixelCoordinates(centerLatitude, centerLongitude, altitude, pixelX, pixelY, planeYaw);
     this.radiansFromNorth = getRadiansFromNorth(planeYaw, sighting.getRadiansFromTop());
   }
 
+  /**
+   * Creates a Gpslocation representing the center of the image
+   *
+   * @param latitude        The latitude of the plane
+   * @param longitude       The longitude of the plane
+   * @param altitude        The altitude of the plane
+   * @param pixelX          The x-coordinate of the pixel center of the tag on the frontend with respect to the image
+   * @param pixelY          The y-coordinate of the pixel center of the tag on the frontend with respect to the image
+   * @param planeYawRadians The yaw of the plane in radians TODO: WRT to what?
+   */
   public static GpsLocation getPixelCoordinates(
       double latitude,
       double longitude,
       double altitude,
-      double pixel_x,
-      double pixel_y,
+      double pixelX,
+      double pixelY,
       double planeYawRadians) {
     // total horizontal distance imaged in feet
     double hdi =
@@ -154,8 +169,8 @@ public class Geotag extends CUAirModel {
     double dppvert = vdi / IMAGE_HEIGHT;
 
     // finding distance from the center
-    double deltapixel_x = pixel_x - (IMAGE_WIDTH / 2);
-    double deltapixel_y = (IMAGE_HEIGHT / 2) - pixel_y;
+    double deltapixel_x = pixelX - (IMAGE_WIDTH / 2);
+    double deltapixel_y = (IMAGE_HEIGHT / 2) - pixelY;
 
     double dppH = deltapixel_x * dpphoriz;
     double dppV = deltapixel_y * dppvert;
@@ -185,11 +200,13 @@ public class Geotag extends CUAirModel {
   }
 
   /**
-   * Get the orientation of this geotag as radians from north
+   * Calculate the orientation of this geotag as radians from north
    *
+   * @param planeYaw        The yaw of the plane in radians
+   * @param radiansFromTop  The radians from the top of the image TODO: DEFINE
    * @return The orientation of this geotag
    */
-  public static Double getRadiansFromNorth(double planeYaw, double radiansFromTop) {
+  public static Double calculateRadiansFromNorth(double planeYaw, double radiansFromTop) {
     return (planeYaw + radiansFromTop) % (2 * Math.PI);
   }
 

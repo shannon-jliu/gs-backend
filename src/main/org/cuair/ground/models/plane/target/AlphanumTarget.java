@@ -45,7 +45,7 @@ public class AlphanumTarget extends Target {
    * @param offaxis        Boolean of whether the target is off-axis
    * @param geotag         Geotag of this Target
    * @param judgeTargetId  Long id of this Target on the competition server
-   * @param thumbnail_tsid Long id of Target Sighting used for thumbnail
+   * @param thumbnailTsid Long id of Target Sighting used for thumbnail
    */
   public AlphanumTarget(
       ODLCUser creator,
@@ -56,8 +56,8 @@ public class AlphanumTarget extends Target {
       Boolean offaxis,
       Geotag geotag,
       Long judgeTargetId,
-      Long thumbnail_tsid) {
-    super(creator, geotag, judgeTargetId, thumbnail_tsid);
+      Long thumbnailTsid) {
+    super(creator, geotag, judgeTargetId, thumbnailTsid);
     this.shape = shape;
     this.shapeColor = shapeColor;
     this.alpha = alpha;

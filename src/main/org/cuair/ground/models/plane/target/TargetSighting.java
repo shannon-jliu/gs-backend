@@ -25,9 +25,9 @@ public abstract class TargetSighting extends ClientCreatable {
   @OneToOne(cascade = CascadeType.ALL)
   protected Geotag geotag;
   /** The x pixel coordinate of the center of the target sighting in the specific Image */
-  protected Integer pixel_x;
+  protected Integer pixelX;
   /** The y pixel coordinate of the center of the target sighting in the specific Image */
-  protected Integer pixel_y;
+  protected Integer pixelY;
   /** The horizontal pixel width of the target sighting in the specific image */
   protected Integer width;
   /** The vertical pixel height of the target sighting in the specific image */
@@ -49,14 +49,14 @@ public abstract class TargetSighting extends ClientCreatable {
   /** The confidence the vision system has in the target orientation identification */
   private Double orientationConfidence;
 
-  /*
+  /**
    * Creates a TargetSighting
    *
    * @param creator        the ODLCUser that created this Target Sighting
    * @param geotag         Geotag of this Target Sighting
-   * @param pixel_x         Integer x pixel coordinate of the center of the
+   * @param pixelX         Integer x pixel coordinate of the center of the
    *                       target sighting in the specific Image
-   * @param pixel_y         Integer y pixel coordinate of the center of the
+   * @param pixelY         Integer y pixel coordinate of the center of the
    *                       target sighting in the specific Image
    * @param radiansFromTop the orientation of the Target Sighting
    * @param
@@ -71,8 +71,8 @@ public abstract class TargetSighting extends ClientCreatable {
    */
   public TargetSighting(
       ODLCUser creator,
-      Integer pixel_x,
-      Integer pixel_y,
+      Integer pixelX,
+      Integer pixelY,
       Integer width,
       Integer height,
       Geotag geotag,
@@ -81,8 +81,8 @@ public abstract class TargetSighting extends ClientCreatable {
       Confidence mdlcClassConf,
       Assignment assignment) {
     super(creator);
-    this.pixel_x = pixel_x;
-    this.pixel_y = pixel_y;
+    this.pixelX = pixelX;
+    this.pixelY = pixelY;
     this.width = width;
     this.height = height;
     this.geotag = geotag;
@@ -101,11 +101,11 @@ public abstract class TargetSighting extends ClientCreatable {
   public void updateFromTargetSighting(TargetSighting other) {
     assert this.getAssignment() != null;
 
-    if (other.getpixel_x() != null) {
-      this.pixel_x = other.getpixel_x();
+    if (other.getpixelX() != null) {
+      this.pixelX = other.getpixelX();
     }
-    if (other.getpixel_y() != null) {
-      this.pixel_y = other.getpixel_y();
+    if (other.getpixelY() != null) {
+      this.pixelY = other.getpixelY();
     }
     if (other.getWidth() != null) {
       this.width = other.getWidth();
@@ -140,10 +140,10 @@ public abstract class TargetSighting extends ClientCreatable {
   /**
    * Gets the x pixel coordinate of the TargetSighting
    *
-   * @return pixel_x Integer x pixel coordinate
+   * @return pixelX Integer x pixel coordinate
    */
-  public Integer getpixel_x() {
-    return pixel_x;
+  public Integer getpixelX() {
+    return pixelX;
   }
 
   /**
@@ -151,8 +151,8 @@ public abstract class TargetSighting extends ClientCreatable {
    *
    * @return Integer y pixel coordinate
    */
-  public Integer getpixel_y() {
-    return pixel_y;
+  public Integer getpixelY() {
+    return pixelY;
   }
 
   /**
@@ -230,7 +230,7 @@ public abstract class TargetSighting extends ClientCreatable {
   /**
    * Sets the confidence the vision system has in the target orientation classification
    *
-   * @return orientationConfidence Double representing the target orientation confidence
+   * @param orientationConfidence Double representing the target orientation confidence
    */
   public void setOrientationConfidence(Double orientationConfidence) {
     this.orientationConfidence = orientationConfidence;
@@ -263,11 +263,11 @@ public abstract class TargetSighting extends ClientCreatable {
       return false;
     }
 
-    if (!Objects.deepEquals(this.pixel_x, other.getpixel_x())) {
+    if (!Objects.deepEquals(this.pixelX, other.getpixelX())) {
       return false;
     }
 
-    if (!Objects.deepEquals(this.pixel_y, other.getpixel_y())) {
+    if (!Objects.deepEquals(this.pixelY, other.getpixelY())) {
       return false;
     }
 

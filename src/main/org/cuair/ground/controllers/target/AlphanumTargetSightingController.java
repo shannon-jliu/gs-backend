@@ -34,7 +34,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
       (AlphanumTargetDatabaseAccessor<AlphanumTarget>)
           DAOFactory.getDAO(
               DAOFactory.ModelDAOType.ALPHANUM_TARGET_DATABASE_ACCESSOR, AlphanumTarget.class);
-  private boolean CUAIR_INTEROP_REQUESTS = Flags.CUAIR_INTEROP_REQUESTS;
+  private boolean cuairInteropRequests = Flags.CUAIR_INTEROP_REQUESTS;
 
   /**
    * Gets the TargetSightingsDatabaseAccessor object for this target sighting
@@ -84,7 +84,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
           AlphanumTarget t = alphaTargetDao.get(ts.getTarget().getId());
           t.setthumbnail_tsid(ts.getId());
           alphaTargetDao.update(t);
-          if (CUAIR_INTEROP_REQUESTS) {
+          if (cuairInteropRequests) {
             // TODO: Add back in once client code is complete
             // interopClient.updateTargetImage(ts);
           }
@@ -150,7 +150,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
           if (newThumb != null) {
             newThumb.setTarget(tToEraseFrom);
             tToEraseFrom.setthumbnail_tsid(newThumb.getId());
-            if (CUAIR_INTEROP_REQUESTS) {
+            if (cuairInteropRequests) {
               // TODO: Add back in once client code is complete
               // interopClient.updateTargetImage(newThumb);
             }
@@ -171,7 +171,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
           AlphanumTarget t = alphaTargetDao.get(ts.getTarget().getId());
           t.setthumbnail_tsid(ts.getId());
           alphaTargetDao.update(t);
-          if (CUAIR_INTEROP_REQUESTS) {
+          if (cuairInteropRequests) {
             // TODO: Add back in once client code is complete
             // interopClient.updateTargetImage(ts);
           }
@@ -207,7 +207,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
         AlphanumTargetSighting newThumb = alphaDao.getLastSightingForTarget(ts.getTarget().getId());
         if (newThumb != null) {
           ts.getTarget().setthumbnail_tsid(newThumb.getId());
-          if (CUAIR_INTEROP_REQUESTS) {
+          if (cuairInteropRequests) {
             // TODO: Add back in once client code is complete
             // interopClient.updateTargetImage(newThumb);
           }

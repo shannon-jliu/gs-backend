@@ -26,7 +26,7 @@ public abstract class Target extends ClientCreatable {
   private Long judgeTargetId;
 
   /** Id of target sighting used for thumbnail */
-  private Long thumbnail_tsid;
+  private Long thumbnailTsid;
 
   /**
    * Creates a target
@@ -34,13 +34,13 @@ public abstract class Target extends ClientCreatable {
    * @param creator        the ODLCUser that created this Target
    * @param geotag         Geotag of this Target
    * @param judgeTargetId  Long id of this target on the competition server
-   * @param thumbnail_tsid Long id of Target Sighting used for thumbnail
+   * @param thumbnailTsid Long id of Target Sighting used for thumbnail
    */
-  public Target(ODLCUser creator, Geotag geotag, Long judgeTargetId, Long thumbnail_tsid) {
+  public Target(ODLCUser creator, Geotag geotag, Long judgeTargetId, Long thumbnailTsid) {
     super(creator);
     this.geotag = geotag;
     this.judgeTargetId = judgeTargetId;
-    this.thumbnail_tsid = thumbnail_tsid;
+    this.thumbnailTsid = thumbnailTsid;
   }
 
   /**
@@ -49,8 +49,8 @@ public abstract class Target extends ClientCreatable {
    * @param other Target containing updated fields
    */
   public void updateFromTarget(Target other) {
-    if (other.getthumbnail_tsid() != null) {
-      this.thumbnail_tsid = other.getthumbnail_tsid();
+    if (other.getthumbnailTsid() != null) {
+      this.thumbnailTsid = other.getthumbnailTsid();
     }
   }
 
@@ -100,17 +100,17 @@ public abstract class Target extends ClientCreatable {
    *
    * @return Long thumnail target sighting id
    */
-  public Long getthumbnail_tsid() {
-    return thumbnail_tsid;
+  public Long getthumbnailTsid() {
+    return thumbnailTsid;
   }
 
   /**
    * Sets the id of the target sighting used for thumbnail
    *
-   * @param thumbnail_tsid thumbnail target sighting id
+   * @param thumbnailTsid thumbnail target sighting id
    */
-  public void setthumbnail_tsid(Long thumbnail_tsid) {
-    this.thumbnail_tsid = thumbnail_tsid;
+  public void setthumbnailTsid(Long thumbnailTsid) {
+    this.thumbnailTsid = thumbnailTsid;
   }
 
   /**
@@ -143,6 +143,6 @@ public abstract class Target extends ClientCreatable {
       return false;
     }
 
-    return Objects.deepEquals(this.thumbnail_tsid, other.getthumbnail_tsid());
+    return Objects.deepEquals(this.thumbnailTsid, other.getthumbnailTsid());
   }
 }
