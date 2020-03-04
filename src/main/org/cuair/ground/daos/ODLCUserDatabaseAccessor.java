@@ -1,7 +1,7 @@
 package org.cuair.ground.daos;
 
-import java.util.List;
 import io.ebean.Ebean;
+import java.util.List;
 import org.cuair.ground.models.ODLCUser;
 import org.cuair.ground.util.Flags;
 
@@ -80,9 +80,9 @@ public class ODLCUserDatabaseAccessor extends DatabaseAccessor<ODLCUser> {
    * @return the ODLCUser objects associated with the an MDLC tagger, if none exist then null
    */
 
-   public List<ODLCUser> getMDLCTaggers() {
-     return Ebean.find(ODLCUser.class).where().or().eq("userType", ODLCUser.UserType.MDLCOPERATOR).eq("userType", ODLCUser.UserType.MDLCTAGGER).endOr().findList();
-   }
+  public List<ODLCUser> getMDLCTaggers() {
+    return Ebean.find(ODLCUser.class).where().or().eq("userType", ODLCUser.UserType.MDLCOPERATOR).eq("userType", ODLCUser.UserType.MDLCTAGGER).endOr().findList();
+  }
 
   /**
    * Finds the default ODLCUser object and returns it. If one does not exist, it is created.
@@ -90,15 +90,15 @@ public class ODLCUserDatabaseAccessor extends DatabaseAccessor<ODLCUser> {
    *
    * @return the ODLCUser object associated with the default user or null if USERS_ENABLED = true
    */
-   public ODLCUser getDefaltUser() {
-     if (Flags.USERS_ENABLED) {
-       return null;
-     }
-     ODLCUser user = Ebean.find(ODLCUser.class).where().eq("userType", ODLCUser.UserType.MDLCOPERATOR).eq("username", Flags.DEFAULT_USERNAME).findOne();
-     if (user == null) {
-       user = new ODLCUser(Flags.DEFAULT_USERNAME, "localhost", ODLCUser.UserType.MDLCOPERATOR);
-       this.create(user);
-     }
-     return user;
-   }
+  public ODLCUser getDefaltUser() {
+    if (Flags.USERS_ENABLED) {
+      return null;
+    }
+    ODLCUser user = Ebean.find(ODLCUser.class).where().eq("userType", ODLCUser.UserType.MDLCOPERATOR).eq("username", Flags.DEFAULT_USERNAME).findOne();
+    if (user == null) {
+      user = new ODLCUser(Flags.DEFAULT_USERNAME, "localhost", ODLCUser.UserType.MDLCOPERATOR);
+      this.create(user);
+    }
+    return user;
+  }
 }

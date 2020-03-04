@@ -1,13 +1,11 @@
 package org.cuair.ground.models.plane.settings
 
-import java.util.*
 import javax.persistence.Entity
-import javax.validation.constraints.NotNull
 
 /** Model to represent the settings for the camera gimbal server  */
 @Entity
 class CameraGimbalSettings(val mode: CameraGimbalMode) : PlaneSettingsModel() {
-    enum class CameraGimbalMode(val mode : String) {
+    enum class CameraGimbalMode(val mode: String) {
         FIXED("fixed"),
         TRACKING("tracking"),
         IDLE("idle")

@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Order(1)
 public class LoggingFilter implements Filter {
 
-  private final static Logger logger = LoggerFactory.getLogger("loggingFilter");
+  private static final Logger logger = LoggerFactory.getLogger("loggingFilter");
 
   @Override
   public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)

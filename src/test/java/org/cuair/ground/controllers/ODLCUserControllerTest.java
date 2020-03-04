@@ -1,15 +1,14 @@
 package org.cuair.ground.controllers;
 
 import static org.junit.Assert.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 
 import org.cuair.ground.Application;
 import org.cuair.ground.daos.DAOFactory;
 import org.cuair.ground.daos.ODLCUserDatabaseAccessor;
 import org.cuair.ground.models.ODLCUser;
+import org.cuair.ground.util.Flags;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,6 +89,7 @@ public class ODLCUserControllerTest {
    */
   @Test
   public void errorSameAddress() throws Exception {
+    Flags.ENABLE_MULTIPLE_USERS_PER_IP = false;
     mockMvc.perform(get("/odlcuser/create/mdlc")
         .with(request -> {
           request.setRemoteAddr("localhost");

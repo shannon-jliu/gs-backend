@@ -4,19 +4,17 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.springframework.stereotype.Component;
 
-/*
- * Lifecycle component, contains startup and shutdown logic for server.
- */
+/* Lifecycle component, contains startup and shutdown logic for server. */
 @Component
 public class Lifecycle {
 
-	@PostConstruct
-	public void startUp() {
+  @PostConstruct
+  public void startUp() {
 
-	}
+  }
 
-	@PreDestroy
-	public void shutDown() {
+  @PreDestroy
+  public void shutDown() {
 
-	}
+  }
 }

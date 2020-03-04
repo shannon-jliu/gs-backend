@@ -6,11 +6,11 @@ import javax.persistence.Embedded
 import org.cuair.ground.models.CUAirModel
 
 /** Represents telemetry of an object
-    gps will contain latitude and longitude
-    altitude is in meters
-    planeYaw is in degrees with 0 at north and increasing in the clockwise direction
-    gimOrt is the gimbal orientation with pitch and roll
-    */
+ * gps will contain latitude and longitude
+ * altitude is in meters
+ * planeYaw is in degrees with 0 at north and increasing in the clockwise direction
+ * gimOrt is the gimbal orientation with pitch and roll
+ */
 @Entity
 class Telemetry(
         @Embedded

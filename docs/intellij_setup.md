@@ -52,6 +52,27 @@ Next, go to **Editor > Code Style > Java**. Under **Scheme**, click the hamburge
 
 ![Image](img/import_checkstyle.png)
 
+Next, under **Javadoc**, navigate to **Other** and ensure that *Generate "<p>" on empty lines* is unchecked and *Do not wrap one line comments* is checked, so it should look like this:
+
+![Image](img/javadoc_other.png)
+
+Next under **Imports**, scroll down to **Import Layout** and make sure it looks like this:
+
+![Image](img/rearrange_imports.png)
+
+Essentially, it has to look like
+
+```
+import static all other imports
+<blank line>
+import all other imports
+<blank line>
+```
+
+As by default importing the CheckStyle XML will cause there to be two blank lines to be inserted between `import static` and all other imports, which will cause errors. Now your IntelliJ formatting is good to go!
+
 Now, if you right click on a file/directory, if you select **Reformat Code** it should format it according to the CheckStyle guidelines!
 
 ![Image](img/reformat_code.png)
+
+Make sure you mask the files with the `*.java` qualifier as we only want to run this on Java files.
