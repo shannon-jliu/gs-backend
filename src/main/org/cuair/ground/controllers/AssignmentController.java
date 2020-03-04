@@ -36,7 +36,7 @@ public class AssignmentController {
   private AssignmentDatabaseAccessor assignmentDao =
       (AssignmentDatabaseAccessor)
           DAOFactory.getDAO(DAOFactory.ModellessDAOType.ASSIGNMENT_DATABASE_ACCESSOR);
-  /**The database accessor object for the image database */
+  /** The database accessor object for the image database */
   private ImageDatabaseAccessor imageDao =
       (ImageDatabaseAccessor)
           DAOFactory.getDAO(DAOFactory.ModellessDAOType.IMAGE_DATABASE_ACCESSOR);

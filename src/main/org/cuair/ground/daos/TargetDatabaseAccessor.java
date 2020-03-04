@@ -9,12 +9,12 @@ import org.cuair.ground.models.plane.target.Target;
  */
 public class TargetDatabaseAccessor<T extends Target> extends ClientCreatableDatabaseAccessor<T> {
 
-    /**
-     * Creates a Target database accessor object
-     *
-     * @param modelClass Class of model stored in the database
-     */
-    TargetDatabaseAccessor(Class<T> modelClass) {
-      super(modelClass);
-    }
+  /**
+   * Creates a Target database accessor object
+   *
+   * @param modelClass Class of model stored in the database
+   */
+  TargetDatabaseAccessor(Class<T> modelClass) {
+    super(modelClass);
+  }
 }

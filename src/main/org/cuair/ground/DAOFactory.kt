@@ -36,7 +36,7 @@ class DAOFactory {
          */
         abstract fun createInstance() : DatabaseAccessor<*>
   }
-    
+
   /** Enumeration of all database accessor types that are parametrized on a model */
   enum class ModelDAOType {
     DATABASE_ACCESSOR {
