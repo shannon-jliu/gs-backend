@@ -25,5 +25,5 @@ public class Flags {
 	public static boolean ENABLE_MULTIPLE_USERS_PER_IP = false;
 
 	// Allows clients to create users if true. Otherwise, all will use default user
-	public static boolean USERS_ENABLED = true;
+	public static boolean USERS_ENABLED = false;
 }
