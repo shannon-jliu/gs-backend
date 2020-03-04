@@ -82,7 +82,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
         // Sets new target thumbnail
         if (ts.getTarget() != null) {
           AlphanumTarget t = alphaTargetDao.get(ts.getTarget().getId());
-          t.setthumbnail_tsid(ts.getId());
+          t.setthumbnailTsid(ts.getId());
           alphaTargetDao.update(t);
           if (cuairInteropRequests) {
             // TODO: Add back in once client code is complete
@@ -125,10 +125,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
         ts.getTarget() != null
             && (other.getTarget() == null
             || !ts.getTarget().getId().equals(other.getTarget().getId()))
-            // TODO: Fix: This threw a NullPointerException when moving a target sighting from its correct target to another one
-            // The console on the frontend also threw an error: "index.js:1437 Warning: Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in the componentWillUnmount method.
-            // in MergeSightingPreview (at mergeTarget.js:314)""
-            && ts.getTarget().getthumbnail_tsid() != null && ts.getTarget().getthumbnail_tsid().equals(ts.getId());
+            && ts.getTarget().getthumbnailTsid() != null && ts.getTarget().getthumbnailTsid().equals(ts.getId());
     AlphanumTarget tToEraseFrom = ts.getTarget();
     // checks whether new thumb for new target should be updated
     boolean updateNewThumb =
@@ -142,20 +139,20 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
       if (toEraseThumb) {
         if (ts.getCreator().getUserType() == ODLCUser.UserType.MDLCTAGGER || ts.getCreator().getUserType() == ODLCUser.UserType.MDLCOPERATOR) {
           // If MDLC, set thumb for original target to default value
-          tToEraseFrom.setthumbnail_tsid(0L);
+          tToEraseFrom.setthumbnailTsid(0L);
           // TODO (mariasam1): delete thumbnail through interop
         } else {
           // If ADLC, set thumb for original target to most recent ts (or default if none)
           AlphanumTargetSighting newThumb = alphaDao.getLastSightingForTarget(tToEraseFrom.getId());
           if (newThumb != null) {
             newThumb.setTarget(tToEraseFrom);
-            tToEraseFrom.setthumbnail_tsid(newThumb.getId());
+            tToEraseFrom.setthumbnailTsid(newThumb.getId());
             if (cuairInteropRequests) {
               // TODO: Add back in once client code is complete
               // interopClient.updateTargetImage(newThumb);
             }
           } else {
-            tToEraseFrom.setthumbnail_tsid(0L);
+            tToEraseFrom.setthumbnailTsid(0L);
             // TODO (mariasam1): delete thumbnail through interop
           }
         }
@@ -169,7 +166,7 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
         // Sets new thumbnail for updated target
         if (updateNewThumb) {
           AlphanumTarget t = alphaTargetDao.get(ts.getTarget().getId());
-          t.setthumbnail_tsid(ts.getId());
+          t.setthumbnailTsid(ts.getId());
           alphaTargetDao.update(t);
           if (cuairInteropRequests) {
             // TODO: Add back in once client code is complete
@@ -197,22 +194,22 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
 
     final ResponseEntity retval = super.delete(ts);
 
-    if (ts.getTarget() != null && ts.getTarget().getthumbnail_tsid().equals(id)) {
+    if (ts.getTarget() != null && ts.getTarget().getthumbnailTsid() != null && ts.getTarget().getthumbnailTsid().equals(id)) {
       if (ts.getCreator().getUserType() == ODLCUser.UserType.MDLCTAGGER || ts.getCreator().getUserType() == ODLCUser.UserType.MDLCOPERATOR) {
         // If MDLC, set thumb for original target to default value
-        ts.getTarget().setthumbnail_tsid(0L);
+        ts.getTarget().setthumbnailTsid(0L);
         // TODO (mariasam1): delete thumbnail through interop
       } else {
         // If ADLC, set thumb for original target to most recent ts (or default if none)
         AlphanumTargetSighting newThumb = alphaDao.getLastSightingForTarget(ts.getTarget().getId());
         if (newThumb != null) {
-          ts.getTarget().setthumbnail_tsid(newThumb.getId());
+          ts.getTarget().setthumbnailTsid(newThumb.getId());
           if (cuairInteropRequests) {
             // TODO: Add back in once client code is complete
             // interopClient.updateTargetImage(newThumb);
           }
         } else {
-          ts.getTarget().setthumbnail_tsid(0L);
+          ts.getTarget().setthumbnailTsid(0L);
         }
       }
       alphaTargetDao.update(ts.getTarget());

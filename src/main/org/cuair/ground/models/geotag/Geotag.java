@@ -124,13 +124,13 @@ public class Geotag extends CUAirModel {
       altitude = telemetry.getAltitude();
     }
 
-    double pixelX = sighting.getpixel_x();
-    double pixelY = sighting.getpixel_y();
+    double pixelX = sighting.getpixelX();
+    double pixelY = sighting.getpixelY();
     double planeYaw = telemetry.getPlaneYaw() * Math.PI / 180;
     double centerLongitude = telemetry.getGps().getLongitude();
     double centerLatitude = telemetry.getGps().getLatitude();
     this.gpsLocation = getPixelCoordinates(centerLatitude, centerLongitude, altitude, pixelX, pixelY, planeYaw);
-    this.radiansFromNorth = getRadiansFromNorth(planeYaw, sighting.getRadiansFromTop());
+    this.radiansFromNorth = calculateRadiansFromNorth(planeYaw, sighting.getRadiansFromTop());
   }
 
   /**

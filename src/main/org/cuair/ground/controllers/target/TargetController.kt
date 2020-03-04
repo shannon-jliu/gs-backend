@@ -87,7 +87,7 @@ abstract class TargetController<T : Target> {
             return badRequest().body("Don't pass creator for updates")
         }
 
-        val isTSIdUpdated = t.getthumbnail_tsid() != other.getthumbnail_tsid()
+        val isTSIdUpdated = t.getthumbnailTsid() != other.getthumbnailTsid()
 
         t.updateFromTarget(other)
         if (other.geotag !== null) {
