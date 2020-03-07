@@ -8,36 +8,37 @@ import org.cuair.ground.models.TimestampModel
 import org.cuair.ground.models.plane.target.AlphanumTarget
 import org.cuair.ground.models.plane.target.AlphanumTargetSighting
 import org.cuair.ground.models.plane.target.TargetSighting
-import org.cuair.ground.models.Username
+import org.cuair.ground.models.Image
+import org.cuair.ground.models.ODLCUser
+import org.cuair.ground.daos.ODLCUserDatabaseAccessor
+
 
 /** Factory for creating an managing DAO instances */
 class DAOFactory {
-  /** Enumeration of all database accessor types that are not parametrized on a model */
-  enum class ModellessDAOType {
-    ASSIGNMENT_DATABASE_ACCESSOR {
-        override fun createInstance(): DatabaseAccessor<*> {
-            return AssignmentDatabaseAccessor()
-        }
-    },
-    AUTH_TOKEN_DATABASE_ACCESSOR {
-        override fun createInstance(): DatabaseAccessor<*> {
-            return AuthTokenDatabaseAccessor()
-        }
-    },
-    USERNAME_DATABASE_ACCESSOR {
-        override fun createInstance(): DatabaseAccessor<*> {
-            return UsernameDatabaseAccessor()
-        }
-    };
-
-    /**
-     * Creates an instance of the database accessor
-     *
-     * @return the DAO instance
-     */
-    abstract fun createInstance() : DatabaseAccessor<*>
+    enum class ModellessDAOType {
+        ASSIGNMENT_DATABASE_ACCESSOR {
+            override fun createInstance(): DatabaseAccessor<*> {
+                return AssignmentDatabaseAccessor()
+            }
+        },
+        IMAGE_DATABASE_ACCESSOR {
+            override fun createInstance(): DatabaseAccessor<*> {
+                return ImageDatabaseAccessor()
+            }
+        },
+        ODLCUSER_DATABASE_ACCESSOR {
+            override fun createInstance(): DatabaseAccessor<*> {
+                return ODLCUserDatabaseAccessor()
+            }
+        };
+        /**
+         * Creates an instance of the database accessor
+         *
+         * @return the DAO instance
+         */
+        abstract fun createInstance() : DatabaseAccessor<*>
   }
-
+    
   /** Enumeration of all database accessor types that are parametrized on a model */
   enum class ModelDAOType {
     DATABASE_ACCESSOR {

@@ -17,6 +17,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+/* Lifecycle component, contains startup and shutdown logic for server. */
 @Component
 public class Lifecycle
 {
@@ -80,4 +82,5 @@ public class Lifecycle
     {
 
     }
+
 }

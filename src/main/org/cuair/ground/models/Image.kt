@@ -1,5 +1,6 @@
 package org.cuair.ground.models
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import org.cuair.ground.models.geotag.Telemetry
 import org.cuair.ground.models.geotag.Geotag
 import java.util.Objects
@@ -8,7 +9,6 @@ import javax.persistence.OneToOne
 import javax.persistence.CascadeType
 import javax.persistence.Enumerated
 import javax.validation.constraints.NotNull
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.ebean.annotation.EnumValue
@@ -29,6 +29,10 @@ class Image(
         //@OneToOne(cascade = arrayOf(CascadeType.ALL))
         /** The type of this image. Either FIXED, TRACKING, or OFFAXIS */
         var imgMode: ImgMode,
+        /** True if has at least one associated MDLC assignment, otherwise false. */
+        @JsonIgnore var hasMdlcAssignment: Boolean = false,
+        /** True if has at least one associated ADLC assignment, otherwise false. */
+        @JsonIgnore var hasAdlcAssignment: Boolean = false,
         /** The horizontal field of fiew of this image in degrees. */
         var fov: Double
 ) : TimestampModel() {
@@ -39,7 +43,11 @@ class Image(
             imageUrl: String,
             telemetry: Telemetry,
             fov: Double
-    ) : this(localImageUrl, imageUrl, telemetry, ImgMode.FIXED, fov)
+// <<<<<<< HEAD todo
+//     ) : this(localImageUrl, imageUrl, telemetry, ImgMode.FIXED, fov)
+// =======
+    ) : this(localImageUrl, imageUrl, telemetry, ImgMode.FIXED, false, false, fov)
+//>>>>>>> master
 
     /** The filesystem path this image lives on relative to the server directory */
     //@Transient var localImageUrl: String? = null
