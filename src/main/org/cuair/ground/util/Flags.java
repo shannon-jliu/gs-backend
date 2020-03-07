@@ -64,6 +64,9 @@ public class Flags {
 
   public static double FOV_VERTICAL_RADIANS = 0.560476881;
 
-  public static boolean CUAIR_GEOTAG_MUTABLE = false;
-  
+  public static boolean CUAIR_GEOTAG_MUTABLE = true;
+
+  /* Airdrop */
+
+  public static double CUAIR_AIRDROP_THRESHOLD = 150.0;
 }

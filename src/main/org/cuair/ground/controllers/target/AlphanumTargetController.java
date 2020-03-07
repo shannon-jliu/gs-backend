@@ -50,9 +50,6 @@ public class AlphanumTargetController extends TargetController<AlphanumTarget> {
      */
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity create(@RequestBody AlphanumTarget t) {
-        if (t.isOffaxis() == null) {
-            t.setOffaxis(false);
-        }
         return super.create(t);
     }
 
@@ -64,11 +61,13 @@ public class AlphanumTargetController extends TargetController<AlphanumTarget> {
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public ResponseEntity update(@PathVariable Long id, @RequestBody AlphanumTarget other) {
+        System.out.println("alphanum update");
         AlphanumTarget t = targetDao.get(id);
         if (t == null) {
+            System.out.println("t is null alphanum update return not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-
+        System.out.println("alphanum update KEK");
         return super.update(t, other);
     }
 

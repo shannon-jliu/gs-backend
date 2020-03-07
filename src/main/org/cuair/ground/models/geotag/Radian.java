@@ -46,4 +46,31 @@ public class Radian {
     public static Double add(Double one, Double two) {
         return normalize(one + two);
     }
+
+    public static Double average(Double... radians) {
+        if (radians == null) {
+          return null;
+        }
+
+        int nonNullRadians = 0;
+        List<Double> rads = new ArrayList<>(radians.length);
+        for (Double radian : radians) {
+          if (radian != null && !radian.isNaN()) {
+            nonNullRadians++;
+            rads.add(radian);
+          }
+        }
+        if (nonNullRadians == 0) {
+          return null;
+        }
+
+        Collections.sort(rads);
+
+        int median_index = nonNullRadians / 2;
+        double median_rad_val =
+            nonNullRadians % 2 == 0
+                ? (rads.get(median_index) + rads.get(median_index - 1)) / 2
+                : rads.get(median_index);
+        return normalize(median_rad_val);
+    }
 }

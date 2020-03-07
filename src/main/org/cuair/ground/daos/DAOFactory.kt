@@ -3,7 +3,7 @@ package org.cuair.ground.daos
 import org.cuair.ground.models.ClientCreatable
 import org.cuair.ground.models.CUAirModel
 import org.cuair.ground.models.PlaneModel
-import org.cuair.ground.models.PlaneSettingsModel
+import org.cuair.ground.models.plane.settings.PlaneSettingsModel
 import org.cuair.ground.models.TimestampModel
 import org.cuair.ground.models.plane.target.AlphanumTarget
 import org.cuair.ground.models.plane.target.AlphanumTargetSighting
@@ -58,6 +58,11 @@ class DAOFactory {
     CLIENT_CREATABLE_DATABASE_ACCESSOR {
       override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
         return ClientCreatableDatabaseAccessor(clazz.asSubclass(ClientCreatable::class.java))
+      }
+    },
+    PLANE_SETTINGS_MODEL_DATABASE_ACCESSOR {
+      override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
+        return PlaneSettingsModelDatabaseAccessor(clazz.asSubclass(PlaneSettingsModel::class.java))
       }
     },
     TARGET_DATABASE_ACCESSOR {

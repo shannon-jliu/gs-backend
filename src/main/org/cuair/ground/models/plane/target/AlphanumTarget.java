@@ -33,11 +33,7 @@ public class AlphanumTarget extends Target {
     private Color alphaColor;
 
     /** True if the target is the off axis target, false otherwise */
-    private Boolean offaxis;
-
-    //private Long thumbnail_tsid;
-
-   // private Long thumbnail_tsid;
+    private boolean offaxis;
 
     /**
      * Creates an AlphanumTarget
@@ -58,7 +54,7 @@ public class AlphanumTarget extends Target {
             Color shapeColor,
             String alpha,
             Color alphaColor,
-            Boolean offaxis,
+            boolean offaxis,
             Geotag geotag,
             Long judgeTargetId,
             Long thumbnail_tsid) {
@@ -69,7 +65,6 @@ public class AlphanumTarget extends Target {
         this.alpha = alpha;
         this.alphaColor = alphaColor;
         this.offaxis = offaxis;
-        //this.thumbnail_tsid = thumbnail_tsid; // dont need
     }
 
     /**
@@ -98,10 +93,8 @@ public class AlphanumTarget extends Target {
         if (alphaTarget.getAlphaColor() != null) {
             this.alphaColor = alphaTarget.getAlphaColor();
         }
-        if (alphaTarget.isOffaxis() != null) {
-            this.offaxis = alphaTarget.isOffaxis();
-        }
-        if (alphaTarget.getGeotag() != null) {
+        this.offaxis = alphaTarget.isOffaxis();
+        if (alphaTarget.getGeotag() != null && !alphaTarget.getGeotag().equals(this.geotag)) {
             this.geotag = alphaTarget.getGeotag();
         }
     }
@@ -189,7 +182,7 @@ public class AlphanumTarget extends Target {
      *
      * @return Boolean true if target is offaxis, false otherwise
      */
-    public Boolean isOffaxis() {
+    public boolean isOffaxis() {
         return offaxis;
     }
 
@@ -198,7 +191,7 @@ public class AlphanumTarget extends Target {
      *
      * @param offaxis Boolean true if target is offaxis, false otherwise
      */
-    public void setOffaxis(Boolean offaxis) {
+    public void setOffaxis(boolean offaxis) {
         this.offaxis = offaxis;
     }
 
@@ -239,7 +232,7 @@ public class AlphanumTarget extends Target {
     }
 
     public String toString() {
-        return (offaxis.toString()) + "";
+        return (offaxis) + "";
     }
 
     /**

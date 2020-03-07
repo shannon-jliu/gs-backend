@@ -8,7 +8,6 @@ import org.cuair.ground.models.Assignment;
 import org.cuair.ground.models.AuthToken;
 import org.cuair.ground.models.ClientType;
 import org.cuair.ground.util.Flags;
-import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -52,7 +51,6 @@ public class AssignmentController {
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseEntity<Assignment> get(@PathVariable Long id) {
-        System.out.println("ASSIGNEMTNET HERE 4");
         Assignment a = assignmentDao.get(id);
         if (a == null) {
             ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -91,9 +89,8 @@ public class AssignmentController {
      */
     @RequestMapping(value = "/work/{type}", method = RequestMethod.POST)
     public ResponseEntity createWork(@RequestHeader HttpHeaders headers, @PathVariable String type) {
-        System.out.println("ASSIGNEMTNET HERE 2");
         ClientType assignee = ClientType.valueOf(type);
-        Assignment a = null; // todo
+        Assignment a;
 
         // if auth disabled, continue with old behavior
         // TODO: Implement auth once auth has been finalized
@@ -113,7 +110,6 @@ public class AssignmentController {
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public ResponseEntity update(@PathVariable Long id, @RequestBody Assignment deserialized) {
-        System.out.println("ASSIGNEMTNET HERE 1");
         Assignment a = assignmentDao.get(id);
         if (a == null) {
             return noContent().build();

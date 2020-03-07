@@ -96,7 +96,7 @@ public abstract class TargetSightingController<T extends TargetSighting> {
 
             if (CUAIR_INTEROP_REQUESTS) {
                 // TODO: Add back in once client code is complete
-                // interopClient.updateTarget(ts.getTarget());
+                interopClient.attemptUpdate(ts.getTarget());
             }
         }
 
@@ -122,6 +122,7 @@ public abstract class TargetSightingController<T extends TargetSighting> {
      * @return HTTP response with json of updated target sighting
      */
     ResponseEntity updateFromTargetSighting(T ts, T other) {
+        System.out.println("updateFromTargetSighting"); 
         if (other.getId() != null) {
             return badRequest().body("Don't pass ids for updates");
         }
@@ -147,16 +148,19 @@ public abstract class TargetSightingController<T extends TargetSighting> {
         ts.updateFromTargetSighting(other);
 
         boolean geotagChanged = CUAIR_GEOTAG_MUTABLE && Geotag.attemptSetGeotagForTargetSighting(ts);
+        System.out.println("geotag changed? " + geotagChanged);
 
         getTargetSightingDao().update(ts);
 
         if (geotagChanged && other.getTarget() != null) {
+            System.out.println("gonna update");
             Geotag.updateGeotag(ts.getTarget(), null);
             if (CUAIR_INTEROP_REQUESTS) {
                 // TODO: Add back in once client code is complete
-                // interopClient.updateTarget(ts.getTarget());
+                interopClient.attemptUpdate(ts.getTarget());
             }
         }
+        System.out.println("finished updating?");
         // TODO once autopilot client finished
         // if (ts.getCreator() == ClientType.MDLC)
         //     autopilotClient.sendMdlcRoi(AllTargetSightingController.Companion.getConfidenceGeotags());
@@ -176,7 +180,7 @@ public abstract class TargetSightingController<T extends TargetSighting> {
             Geotag.updateGeotag(ts.getTarget(), null);
             if (CUAIR_INTEROP_REQUESTS) {
                 // TODO: Add back in once client code is complete
-                // interopClient.updateTarget(ts.getTarget());
+                interopClient.attemptUpdate(ts.getTarget());
             }
         }
         // TODO once autopilot client finished

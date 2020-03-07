@@ -78,6 +78,7 @@ abstract class TargetController<T : Target> {
      * @return the updated Target as JSON
      */
     fun update(t: T, other: T): ResponseEntity<Any> {
+        logger.info("update target controller");
         val targetSightingDao = DAOFactory.getDAO(
             DAOFactory.ModelDAOType.TARGET_SIGHTINGS_DATABASE_ACCESSOR,
             t.fetchAssociatedTargetSightingClass()) as TargetSightingsDatabaseAccessor<out TargetSighting>
@@ -90,26 +91,38 @@ abstract class TargetController<T : Target> {
         }
 
         val isTSIdUpdated = t.getthumbnail_tsid() != other.getthumbnail_tsid()
+        logger.info("isTSIdUpdated? " + isTSIdUpdated);
 
         t.updateFromTarget(other)
+        logger.info("update from target other done?");
         if (other.geotag !== null) {
+            logger.info("other geotag is not null");
             targetSightingDao
                 .getAllTargetSightingsForTarget(t.id)
                 .forEach { it.geotag?.isManualGeotag = true }
         }
+        logger.info("other geotag is not null after");
         getTargetDao().update(t)
+        logger.info("other geotag is not null after update");
         if (isTSIdUpdated && CUAIR_INTEROP_REQUESTS) {
+            logger.info("before update target image geotag is not null");
             interopClient.updateTargetImage(targetSightingDao.get(t.getthumbnail_tsid()))
+            logger.info("after update target image");
         }
         //interopClient.updateTarget(getTargetDao().get(t.id))
 
         // TODO: Add client code
-        // if (CUAIR_INTEROP_REQUESTS) {
-        //     if (isTSIdUpdated) {
-        //         interopClient.updateTargetImage(targetSightingDao.get(t.thumbnail_tsid))
-        //     }
-        //     interopClient.updateTarget(getTargetDao().get(t.id))
-        // }
+        if (CUAIR_INTEROP_REQUESTS) {
+            logger.info("cuair interop requests before ");
+            if (isTSIdUpdated) {
+                logger.info("isTSIdUpdated inside");
+                interopClient.updateTargetImage(targetSightingDao.get(t.getthumbnail_tsid()))
+                logger.info("update target image");
+            }
+            logger.info("before attempt update");
+            interopClient.attemptUpdate(getTargetDao().get(t.id))
+            logger.info("after attempt update geotag is not null");
+        }
         return ok(t)
     }
 
@@ -134,7 +147,8 @@ abstract class TargetController<T : Target> {
 
         targetSightingDao.unassociateAllTargetSightingsForTarget(id)
         getTargetDao().delete(id)
-        return ok(t)
+        t.setGeotag(null);
+        return ok(t);
     }
 
     companion object {

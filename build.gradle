@@ -64,26 +64,17 @@ dependencies {
     // JSON
     compile("org.json:json:20190722")
 
-    //annotationProcessor("io.ebean:querybean-generator:12.1.8")
-//=======
     implementation("com.google.protobuf:protobuf-java:3.9.1")
-// =======
-//     implementation "com.google.protobuf:protobuf-java:3.9.1"
-// >>>>>>> origin/SpaceProtocol/image-controller-backup-all-files
 
     // Ebean
     implementation "io.ebean:ebean:12.1.9"
     implementation "io.ebean:ebean-querybean:12.1.9"
-//<<<<<<< HEAD
+
     testImplementation("io.ebean.test:ebean-test-config:11.39.1")
     testImplementation "io.ebean:ebean-test:12.1.9"
-//>>>>>>> master
 
     implementation("org.avaje.composite:logback:1.1")
     testImplementation("org.avaje.composite:junit:1.1")
-// =======
-    implementation "org.avaje.composite:logback:1.1"
-// >>>>>>> origin/SpaceProtocol/image-controller-backup-all-files
 
     // Json
     implementation "com.fasterxml.jackson.core:jackson-databind:2.9.4"

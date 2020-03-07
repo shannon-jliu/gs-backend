@@ -191,7 +191,6 @@ public class ImageController {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity upload(@RequestPart("json") String jsonString,
                                  @RequestPart("files") MultipartFile file) {
-        System.out.println("eep");
         if (file == null || file.isEmpty()) {
           return badRequest().body("Missing image file");
         }
@@ -303,7 +302,6 @@ public class ImageController {
         String imageExtension = contentType.split("\\/")[1];
         imageFileName += "." + imageExtension;
         i.setLocalImageUrl(PLANE_IMAGE_DIR + imageFileName);
-        System.out.println(i.getLocalImageUrl());
 
         // store the image locally
         try {
@@ -315,7 +313,6 @@ public class ImageController {
         }
 
         i.setImageUrl("/api/v1/image/file/" + imageFileName);
-        //i.setImageUrl(PLANE_IMAGE_DIR + imageFileName);
 
         imageDao.create(i);
 

@@ -78,6 +78,7 @@ public class DatabaseAccessor<T extends CUAirModel> {
      */
     public boolean create(T object) {
         if (get(object.getId()) != null) {
+            System.out.println("RETURNING FALSE");
             return false;
         }
         Ebean.save(object);

@@ -1,8 +1,8 @@
 package org.cuair.ground.daos;
 
 import io.ebean.Ebean;
-import org.cuair.ground.models.PlaneSettingsModel;
-import org.cuair.ground.models.PlaneSettingsModel.PlaneModelStatus;
+import org.cuair.ground.models.plane.settings.PlaneSettingsModel;
+import org.cuair.ground.models.plane.settings.PlaneSettingsModel.PlaneModelStatus;
 
 /**
  * Database Accessor Object that provides an interface for persisting plane settings models.

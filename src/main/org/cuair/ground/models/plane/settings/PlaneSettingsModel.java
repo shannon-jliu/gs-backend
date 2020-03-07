@@ -1,9 +1,10 @@
-package org.cuair.ground.models;
+package org.cuair.ground.models.plane.settings;
 
 import io.ebean.annotation.EnumValue;
 import java.util.Objects;
 import javax.validation.constraints.NotNull;
 import javax.persistence.MappedSuperclass;
+import org.cuair.ground.models.PlaneModel;
 
 /**
  * Base class for all settings that get sent to the plane. All Settings and models should extend
@@ -53,7 +54,7 @@ public class PlaneSettingsModel extends PlaneModel {
     }
     
     @Override
-    public boolean equals(@NotNull Object o) {
+    public boolean equals(Object o) {
         if (o == null || !super.equals(o)) {
             return false;
         }

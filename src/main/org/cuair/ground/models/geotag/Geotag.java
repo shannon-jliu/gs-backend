@@ -43,7 +43,7 @@ public class Geotag extends CUAirModel {
     public static double IMAGE_HEIGHT = Flags.IMAGE_HEIGHT;
 
     /** A logger */
-    private static final Logger logger = LoggerFactory.getLogger(GpsLocation.class);
+    private static final Logger logger = LoggerFactory.getLogger(Geotag.class);
 
     /** The database access object for the assignment table */
     private static final AssignmentDatabaseAccessor assignmentDao =
@@ -264,8 +264,8 @@ public class Geotag extends CUAirModel {
             Arrays.stream(geotags).map(Geotag::getRadiansFromNorth).toArray(Double[]::new);
         Boolean[] manualGeotags =
             Arrays.stream(geotags).map(Geotag::getIsManualGeotag).toArray(Boolean[]::new);
-        // return new Geotag(GpsLocation.average(manualGeotags, locations), Radian.average(radians));
-        return null;
+        return new Geotag(GpsLocation.average(manualGeotags, locations), Radian.average(radians));
+        //return null;
     }
 
     /**
@@ -279,6 +279,7 @@ public class Geotag extends CUAirModel {
             return false;
           }
         }
+        System.out.println("after oxx axis");
         Assignment assignment = sighting.getAssignment();
         if (assignment == null) {
             return false;
@@ -297,7 +298,8 @@ public class Geotag extends CUAirModel {
         if (gps == null && (Double) telemetry.getAltitude() == null) {
             return false;
         }
-        return false; // TODO
+        System.out.println("can lmfao");
+        return true;
     }
 
     /**
@@ -307,6 +309,7 @@ public class Geotag extends CUAirModel {
      * @param ts the target sighting
      */
     public static void updateGeotag(Target targ, TargetSighting ts) {
+        System.out.println("updateGeotag");
         List<TargetSighting> sights = new ArrayList<TargetSighting>();
 
         if (targ.fetchAssociatedTargetSightingClass() == AlphanumTargetSighting.class) {
@@ -316,7 +319,9 @@ public class Geotag extends CUAirModel {
         } else {
             logger.warn("Target class is not Alphanum or Emergent");
         }
+        System.out.println("sights size " + sights.size());
         if (ts != null && !sights.contains(ts)) sights.add(ts);
+        System.out.println("sights size after " + sights.size());
         TargetSighting[] sightsArr = sights.toArray(new TargetSighting[sights.size()]);
         Geotag[] geotags =
             Arrays.stream(sightsArr)
@@ -336,8 +341,10 @@ public class Geotag extends CUAirModel {
      */
     public static boolean attemptSetGeotagForTargetSighting(TargetSighting ts) {
         if (!canSetGeotag(ts)) {
+            System.out.println("CANT SET GEOTAG");
             return false;
         }
+        System.out.println("CAN INDEED SET GEOTAG");
         ts.setGeotag(new Geotag(ts));
         return true;
     }
@@ -349,8 +356,10 @@ public class Geotag extends CUAirModel {
      */
     private static void updateTargetInDao(Target targ) {
         if (targ.fetchAssociatedTargetSightingClass() == AlphanumTargetSighting.class) {
-            if (!alphanumTargetDao.create((AlphanumTarget) targ))
-                alphanumTargetDao.update((AlphanumTarget) targ);
+            if (!alphanumTargetDao.create((AlphanumTarget) targ)) {
+              System.out.println("updating alphanum target " + targ.getGeotag());
+              alphanumTargetDao.update((AlphanumTarget) targ);
+            }
         } else if (targ.fetchAssociatedTargetSightingClass() == EmergentTargetSighting.class) {
             emergentTargetDao.update((EmergentTarget) targ);
         } else {

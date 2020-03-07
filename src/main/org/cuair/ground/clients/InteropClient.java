@@ -1,24 +1,32 @@
 package org.cuair.ground.clients;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.util.JsonFormat;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.net.HttpCookie;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import javax.imageio.ImageIO;
 import org.apache.commons.io.IOUtils;
 import org.cuair.ground.daos.AlphanumTargetDatabaseAccessor;
 import org.cuair.ground.daos.AlphanumTargetSightingsDatabaseAccessor;
 import org.cuair.ground.daos.ClientCreatableDatabaseAccessor;
+import org.cuair.ground.daos.PlaneSettingsModelDatabaseAccessor;
 import org.cuair.ground.daos.DAOFactory;
 import org.cuair.ground.models.ClientType;
 import org.cuair.ground.models.exceptions.InvalidGpsLocationException;
 import org.cuair.ground.models.geotag.*;
+import org.cuair.ground.models.plane.settings.*;
 import org.cuair.ground.models.plane.target.*;
 import org.cuair.ground.protobuf.InteropApi.*;
 import org.cuair.ground.util.*;
@@ -32,6 +40,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.client.AsyncRestTemplate;
+
+// todo for all getjudgetargetid wait and retry
 
 /*
  * Client for interop communications
@@ -57,11 +67,20 @@ public class InteropClient {
                   DAOFactory.ModelDAOType.ALPHANUM_TARGET_SIGHTINGS_DATABASE_ACCESSOR,
                   AlphanumTargetSighting.class);
 
+  private static final PlaneSettingsModelDatabaseAccessor<AirdropSettings> airdropDao = 
+      (PlaneSettingsModelDatabaseAccessor<AirdropSettings>)
+          DAOFactory.getDAO(
+              DAOFactory.ModelDAOType.PLANE_SETTINGS_MODEL_DATABASE_ACCESSOR, 
+              AirdropSettings.class);
+
+
   private AsyncRestTemplate template = new AsyncRestTemplate();
 
   public String INTEROP_IP = "localhost";
 
   public String INTEROP_PORT = "8000";
+
+  public String INTEROP_ADDRESS = "http://" + INTEROP_IP + ":" + INTEROP_PORT;
 
   public String LOGIN = "/api/login";
 
@@ -69,28 +88,16 @@ public class InteropClient {
 
   public String PASSWORD = "testpass";
 
-  public String MISSION_INFO = Flags.MISSION_INFO;
-
-  public int MISSION_ID = Flags.MISSION_ID;
-
   public String TARGET_ROUTE = Flags.TARGET_ROUTE;
 
-  public double IMAGE_WIDTH = Flags.IMAGE_WIDTH;
-
-  public double IMAGE_HEIGHT = Flags.IMAGE_HEIGHT;
+  public String TARGET_DIRECTORY = Flags.INTEROP_TARGET_DIR;
 
   public String cookieValue;
 
-  public String targetDirectory = Flags.INTEROP_TARGET_DIR;
-
-  public void processOffAxisPos(Mission missionInfo) {
-    AlphanumTarget offAxisTarget = alphaTargetDao.getOffaxisTarget();
-    if (offAxisTarget.getJudgeTargetId() != null) return;
-
-    Position offAxisPos = missionInfo.getOffAxisOdlcPos();
-    double latitude = offAxisPos.getLatitude();
-    double longitude = offAxisPos.getLongitude();
-    double altitude = offAxisPos.getAltitude();
+  public GpsLocation getGpsLoc(Position pos) {
+    double latitude = pos.getLatitude();
+    double longitude = pos.getLongitude();
+    double altitude = pos.getAltitude();
 
     GpsLocation gpsLocation = null;
     try {
@@ -98,8 +105,26 @@ public class InteropClient {
     } catch (InvalidGpsLocationException e) {
       logger.error("Invalid GPS location for off axis.");
     }
+    return gpsLocation;
+  }
 
-    Geotag geotag = new Geotag(gpsLocation, null);
+  public void processOffAxisPos(Mission missionInfo) {
+    AlphanumTarget offAxisTarget = alphaTargetDao.getOffaxisTarget();
+    if (offAxisTarget.getJudgeTargetId() != null) return;
+
+    Position offAxisPos = missionInfo.getOffAxisOdlcPos();
+    // double latitude = offAxisPos.getLatitude();
+    // double longitude = offAxisPos.getLongitude();
+    // double altitude = offAxisPos.getAltitude();
+
+    // GpsLocation gpsLocation = null;
+    // try {
+    //   gpsLocation = new GpsLocation(latitude, longitude);
+    // } catch (InvalidGpsLocationException e) {
+    //   logger.error("Invalid GPS location for off axis.");
+    // }
+    GpsLocation offAxisLocation = getGpsLoc(offAxisPos);
+    Geotag geotag = new Geotag(offAxisLocation, null);
     offAxisTarget.setGeotag(geotag);
     alphaTargetDao.update(offAxisTarget);
     attemptSend(offAxisTarget);
@@ -109,37 +134,41 @@ public class InteropClient {
     EmergentTarget emergentTarget = getEmergentTarget();
     if (emergentTarget.getJudgeTargetId() != null) return;
 
+   // Position emergentPos = missionInfo.getEmergentLastKnownPos();
+    // double latitude = emergentPos.getLatitude();
+    // double longitude = emergentPos.getLongitude();
+    // double altitude = emergentPos.getAltitude();
+
+    // GpsLocation gpsLocation = null;
+    // try {
+    //   gpsLocation = new GpsLocation(latitude, longitude);
+    // } catch (InvalidGpsLocationException e) {
+    //   logger.error("Invalid GPS location for emergent.");
+    // }
     Position emergentPos = missionInfo.getEmergentLastKnownPos();
-    double latitude = emergentPos.getLatitude();
-    double longitude = emergentPos.getLongitude();
-    double altitude = emergentPos.getAltitude();
-
-    GpsLocation gpsLocation = null;
-    try {
-      gpsLocation = new GpsLocation(latitude, longitude);
-    } catch (InvalidGpsLocationException e) {
-      logger.error("Invalid GPS location for emergent.");
-    }
-
-    Geotag geotag = new Geotag(gpsLocation, null);
+    GpsLocation emergentLocation = getGpsLoc(emergentPos);
+    Geotag geotag = new Geotag(emergentLocation, null);
     emergentTarget.setGeotag(geotag);
     emergentTargetDao.update(emergentTarget);
     attemptSend(emergentTarget);
   }
 
-  public void processAirdrop(Mission missionInfo) {}
+  public void processAirdrop(Mission missionInfo) {
+    Position airdropPos = missionInfo.getAirDropPos();
+    GpsLocation airdropLocation = getGpsLoc(airdropPos);
+    AirdropSettings as = new AirdropSettings(airdropLocation, Flags.CUAIR_AIRDROP_THRESHOLD - 1, false, false);
+    airdropDao.create(as);
+  }
 
   public void getMissionInfo() {
-    URI missionURI = URI.create("http://" + INTEROP_IP + ":" + INTEROP_PORT + MISSION_INFO);
+    URI missionURI = URI.create(INTEROP_ADDRESS + Flags.MISSION_INFO);
     HttpHeaders headers = RequestUtil.getDefaultCookieHeaders(cookieValue);
     HttpEntity<String> requestEntity = new HttpEntity<String>(headers);
     ListenableFuture<ResponseEntity<String>> missionFuture =
         template.exchange(missionURI, HttpMethod.GET, requestEntity, String.class);
 
-    // todo printing error messages when success callback is bad
     RequestUtil.SuccessCallback<String> missionCallback =
         (ResponseEntity<String> result) -> {
-          System.out.println("GOT MISSION SUCCESS");
           Mission.Builder missionBuilder = Mission.newBuilder();
           try {
             // int idd = result.getBody().getId();
@@ -148,12 +177,11 @@ public class InteropClient {
             Mission missionInfo = missionBuilder.build();
             processOffAxisPos(missionInfo);
             processEmergent(missionInfo);
-
-          } catch (Exception e) // todo specific exception
-          {
+          } catch (InvalidProtocolBufferException e) {
             logger.error("Error parsing mission information: " + e.getMessage());
           }
 
+          // todo
           // init emergent
           // init off axis
           // init airdrop
@@ -167,17 +195,42 @@ public class InteropClient {
     return emergentTarget;
   }
 
+  public void attemptUpdate(Target target) {
+    Odlc odlcProto = createOdlcProto(target);
+    // todo if judge target id null - timeout and try update again?
+    // todo use updatetarget?
+    URI putODLCURI = URI.create(INTEROP_ADDRESS + TARGET_ROUTE + "/" + target.getJudgeTargetId());
+    // HttpHeaders headers = new HttpHeaders();
+    // headers.add("Cookie", String.format("sessionid=%s", cookieValue));
+    // todo use requestutil for headers
+    HttpHeaders headers = RequestUtil.getDefaultCookieHeaders(cookieValue);
+    try {
+      HttpEntity<String> requestEntity =
+          new HttpEntity<String>(JsonFormat.printer().print(odlcProto), headers);
+      ListenableFuture<ResponseEntity<String>> putTargetFuture =
+          template.exchange(putODLCURI, HttpMethod.PUT, requestEntity, String.class);
+
+      RequestUtil.SuccessCallback<String> putOdlcCallback =
+          (ResponseEntity<String> result) -> {
+            logger.info("Successfully updated " + ((target instanceof AlphanumTarget) ? "Alphanum" : "Emergent") + " target " + target.getId());
+            Odlc odlcInfo = getOdlcDataAsProto(result.getBody());
+            target.setJudgeTargetId(Long.valueOf(odlcInfo.getId()));
+            if (target instanceof AlphanumTarget) {
+              alphaTargetDao.update((AlphanumTarget) target);
+            } else if (target instanceof EmergentTarget) {
+              emergentTargetDao.update((EmergentTarget) target);
+            }
+          };
+
+      RequestUtil.futureCallback(putODLCURI, putTargetFuture, putOdlcCallback);
+    } catch (InvalidProtocolBufferException e) {
+      logger.error("Error when updating target: " + e.getMessage());
+    }
+  }
+
   public void attemptUpdateImage(Target target) {
     URI updateImageURI =
-        URI.create(
-            "http://"
-                + INTEROP_IP
-                + ":"
-                + INTEROP_PORT
-                + TARGET_ROUTE
-                + "/"
-                + target.getJudgeTargetId()
-                + "/image");
+        URI.create(INTEROP_ADDRESS + TARGET_ROUTE + "/" + target.getJudgeTargetId() + "/image");
     HttpHeaders headers = new HttpHeaders();
     headers.add("Cookie", String.format("sessionid=%s", cookieValue));
     headers.setContentType(MediaType.IMAGE_JPEG);
@@ -210,12 +263,14 @@ public class InteropClient {
           logger.error("Pending update target thumbnail until JudgeTargetId");
         }
         try {
-          Thread.sleep(Flags.TARGETLOGGER_DELAY); // todo
+          Thread.sleep(Flags.TARGETLOGGER_DELAY);
         } catch (InterruptedException e) {
         }
-        // todo emergent vs alpha
-
-        this.target = alphaTargetDao.get(this.targetSighting.getTarget().getId());
+        if (this.target instanceof AlphanumTarget) {
+          this.target = alphaTargetDao.get(this.targetSighting.getTarget().getId());
+        } else {
+          this.target = emergentTargetDao.get(this.targetSighting.getTarget().getId());
+        }
       }
       if (this.target.getJudgeTargetId() == null) {
         logger.error(
@@ -256,6 +311,40 @@ public class InteropClient {
   }
 
   /**
+   * Gets the file name where the target's data was stored
+   *
+   * @param t Target
+   * @return String file name
+   */
+  private File getTargetInteropFile(Target target) {
+    File file = new File(TARGET_DIRECTORY + target.getJudgeTargetId() + ".json");
+    return file;
+  }
+
+  private void saveTargetFile(Target target) {
+    String targetJsonString = null;
+    try {
+      targetJsonString = (new ObjectMapper()).writerWithDefaultPrettyPrinter().writeValueAsString(target.toJson());
+    } catch (JsonProcessingException e) {
+      logger.error("Unable to pretty print json string: " + e.getMessage());
+      targetJsonString = target.toJson().toString();
+    }
+
+    File file = getTargetInteropFile(target);
+    PrintWriter writer = null;
+    try {
+      writer = new PrintWriter(file);
+      writer.println(targetJsonString);
+    } catch (FileNotFoundException e) {
+      logger.error("Target Export Failed: " + e.getMessage());
+    } finally {
+      if (writer != null) {
+        writer.close();
+      }
+    }
+  }
+
+  /**
    * Saves a thumbnail of a target sighting for a target
    *
    * @param targetSighting TargetSighting of the Target
@@ -274,8 +363,8 @@ public class InteropClient {
 
     int topLeftX = Math.max(0, targetSighting.getpixel_x() - targetSighting.getWidth() / 2);
     int topLeftY = Math.max(0, targetSighting.getpixel_y() - targetSighting.getHeight() / 2);
-    int width = Math.min((int)(IMAGE_WIDTH - topLeftX), targetSighting.getWidth());
-    int height = Math.min((int)(IMAGE_HEIGHT - topLeftY), targetSighting.getHeight());
+    int width = Math.min((int)(Flags.IMAGE_WIDTH - topLeftX), targetSighting.getWidth());
+    int height = Math.min((int)(Flags.IMAGE_HEIGHT - topLeftY), targetSighting.getHeight());
     BufferedImage newImage = in.getSubimage(topLeftX, topLeftY, width, height);
 
     Target target;
@@ -297,7 +386,7 @@ public class InteropClient {
 
   public File getTargetInteropImage(Target t) {
     // todo wait if judge target id is not there yet?
-    File file = new File(targetDirectory + t.getJudgeTargetId() + ".png");
+    File file = new File(TARGET_DIRECTORY + t.getJudgeTargetId() + ".png");
     try {
       file.createNewFile();
     } catch (IOException e) {
@@ -306,7 +395,7 @@ public class InteropClient {
   }
 
   public InputStream getIS(Target t) {
-    File file = new File(targetDirectory + t.getJudgeTargetId() + ".png");
+    File file = new File(TARGET_DIRECTORY + t.getJudgeTargetId() + ".png");
     InputStream targetStream = null;
     try {
       targetStream = new FileInputStream(file);
@@ -314,6 +403,19 @@ public class InteropClient {
       logger.error("Error when getting file stream: " + e.getMessage());
     }
     return targetStream;
+  }
+
+  private void removeTargetFile(Target target) {
+    Path jsonPath = getTargetInteropFile(target).toPath();
+    Path thumbnailPath = getTargetInteropImage(target).toPath();
+    try {
+      Files.delete(jsonPath);
+      if (target.getthumbnail_tsid() != 0L) {
+        Files.delete(thumbnailPath);
+      }
+    } catch (Exception e) {
+      logger.error("Unable to delete interop file: " + e.getMessage());
+    }
   }
 
   public Odlc createOdlcProto(Target target) {
@@ -325,8 +427,11 @@ public class InteropClient {
     } else {
       logger.error("Null gps location for target: " + target.toString());
     }
+    if (target.getJudgeTargetId() != null) {
+      odlcProto.setId(target.getJudgeTargetId().intValue());
+    }
     odlcProto.setAutonomous(target.getCreator().equals(ClientType.ADLC));
-    odlcProto.setMission(MISSION_ID);
+    odlcProto.setMission(Flags.MISSION_ID);
     if (target.getTypeString().equals("Alphanum")) {
       AlphanumTarget alphanumTarget = ((AlphanumTarget) target);
       if (alphanumTarget.getAlpha() != null) {
@@ -370,16 +475,14 @@ public class InteropClient {
 
   public void attemptSend(Target target) {
     Odlc odlcProto = createOdlcProto(target);
-    URI postODLCURI = URI.create("http://" + INTEROP_IP + ":" + INTEROP_PORT + TARGET_ROUTE);
-    HttpHeaders headers = new HttpHeaders();
-    headers.add("Cookie", String.format("sessionid=%s", cookieValue));
+    URI postODLCURI = URI.create(INTEROP_ADDRESS + TARGET_ROUTE);
+    HttpHeaders headers = RequestUtil.getDefaultCookieHeaders(cookieValue);
     try {
       HttpEntity<String> requestEntity =
           new HttpEntity<String>(JsonFormat.printer().print(odlcProto), headers);
       ListenableFuture<ResponseEntity<String>> postTargetFuture =
           template.exchange(postODLCURI, HttpMethod.POST, requestEntity, String.class);
 
-      // todo printing error messages when success callback is bad
       RequestUtil.SuccessCallback<String> postOdlcCallback =
           (ResponseEntity<String> result) -> {
             logger.info("Successfully submitted " + ((target instanceof AlphanumTarget) ? "Alphanum" : "Emergent") + " target " + target.getId());
@@ -399,39 +502,26 @@ public class InteropClient {
   }
 
   public void attemptDelete(Target t) {
-    // todo combine all interop stuff
     URI deleteURI =
-        URI.create(
-            "http://"
-                + INTEROP_IP
-                + ":"
-                + INTEROP_PORT
-                + TARGET_ROUTE
-                + "/"
-                + t.getJudgeTargetId());
+        URI.create(INTEROP_ADDRESS + TARGET_ROUTE + "/" + t.getJudgeTargetId());
     HttpHeaders headers = RequestUtil.getDefaultCookieHeaders(cookieValue);
     HttpEntity<String> requestEntity = new HttpEntity<String>(headers);
     ListenableFuture<ResponseEntity<String>> deleteFuture =
         template.exchange(deleteURI, HttpMethod.DELETE, requestEntity, String.class);
-
-    RequestUtil.futureCallback(deleteURI, deleteFuture);
+    RequestUtil.SuccessCallback<String> deleteCallback =
+          (ResponseEntity<String> result) -> {
+            logger.info("Successfully deleted target " + t.getId());
+            removeTargetFile(t);
+          };
+    RequestUtil.futureCallback(deleteURI, deleteFuture, deleteCallback);
   }
 
   public void attemptLogin() {
-    URI interopURI = URI.create("http://" + INTEROP_IP + ":" + INTEROP_PORT + LOGIN);
-
+    URI interopURI = URI.create(INTEROP_ADDRESS + LOGIN);
     HttpHeaders headers = new HttpHeaders();
-
     headers.setContentType(MediaType.APPLICATION_JSON);
-
     Credentials credentials =
         Credentials.newBuilder().setUsername(USERNAME).setPassword(PASSWORD).build();
-
-    // todo with protobuf
-    JSONObject personJsonObject = new JSONObject();
-    personJsonObject.put("username", USERNAME);
-    personJsonObject.put("password", PASSWORD);
-
     try {
       HttpEntity<String> requestEntity =
           new HttpEntity<String>(JsonFormat.printer().print(credentials), headers);
