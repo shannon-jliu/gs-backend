@@ -3,7 +3,6 @@ package org.cuair.ground.models.plane.settings;
 import javax.annotation.Nonnull;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
-//import org.cuair.ground.models.PlaneSettingsModel;
 import org.cuair.ground.models.geotag.GpsLocation;
 
 /** Model to represent the settings for Airdrop */

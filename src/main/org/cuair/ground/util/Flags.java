@@ -26,7 +26,13 @@ public class Flags {
 
   public static String AIRDROP_PORT = "5002";
 
-  public static String CAM_GIM_MODE = "/api/mode";
+  public static String SET_CAM_GIM_MODE_SETTINGS_ROUTE = "/api/mode";
+
+  public static String SET_AIRDROP_SETTINGS_ROUTE = "/v1/airdrop/setting";
+
+  public static String GET_CAM_GIM_MODE_SETTINGS_ROUTE = "/api/state";
+
+  public static String GET_AIRDROP_SETTINGS_ROUTE = "/v1/airdrop/state";
 
   /* Interop */
 

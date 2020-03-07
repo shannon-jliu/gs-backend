@@ -202,8 +202,6 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
                 if (ts.getCreator() == ClientType.MDLC) {
                     // If MDLC, set thumb for original target to default value
                     tToEraseFrom.setthumbnail_tsid(0L);
-                    System.out.println("set 0");
-                    // TODO (mariasam1): delete thumbnail through interop
                 } else {
                     // If ADLC, set thumb for original target to most recent ts (or default if none)
                     AlphanumTargetSighting newThumb = alphaDao.getLastSightingForTarget(tToEraseFrom.getId());
@@ -215,17 +213,14 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
                         }
                     } else {
                         tToEraseFrom.setthumbnail_tsid(0L);
-                        // TODO (mariasam1): delete thumbnail through interop
                     }
                 }
-                System.out.println("udpate alpha dao");
                 alphaTargetDao.update(tToEraseFrom);
             }
 
             if (ts.getCreator() == ClientType.ADLC) {
                 // TODO: Add back in once client code is complete
                 // autopilotClient.sendAdlcRoi(alphaDao.getTopAdlcLocations(5));
-
                 // Sets new thumbnail for updated target
                 if (updateNewThumb) {
                     AlphanumTarget t = alphaTargetDao.get(ts.getTarget().getId());
@@ -260,7 +255,6 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
             if (ts.getCreator() == ClientType.MDLC) {
                 // If MDLC, set thumb for original target to default value
                 ts.getTarget().setthumbnail_tsid(0L);
-                // TODO (mariasam1): delete thumbnail through interop
             } else {
                 // If ADLC, set thumb for original target to most recent ts (or default if none)
                 AlphanumTargetSighting newThumb = alphaDao.getLastSightingForTarget(ts.getTarget().getId());

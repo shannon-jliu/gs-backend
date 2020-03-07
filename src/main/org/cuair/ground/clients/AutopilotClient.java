@@ -34,7 +34,7 @@ public class AutopilotClient {
 
   private String AIRAPI_PORT = Flags.CAM_GIM_PORT;
 
-  private String COVERAGE = Flags.CAM_GIM_MODE;
+  private String COVERAGE = Flags.AUTOPILOT_COVERAGE;
 
   public void sendMDLCGroundROIS(JSONObject rois) {
     URI groundROIs =

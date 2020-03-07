@@ -6,6 +6,8 @@ import javax.validation.constraints.NotNull;
 import javax.persistence.MappedSuperclass;
 import org.cuair.ground.models.PlaneModel;
 
+// todo implement this
+
 /**
  * Base class for all settings that get sent to the plane. All Settings and models should extend
  * this class. It consists of a timestamp indicating when it was created.
