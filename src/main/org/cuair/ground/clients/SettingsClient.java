@@ -8,7 +8,6 @@ import org.json.*;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.client.AsyncRestTemplate;
@@ -30,12 +29,7 @@ public class SettingsClient<T> {
 
   public void changeMode(T setting) {
     URI settingsURI = URI.create(OBC_ADDRESS + SERVER_PORT + SET_MODE_ROUTE);
-
-    // todo requestutil
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-
-    HttpEntity<T> requestEntity = new HttpEntity<T>(setting, headers);
+    HttpEntity<T> requestEntity = new HttpEntity<T>(setting, RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture =
         template.exchange(settingsURI, HttpMethod.POST, requestEntity, String.class);
     RequestUtil.futureCallback(settingsURI, settingsFuture);
@@ -43,12 +37,7 @@ public class SettingsClient<T> {
 
   public ResponseEntity<String> getMode() throws Exception {
     URI settingsURI = URI.create(OBC_ADDRESS + SERVER_PORT + GET_MODE_ROUTE);
-
-    // todo requestutil
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-
-    HttpEntity<String> requestEntity = new HttpEntity<String>(headers);
+    HttpEntity<String> requestEntity = new HttpEntity<String>(RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture =
         template.exchange(settingsURI, HttpMethod.GET, requestEntity, String.class);
     return settingsFuture.get();

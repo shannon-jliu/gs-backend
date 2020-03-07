@@ -6,6 +6,7 @@ import org.json.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
@@ -99,6 +100,12 @@ public class RequestUtil {
             failureCallback.callbackFunction(ex);
           }
         });
+  }
+
+  public static HttpHeaders getDefaultHeaders() {
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    return headers;
   }
 
   public static HttpHeaders getDefaultCookieHeaders(String cookieValue) {
