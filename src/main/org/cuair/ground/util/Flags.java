@@ -4,18 +4,19 @@ public class Flags {
   /** Special username */
   public static String MDLC_OPERATOR_USERNAME = "operator";
 
-  // Image directory
+  /** Image Directory */
   public static String PLANE_IMAGE_DIR = "images/";
 
-  // Constants
+  /** Constants */
   public static double FOV_HORIZONTAL_RADIANS = 0.7328394987;
   public static double FOV_VERTICAL_RADIANS = 0.560476881;
   public static double IMAGE_WIDTH = 4912.0;
   public static double IMAGE_HEIGHT = 3684.0;
 
-  // Flags
-  public static boolean AUTH_ENABLED = false;
+  /** Interop */
   public static boolean CUAIR_INTEROP_REQUESTS = false;
+
+  /** Geotag */
   public static boolean CUAIR_GEOTAG_MUTABLE = false;
 
   /** Default username if no username specified as part of request */
