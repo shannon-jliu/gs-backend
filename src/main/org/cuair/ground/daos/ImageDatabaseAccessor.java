@@ -9,7 +9,6 @@ public class ImageDatabaseAccessor extends TimestampDatabaseAccessor<Image> {
     super(Image.class);
   }
 
-
   public boolean setImageHasMDLCAssignment(Image i) {
     i.setHasMdlcAssignment(true);
     return this.update(i);

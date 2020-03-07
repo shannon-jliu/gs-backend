@@ -3,11 +3,7 @@ package org.cuair.ground.controllers;
 import static org.springframework.http.ResponseEntity.ok;
 
 import io.ebean.Ebean;
-import io.ebean.SqlQuery;
-import io.ebean.SqlRow;
-import io.ebean.SqlUpdate;
 import java.io.IOException;
-import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.cuair.ground.util.Flags;
 import org.slf4j.Logger;
@@ -31,15 +27,21 @@ public class UtilController {
   /**
    * @return 200 if the database is cleared successfully, otherwise 400 with a descriptive error message
    */
-  @RequestMapping(value = "/clear", method = RequestMethod.POST)
-  public ResponseEntity clearDb() {
-    String sql = "SELECT table_name" + " FROM information_schema.tables" + " WHERE table_schema='public'" + " AND table_type='BASE TABLE'";
-    SqlQuery sqlQuery = Ebean.createSqlQuery(sql);
-    List<SqlRow> list = sqlQuery.findList();
-    for (SqlRow row : list) {
-      sql = "TRUNCATE " + row.get("table_name") + " CASCADE";
-      SqlUpdate delete = Ebean.createSqlUpdate(sql);
-      delete.execute();
+  @RequestMapping(value = "/clear_mdlc", method = RequestMethod.POST)
+  public ResponseEntity clearMdlc() {
+    String[] names = {
+        "telemetry",
+        "emergent_target",
+        "geotag",
+        "alphanum_target",
+        "image",
+        "assignment",
+        "alphanum_target_sighting",
+        "emergent_target_sighting"
+    };
+    for (String name : names) {
+      String sql = "TRUNCATE " + name + " RESTART IDENTITY CASCADE";
+      Ebean.createSqlUpdate(sql).execute();
     }
 
     try {
@@ -48,7 +50,7 @@ public class UtilController {
       logger.error(planeImageDir + " could not be cleared\n");
     }
 
-    logger.warn("The database and image directory have been cleared\n");
+    logger.info("The MDLC-related tables and image directory have been cleared\n");
 
     return ok().build();
   }

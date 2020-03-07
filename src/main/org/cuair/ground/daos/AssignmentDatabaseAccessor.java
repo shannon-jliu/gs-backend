@@ -8,7 +8,7 @@ import org.cuair.ground.models.ODLCUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** Database Accessor Object that provides an interface for persisting assignments. */
+/** Database Accessor Object that provides an interface for persisting assignments */
 public class AssignmentDatabaseAccessor extends TimestampDatabaseAccessor<Assignment> {
 
   /** The database access object for the image database */
