@@ -14,5 +14,8 @@ before_script:
   - POSTGRES_MULTIPLE_DATABASES=groundserver,groundservertest ./pg-docker-script/create-multiple-databases.sh
   # since we have no db container, need to alias localhost to db so it can find the db
   - sudo sed -i '/127.0.0.1/ s/$/db/' /etc/hosts
+script:
+  - java -jar checkstyle/checkstyle-8.24-all.jar -c checkstyle/google_checks.xml src/main
+  - gradle check
 addons:
   postgresql: "10"
