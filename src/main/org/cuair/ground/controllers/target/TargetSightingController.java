@@ -83,7 +83,7 @@ public abstract class TargetSightingController<T extends TargetSighting> {
     }
 
     // TODO: Add back in once client code is complete
-    // if (ts.getCreator() == ClientType.MDLC)
+    // if (ts.getCreator().getUserType() == ODLCUser.UserType.MDLCTAGGER || ts.getCreator().getUserType() == ODLCUser.UserType.MDLCOPERATOR)
     // autopilotClient.sendMdlcRoi(AllTargetSightingController.Companion.getConfidenceGeotags());
     return ok(ts);
   }
@@ -140,7 +140,7 @@ public abstract class TargetSightingController<T extends TargetSighting> {
       }
     }
     // TODO: Add back in once client code is complete
-    // if (ts.getCreator() == ClientType.MDLC)
+    // if (ts.getCreator().getUserType() == ODLCUser.UserType.MDLCTAGGER || ts.getCreator().getUserType() == ODLCUser.UserType.MDLCOPERATOR)
     // autopilotClient.sendMdlcRoi(AllTargetSightingController.Companion.getConfidenceGeotags());
     return ok(ts);
   }
@@ -162,7 +162,7 @@ public abstract class TargetSightingController<T extends TargetSighting> {
       }
     }
     // TODO: Add back in once client code is complete
-    // if (ts.getCreator() == ClientType.MDLC)
+    // if (ts.getCreator().UserType == ODLCUser.UserType.ADLC)
     // autopilotClient.sendMdlcRoi(AllTargetSightingController.Companion.getConfidenceGeotags());
     return ok(ts);
   }

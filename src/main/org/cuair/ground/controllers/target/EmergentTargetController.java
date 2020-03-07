@@ -45,8 +45,6 @@ public class EmergentTargetController extends TargetController<EmergentTarget> {
    *
    * @return the created Target as JSON
    */
-  // TODO: Figure out if this is necessary
-  // @ValidateJson(EmergentTarget::class)
   @RequestMapping(method = RequestMethod.POST)
   public ResponseEntity create(@RequestBody EmergentTarget t) {
     return super.create(t);
@@ -58,8 +56,6 @@ public class EmergentTargetController extends TargetController<EmergentTarget> {
    * @param id Long id of the Target being updated
    * @return the updated Target as JSON
    */
-  // @ValidateJson(EmergentTarget::class)
-  // TODO: Figure out if this is necessary
   @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
   public ResponseEntity update(@PathVariable Long id, @RequestBody EmergentTarget other) {
     EmergentTarget t = targetDao.get(id);

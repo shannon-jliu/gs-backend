@@ -138,7 +138,6 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
         if (ts.getCreator().getUserType() == ODLCUser.UserType.MDLCTAGGER || ts.getCreator().getUserType() == ODLCUser.UserType.MDLCOPERATOR) {
           // If MDLC, set thumb for original target to default value
           tToEraseFrom.setthumbnailTsid(0L);
-          // TODO (mariasam1): delete thumbnail through interop
         } else {
           // If ADLC, set thumb for original target to most recent ts (or default if none)
           AlphanumTargetSighting newThumb = alphaDao.getLastSightingForTarget(tToEraseFrom.getId());
@@ -151,7 +150,6 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
             }
           } else {
             tToEraseFrom.setthumbnailTsid(0L);
-            // TODO (mariasam1): delete thumbnail through interop
           }
         }
         alphaTargetDao.update(tToEraseFrom);
@@ -196,7 +194,6 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
       if (ts.getCreator().getUserType() == ODLCUser.UserType.MDLCTAGGER || ts.getCreator().getUserType() == ODLCUser.UserType.MDLCOPERATOR) {
         // If MDLC, set thumb for original target to default value
         ts.getTarget().setthumbnailTsid(0L);
-        // TODO (mariasam1): delete thumbnail through interop
       } else {
         // If ADLC, set thumb for original target to most recent ts (or default if none)
         AlphanumTargetSighting newThumb = alphaDao.getLastSightingForTarget(ts.getTarget().getId());

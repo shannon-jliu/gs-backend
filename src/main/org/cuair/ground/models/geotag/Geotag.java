@@ -141,7 +141,7 @@ public class Geotag extends CUAirModel {
    * @param altitude        The altitude of the plane
    * @param pixelX          The x-coordinate of the pixel center of the tag on the frontend with respect to the image
    * @param pixelY          The y-coordinate of the pixel center of the tag on the frontend with respect to the image
-   * @param planeYawRadians The yaw of the plane in radians TODO: WRT to what?
+   * @param planeYawRadians The yaw of the plane in radians
    */
   public static GpsLocation getPixelCoordinates(
       double latitude,
