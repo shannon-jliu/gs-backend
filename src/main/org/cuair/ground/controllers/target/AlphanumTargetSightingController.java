@@ -65,7 +65,6 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
   @RequestMapping(value = "/assignment/{id}", method = RequestMethod.POST)
   public ResponseEntity create(@PathVariable Long id, @RequestBody AlphanumTargetSighting ts) {
     if (ts.isOffaxis() != null && ts.isOffaxis()) {
-      // TODO: Figure out if this is necessary
       if (ts.getTarget() != null) {
         badRequest().body("Don't pass targets for off-axis sighting creates");
       }
@@ -107,7 +106,6 @@ public class AlphanumTargetSightingController extends TargetSightingController<A
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
-    // TODO: Figure out if the offaxis checks are necessary
     // checks if the target is offaxis or updated to offaxis and if a target is set
     if (((ts.isOffaxis() && other.isOffaxis() == null) || (Boolean.TRUE.equals(other.isOffaxis())))
         && other.getTarget() != null) {
