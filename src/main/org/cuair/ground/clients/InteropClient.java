@@ -23,11 +23,12 @@ import org.cuair.ground.daos.AlphanumTargetSightingsDatabaseAccessor;
 import org.cuair.ground.daos.ClientCreatableDatabaseAccessor;
 import org.cuair.ground.daos.PlaneSettingsModelDatabaseAccessor;
 import org.cuair.ground.daos.DAOFactory;
-import org.cuair.ground.models.ClientType;
 import org.cuair.ground.models.exceptions.InvalidGpsLocationException;
 import org.cuair.ground.models.geotag.*;
+
 import org.cuair.ground.models.plane.settings.*;
 import org.cuair.ground.models.plane.target.*;
+import org.cuair.ground.models.ODLCUser;
 import org.cuair.ground.protobuf.InteropApi.*;
 import org.cuair.ground.util.*;
 import org.json.*;
@@ -337,8 +338,8 @@ public class InteropClient {
       logger.error("Cannot read image " + imageURL + " from image directory " + e.getMessage());
     }
 
-    int topLeftX = Math.max(0, targetSighting.getpixel_x() - targetSighting.getWidth() / 2);
-    int topLeftY = Math.max(0, targetSighting.getpixel_y() - targetSighting.getHeight() / 2);
+    int topLeftX = Math.max(0, targetSighting.getpixelX() - targetSighting.getWidth() / 2);
+    int topLeftY = Math.max(0, targetSighting.getpixelY() - targetSighting.getHeight() / 2);
     int width = Math.min((int)(Flags.IMAGE_WIDTH - topLeftX), targetSighting.getWidth());
     int height = Math.min((int)(Flags.IMAGE_HEIGHT - topLeftY), targetSighting.getHeight());
     BufferedImage newImage = in.getSubimage(topLeftX, topLeftY, width, height);
@@ -387,7 +388,7 @@ public class InteropClient {
     Path thumbnailPath = getTargetInteropImage(target).toPath();
     try {
       Files.delete(jsonPath);
-      if (target.getthumbnail_tsid() != 0L) {
+      if (target.getthumbnailTsid() != 0L) {
         Files.delete(thumbnailPath);
       }
     } catch (Exception e) {
@@ -407,7 +408,7 @@ public class InteropClient {
     if (target.getJudgeTargetId() != null) {
       odlcProto.setId(target.getJudgeTargetId().intValue());
     }
-    odlcProto.setAutonomous(target.getCreator().equals(ClientType.ADLC));
+    odlcProto.setAutonomous(target.getCreator().equals(ODLCUser.UserType.ADLC));
     odlcProto.setMission(Flags.MISSION_ID);
     if (target.getTypeString().equals("Alphanum")) {
       AlphanumTarget alphanumTarget = ((AlphanumTarget) target);

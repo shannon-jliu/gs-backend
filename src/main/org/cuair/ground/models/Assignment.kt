@@ -16,7 +16,7 @@ class Assignment : TimestampModel {
 
   /** Represents whether the image has been processed  */
   var done: Boolean
-  
+
   /**
    * Creates an unprocessed Assignment object
    *

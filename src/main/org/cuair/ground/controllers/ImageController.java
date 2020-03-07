@@ -26,7 +26,6 @@ import org.cuair.ground.models.Image;
 import org.cuair.ground.models.geotag.GimbalOrientation;
 import org.cuair.ground.models.geotag.GpsLocation;
 import org.cuair.ground.models.geotag.Telemetry;
-
 import org.cuair.ground.util.Flags;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.CacheControl;

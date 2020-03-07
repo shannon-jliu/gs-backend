@@ -9,8 +9,9 @@ import org.cuair.ground.daos.DAOFactory;
 import org.cuair.ground.daos.AlphanumTargetDatabaseAccessor;
 import org.cuair.ground.models.plane.target.AlphanumTarget;
 import org.cuair.ground.models.plane.target.EmergentTarget;
-import org.cuair.ground.models.ClientType;
+import org.cuair.ground.models.ODLCUser;
 import org.cuair.ground.clients.InteropClient;
+
 import org.cuair.ground.util.Flags;
 import java.util.List;
 
@@ -59,7 +60,7 @@ public class Lifecycle
         if (offaxisTarget == null)
         {
             offaxisTarget =
-                new AlphanumTarget(ClientType.MDLC, null, null, null, null, true, null, null, 0L);
+                new AlphanumTarget(new ODLCUser("interop", "localhost", ODLCUser.UserType.MDLCOPERATOR), null, null, null, null, true, null, null, 0L);
             alphaTargetDao.create(offaxisTarget);
         }
     }
@@ -72,7 +73,7 @@ public class Lifecycle
         if (emergentTarget == null)
         {
             emergentTarget =
-                new EmergentTarget(ClientType.MDLC, null, DEFAULT_EMERGENT_TARGET_DESC, null, 0L);
+                new EmergentTarget(new ODLCUser("interop", "localhost", ODLCUser.UserType.ADLC), null, DEFAULT_EMERGENT_TARGET_DESC, null, 0L);
             emergentTargetDao.create(emergentTarget);
         }
     }

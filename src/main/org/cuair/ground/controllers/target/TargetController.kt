@@ -4,7 +4,6 @@ import org.cuair.ground.clients.ClientFactory
 import org.cuair.ground.daos.ClientCreatableDatabaseAccessor
 import org.cuair.ground.daos.DAOFactory
 import org.cuair.ground.daos.TargetSightingsDatabaseAccessor
-import org.cuair.ground.models.ClientType
 import org.cuair.ground.models.plane.target.Target
 import org.cuair.ground.models.plane.target.TargetSighting
 import org.cuair.ground.util.Flags;
@@ -56,17 +55,6 @@ abstract class TargetController<T : Target> {
         if (t.creator == null) return badRequest().body("Create request should have creator")
         getTargetDao().create(t)
         interopClient.attemptSend(getTargetDao().get(t.id));
-        // TODO: Add interop code
-        // if (CUAIR_INTEROP_REQUESTS) {
-        //     interopClient.createTarget(getTargetDao().get(t.id))
-        //     thread {
-        //         Thread.sleep(PlayConfig.TARGETLOGGER_DELAY)
-        //         while (getTargetDao().get(t.id).judgeTargetId == null) {
-        //             logger.warn("${t.typeString} Target ${t.id} not sent to judges!")
-        //             Thread.sleep(PlayConfig.TARGETLOGGER_DELAY)
-        //         }
-        //     }
-        // }
         return ok(t)
     }
 
@@ -90,8 +78,7 @@ abstract class TargetController<T : Target> {
             return badRequest().body("Don't pass creator for updates")
         }
 
-        val isTSIdUpdated = t.getthumbnail_tsid() != other.getthumbnail_tsid()
-        logger.info("isTSIdUpdated? " + isTSIdUpdated);
+        val isTSIdUpdated = t.getthumbnailTsid() != other.getthumbnailTsid()
 
         t.updateFromTarget(other)
         logger.info("update from target other done?");
@@ -101,27 +88,16 @@ abstract class TargetController<T : Target> {
                 .getAllTargetSightingsForTarget(t.id)
                 .forEach { it.geotag?.isManualGeotag = true }
         }
-        logger.info("other geotag is not null after");
         getTargetDao().update(t)
-        logger.info("other geotag is not null after update");
         if (isTSIdUpdated && CUAIR_INTEROP_REQUESTS) {
-            logger.info("before update target image geotag is not null");
-            interopClient.updateTargetImage(targetSightingDao.get(t.getthumbnail_tsid()))
-            logger.info("after update target image");
+            interopClient.updateTargetImage(targetSightingDao.get(t.getthumbnailTsid()))
         }
-        //interopClient.updateTarget(getTargetDao().get(t.id))
 
-        // TODO: Add client code
         if (CUAIR_INTEROP_REQUESTS) {
-            logger.info("cuair interop requests before ");
             if (isTSIdUpdated) {
-                logger.info("isTSIdUpdated inside");
-                interopClient.updateTargetImage(targetSightingDao.get(t.getthumbnail_tsid()))
-                logger.info("update target image");
+                interopClient.updateTargetImage(targetSightingDao.get(t.getthumbnailTsid()))
             }
-            logger.info("before attempt update");
             interopClient.attemptUpdate(getTargetDao().get(t.id))
-            logger.info("after attempt update geotag is not null");
         }
         return ok(t)
     }
@@ -142,7 +118,6 @@ abstract class TargetController<T : Target> {
             DAOFactory.ModelDAOType.TARGET_SIGHTINGS_DATABASE_ACCESSOR,
             t.fetchAssociatedTargetSightingClass()) as TargetSightingsDatabaseAccessor<out TargetSighting>
 
-        // TODO: Add client code
         if (CUAIR_INTEROP_REQUESTS) interopClient.attemptDelete(t)
 
         targetSightingDao.unassociateAllTargetSightingsForTarget(id)

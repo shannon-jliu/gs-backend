@@ -5,10 +5,10 @@ import org.cuair.ground.models.CUAirModel
 import org.cuair.ground.models.PlaneModel
 import org.cuair.ground.models.plane.settings.PlaneSettingsModel
 import org.cuair.ground.models.TimestampModel
+import org.cuair.ground.models.Image
 import org.cuair.ground.models.plane.target.AlphanumTarget
 import org.cuair.ground.models.plane.target.AlphanumTargetSighting
 import org.cuair.ground.models.plane.target.TargetSighting
-import org.cuair.ground.models.Image
 import org.cuair.ground.models.ODLCUser
 import org.cuair.ground.daos.ODLCUserDatabaseAccessor
 
@@ -38,7 +38,7 @@ class DAOFactory {
          */
         abstract fun createInstance() : DatabaseAccessor<*>
   }
-    
+
   /** Enumeration of all database accessor types that are parametrized on a model */
   enum class ModelDAOType {
     DATABASE_ACCESSOR {
