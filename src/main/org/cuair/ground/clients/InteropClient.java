@@ -41,14 +41,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.client.AsyncRestTemplate;
 
-// todo for all getjudgetargetid wait and retry
-
 /*
  * Client for interop communications
  */
 public class InteropClient {
 
   private static final Logger logger = LoggerFactory.getLogger(InteropClient.class);
+
+  private static AirdropClient airdropClient = ClientFactory.getAirdropClient();
 
   private ClientCreatableDatabaseAccessor<EmergentTarget> emergentTargetDao =
       (ClientCreatableDatabaseAccessor<EmergentTarget>)
@@ -113,16 +113,6 @@ public class InteropClient {
     if (offAxisTarget.getJudgeTargetId() != null) return;
 
     Position offAxisPos = missionInfo.getOffAxisOdlcPos();
-    // double latitude = offAxisPos.getLatitude();
-    // double longitude = offAxisPos.getLongitude();
-    // double altitude = offAxisPos.getAltitude();
-
-    // GpsLocation gpsLocation = null;
-    // try {
-    //   gpsLocation = new GpsLocation(latitude, longitude);
-    // } catch (InvalidGpsLocationException e) {
-    //   logger.error("Invalid GPS location for off axis.");
-    // }
     GpsLocation offAxisLocation = getGpsLoc(offAxisPos);
     Geotag geotag = new Geotag(offAxisLocation, null);
     offAxisTarget.setGeotag(geotag);
@@ -133,18 +123,6 @@ public class InteropClient {
   public void processEmergent(Mission missionInfo) {
     EmergentTarget emergentTarget = getEmergentTarget();
     if (emergentTarget.getJudgeTargetId() != null) return;
-
-   // Position emergentPos = missionInfo.getEmergentLastKnownPos();
-    // double latitude = emergentPos.getLatitude();
-    // double longitude = emergentPos.getLongitude();
-    // double altitude = emergentPos.getAltitude();
-
-    // GpsLocation gpsLocation = null;
-    // try {
-    //   gpsLocation = new GpsLocation(latitude, longitude);
-    // } catch (InvalidGpsLocationException e) {
-    //   logger.error("Invalid GPS location for emergent.");
-    // }
     Position emergentPos = missionInfo.getEmergentLastKnownPos();
     GpsLocation emergentLocation = getGpsLoc(emergentPos);
     Geotag geotag = new Geotag(emergentLocation, null);
@@ -157,6 +135,7 @@ public class InteropClient {
     Position airdropPos = missionInfo.getAirDropPos();
     GpsLocation airdropLocation = getGpsLoc(airdropPos);
     AirdropSettings as = new AirdropSettings(airdropLocation, Flags.CUAIR_AIRDROP_THRESHOLD - 1, false, false);
+    airdropClient.changeMode(as);
     airdropDao.create(as);
   }
 
@@ -171,20 +150,15 @@ public class InteropClient {
         (ResponseEntity<String> result) -> {
           Mission.Builder missionBuilder = Mission.newBuilder();
           try {
-            // int idd = result.getBody().getId();
             JsonFormat.parser()
                 .merge(result.getBody().substring(1, result.getBody().length()), missionBuilder);
             Mission missionInfo = missionBuilder.build();
             processOffAxisPos(missionInfo);
             processEmergent(missionInfo);
+            processAirdrop(missionInfo);
           } catch (InvalidProtocolBufferException e) {
             logger.error("Error parsing mission information: " + e.getMessage());
           }
-
-          // todo
-          // init emergent
-          // init off axis
-          // init airdrop
         };
     RequestUtil.futureCallback(missionURI, missionFuture, missionCallback);
   }
@@ -197,12 +171,8 @@ public class InteropClient {
 
   public void attemptUpdate(Target target) {
     Odlc odlcProto = createOdlcProto(target);
-    // todo if judge target id null - timeout and try update again?
-    // todo use updatetarget?
+    waitForJudgeTargetId(target);
     URI putODLCURI = URI.create(INTEROP_ADDRESS + TARGET_ROUTE + "/" + target.getJudgeTargetId());
-    // HttpHeaders headers = new HttpHeaders();
-    // headers.add("Cookie", String.format("sessionid=%s", cookieValue));
-    // todo use requestutil for headers
     HttpHeaders headers = RequestUtil.getDefaultCookieHeaders(cookieValue);
     try {
       HttpEntity<String> requestEntity =
@@ -229,6 +199,7 @@ public class InteropClient {
   }
 
   public void attemptUpdateImage(Target target) {
+    waitForJudgeTargetId(target);
     URI updateImageURI =
         URI.create(INTEROP_ADDRESS + TARGET_ROUTE + "/" + target.getJudgeTargetId() + "/image");
     HttpHeaders headers = new HttpHeaders();
@@ -245,6 +216,29 @@ public class InteropClient {
     }
   }
 
+  public void waitForJudgeTargetId(Target target) {
+    // Try for approx. 90 sec.
+    int i = 0;
+    while (target.getJudgeTargetId() == null && i++ != 2) {
+      if (i == 1) {
+        logger.error("Pending update target thumbnail until JudgeTargetId");
+      }
+      try {
+        Thread.sleep(Flags.TARGETLOGGER_DELAY);
+      } catch (InterruptedException e) {
+      }
+      if (target instanceof AlphanumTarget) {
+        target = alphaTargetDao.get(target.getId());
+      } else {
+        target = emergentTargetDao.get(target.getId());
+      }
+    }
+    if (target.getJudgeTargetId() == null) {
+      logger.error(
+          "Can't update target thumbnail: Target does not exist on the competition server");
+    }
+  }
+
   class UpdateTarget implements Runnable {
 
     Target target;
@@ -256,26 +250,7 @@ public class InteropClient {
     }
 
     public void run() {
-      // Try for approx. 90 sec.
-      int i = 0;
-      while (this.target.getJudgeTargetId() == null && i++ != 2) {
-        if (i == 1) {
-          logger.error("Pending update target thumbnail until JudgeTargetId");
-        }
-        try {
-          Thread.sleep(Flags.TARGETLOGGER_DELAY);
-        } catch (InterruptedException e) {
-        }
-        if (this.target instanceof AlphanumTarget) {
-          this.target = alphaTargetDao.get(this.targetSighting.getTarget().getId());
-        } else {
-          this.target = emergentTargetDao.get(this.targetSighting.getTarget().getId());
-        }
-      }
-      if (this.target.getJudgeTargetId() == null) {
-        logger.error(
-            "Can't update target thumbnail: Target does not exist on the competition server");
-      }
+      waitForJudgeTargetId(this.target);
       if (this.targetSighting.getAssignment() == null
           || this.targetSighting.getAssignment().getImage() == null) {
         logger.error("Can't update target thumbnail: TargetSighting doesn't have image");
@@ -317,6 +292,7 @@ public class InteropClient {
    * @return String file name
    */
   private File getTargetInteropFile(Target target) {
+    waitForJudgeTargetId(target);
     File file = new File(TARGET_DIRECTORY + target.getJudgeTargetId() + ".json");
     return file;
   }
@@ -385,7 +361,7 @@ public class InteropClient {
   }
 
   public File getTargetInteropImage(Target t) {
-    // todo wait if judge target id is not there yet?
+    waitForJudgeTargetId(t);
     File file = new File(TARGET_DIRECTORY + t.getJudgeTargetId() + ".png");
     try {
       file.createNewFile();
@@ -395,6 +371,7 @@ public class InteropClient {
   }
 
   public InputStream getIS(Target t) {
+    waitForJudgeTargetId(t);
     File file = new File(TARGET_DIRECTORY + t.getJudgeTargetId() + ".png");
     InputStream targetStream = null;
     try {
@@ -502,6 +479,7 @@ public class InteropClient {
   }
 
   public void attemptDelete(Target t) {
+    waitForJudgeTargetId(t);
     URI deleteURI =
         URI.create(INTEROP_ADDRESS + TARGET_ROUTE + "/" + t.getJudgeTargetId());
     HttpHeaders headers = RequestUtil.getDefaultCookieHeaders(cookieValue);
@@ -516,7 +494,7 @@ public class InteropClient {
     RequestUtil.futureCallback(deleteURI, deleteFuture, deleteCallback);
   }
 
-  public void attemptLogin() {
+  public void startInteropSequence() {
     URI interopURI = URI.create(INTEROP_ADDRESS + LOGIN);
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);

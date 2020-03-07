@@ -9,6 +9,9 @@ public class ClientFactory {
   /** The autopilot client for communiation with autopilot ground station */
   private static AutopilotClient autopilotClient = new AutopilotClient();
 
+  /** The airdrop client for communiation with the airdrop server */
+  private static AirdropClient airdropClient = new AirdropClient();
+
   /**
    * Returns the interop client object
    *
@@ -25,6 +28,15 @@ public class ClientFactory {
    */
   public static AutopilotClient getAutopilotClient() {
     return autopilotClient;
+  }
+
+  /**
+   * Returns the airdrop client object
+   *
+   * @return the airdrop client object
+   */
+  public static AirdropClient getAirdropClient() {
+    return airdropClient;
   }
 
 }

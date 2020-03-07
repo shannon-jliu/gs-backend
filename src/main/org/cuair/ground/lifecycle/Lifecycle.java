@@ -42,7 +42,7 @@ public class Lifecycle
         initializeEmergentTargetDatabase();
         try
         {
-            interopClient.attemptLogin();
+            interopClient.startInteropSequence();
         }
         catch (Exception e)
         {
