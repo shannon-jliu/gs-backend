@@ -115,8 +115,7 @@ public class Geotag extends CUAirModel {
       return;
     }
     GpsLocation gps = telemetry.getGps();
-    // TODO: Should this be && or ||?
-    if (gps == null && (Double) telemetry.getAltitude() == null) {
+    if (gps == null || (Double) telemetry.getAltitude() == null) {
       return;
     }
     double altitude = -1;
@@ -203,7 +202,7 @@ public class Geotag extends CUAirModel {
    * Calculate the orientation of this geotag as radians from north
    *
    * @param planeYaw       The yaw of the plane in radians
-   * @param radiansFromTop The radians from the top of the image TODO: DEFINE
+   * @param radiansFromTop The radians from the top of the image
    * @return The orientation of this geotag
    */
   public static Double calculateRadiansFromNorth(double planeYaw, double radiansFromTop) {
