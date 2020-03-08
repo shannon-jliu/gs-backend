@@ -77,4 +77,12 @@ public class ODLCUserController {
     odlcUserDao.create(new ODLCUser("adlc", address, ODLCUser.UserType.ADLC));
     return ok("adlc");
   }
+
+  /**
+   * @return 200 with true if users are enabled, false if users are not enabled
+   */
+  @RequestMapping(value = "/enabled", method = RequestMethod.GET)
+  public ResponseEntity enabled() {
+    return ok(Flags.USERS_ENABLED);
+  }
 }
