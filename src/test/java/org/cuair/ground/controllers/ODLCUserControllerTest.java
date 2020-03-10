@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cuair.ground.Application;
 import org.cuair.ground.daos.DAOFactory;
 import org.cuair.ground.daos.ODLCUserDatabaseAccessor;
@@ -32,14 +33,20 @@ public class ODLCUserControllerTest {
   @Test
   public void newUserCreation() throws Exception {
     ODLCUser expected = new ODLCUser("test", "localhost", ODLCUser.UserType.MDLCTAGGER);
+    String username = "test";
     String response = mockMvc.perform(get("/odlcuser/create/mdlc")
         .with(request -> {
           request.setRemoteAddr("localhost");
           return request;
-        }).header("Username", "test")
+        }).header("Username", username)
     ).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-    assertEquals(response, expected.getUsername());
-    String addr = odlcdao.getAddressFromUsername("test");
+
+    expected = odlcdao.getODLCUserFromUsername(username);
+    ObjectMapper objectMapper = new ObjectMapper();
+    String expectedString = objectMapper.writeValueAsString(expected);
+
+    assertEquals(response, expectedString);
+    String addr = odlcdao.getAddressFromUsername(username);
     assertEquals(addr, "localhost");
   }
 

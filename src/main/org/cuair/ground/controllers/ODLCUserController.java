@@ -37,7 +37,7 @@ public class ODLCUserController {
         return badRequest().body("Username already exists: " + username);
       } else {
         // if it reaches here, then the username, address matches and the user is re-logging in
-        return ok(username);
+        return ok(odlcUserDao.getODLCUserFromUsername(username));
       }
     }
 
@@ -53,7 +53,7 @@ public class ODLCUserController {
     } else {
       odlcUserDao.create(new ODLCUser(username, address, ODLCUser.UserType.MDLCTAGGER));
     }
-    return ok(username);
+    return ok(odlcUserDao.getODLCUserFromUsername(username));
   }
 
   /**
