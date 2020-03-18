@@ -6,16 +6,19 @@ import javax.persistence.Embedded
 import org.cuair.ground.models.CUAirModel
 
 /** Represents telemetry of an object
-    gps will contain latitude and longitude
-    altitude is in meters
-    planeYaw is in degrees with 0 at north and increasing in the clockwise direction
-    */
+ * gps will contain latitude and longitude
+ * altitude is in meters
+ * planeYaw is in degrees with 0 at north and increasing in the clockwise direction
+ * gimOrt is the gimbal orientation with pitch and roll
+ */
 @Entity
 class Telemetry(
         @Embedded
         private var gps: GpsLocation,
         private var altitude: Double,
-        private var planeYaw: Double
+        private var planeYaw: Double,
+        @Embedded
+        private var gimOrt: GimbalOrientation
 ) : CUAirModel() {
     // TODO: Add the rest of the methods
 
@@ -47,6 +50,15 @@ class Telemetry(
     }
 
     /**
+     * Get the gimbal orientation of this Telemetry instance
+     *
+     * @return the gimbal orientation of this Telemetry instance
+     */
+    fun getGimOrt(): GimbalOrientation {
+        return gimOrt;
+    }
+
+    /**
      * Change the gps of this Telemetry instance
      *
      * @param gps The new gps for this Telemetry instance
@@ -74,42 +86,13 @@ class Telemetry(
     }
 
     /**
-     * Gets the gps this of telemetry data
+     * Change the gimbal orientation of this Telemetry instance
      *
-     * @return GpsLocation? The aerial position of this telemetry data
+     * @param gimOrt The new gimbal orientation for this Telemetry instance
      */
-    fun getGps(): GpsLocation? {
-        return gps
+    fun setGimOrt(gimOrt: GimbalOrientation) {
+        this.gimOrt = gimOrt;
     }
-
-    /**
-     * Gets the altitude of this telemetry data
-     *
-     * @return Double? The aerial position of this telemetry data
-     */
-    fun getAltitude(): Double? {
-        return altitude
-    }
-
-    /**
-     * Gets the heading of this telemetry data
-     *
-     * @return Double The heading of this telemetry data as radians from north
-     */
-    fun getPlaneYaw(): Double? {
-        return planeYaw
-    }
-
-    /**
-     * Gets the gimbal orientation of this telemetry data
-     *
-     * @return GimbalOrientation The gimbal orientation of this telemetry data
-     */
-    fun getOrientation(): GimbalOrientation? {
-        return orientation
-    }
-
-    // TODO: Add the rest of the methods
 
     /**
      * Determines if the given object is logically equal to this Telemetry
@@ -123,6 +106,7 @@ class Telemetry(
         if (this.altitude != other.altitude) return false
         if (this.planeYaw != other.planeYaw) return false
         if (!Objects.equals(this.gps, other.gps)) return false
+        if (!Objects.equals(this.gimOrt, other.gimOrt)) return false
         return true
     }
 }

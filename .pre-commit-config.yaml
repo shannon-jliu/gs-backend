@@ -11,5 +11,6 @@ repos:
     hooks:
     -   id: checkstyle
         name: checkstyle
-        entry: java -jar checkstyle/checkstyle-8.24-all.jar -c checkstyle/google_checks.xml src/
+        pass_filenames: false
+        entry: java -jar checkstyle/checkstyle-8.24-all.jar -c checkstyle/google_checks.xml src/main
         language: system
