@@ -24,12 +24,24 @@ public class RequestUtil {
     void callbackFunction(Throwable ex);
   }
 
+  /** 
+   * Logs message if client print flag is true
+   * 
+   * @param message message to print
+   */
   public static void printIfFlag(String message) {
     if (printClientLogs) {
       logger.info(message);
     }
   }
 
+  /** 
+   * Performs default success and callback functions when future completes - i.e. prints 
+   * success or failure.
+   * 
+   * @param uri request url 
+   * @param future the actual request future
+   */
   public static void futureCallback(URI uri, ListenableFuture<ResponseEntity<String>> future) {
     future.addCallback(
         new ListenableFutureCallback<ResponseEntity<String>>() {
@@ -37,7 +49,6 @@ public class RequestUtil {
           @Override
           public void onSuccess(ResponseEntity<String> result) {
             printIfFlag("Request: " + uri.toString() + " succeeded!");
-            System.out.println(result.getBody());
           }
 
           @Override
@@ -47,6 +58,15 @@ public class RequestUtil {
         });
   }
 
+  /** 
+   * Performs *specified* success and callback functions when future completes, for
+   * customization.
+   * 
+   * @param uri request url 
+   * @param future the actual request future
+   * @param successCallback custom success callback
+   * @param failureCallback custom failure callback
+   */
   public static void futureCallback(
       URI uri,
       ListenableFuture<ResponseEntity<String>> future,
@@ -67,6 +87,13 @@ public class RequestUtil {
         });
   }
 
+  /** 
+   * Performs specified success callback and default failure callback when future completes.
+   * 
+   * @param uri request url 
+   * @param future the actual request future
+   * @param successCallback custom success callback
+   */
   public static void futureCallback(
       URI uri, ListenableFuture<ResponseEntity<String>> future, SuccessCallback successCallback) {
     future.addCallback(
@@ -84,6 +111,13 @@ public class RequestUtil {
         });
   }
 
+  /** 
+   * Performs default success callback and specified failure callback when future completes.
+   * 
+   * @param uri request url 
+   * @param future the actual request future
+   * @param failureCallback custom failure callback
+   */
   public static void futureCallback(
       URI uri, ListenableFuture<ResponseEntity<String>> future, FailureCallback failureCallback) {
     future.addCallback(
@@ -101,12 +135,20 @@ public class RequestUtil {
         });
   }
 
+  /** 
+   * Helper method to provide default HTTP headers.
+   */
   public static HttpHeaders getDefaultHeaders() {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
     return headers;
   }
-
+  /** 
+   * Helper method to provide default HTTP headers with the cookie attached to request headers. 
+   * Used to send requests to interop.
+   * 
+   * @param cookieValue cookie recevied by interop on authentication
+   */
   public static HttpHeaders getDefaultCookieHeaders(String cookieValue) {
     HttpHeaders headers = new HttpHeaders();
     headers.add("Cookie", String.format("sessionid=%s", cookieValue));

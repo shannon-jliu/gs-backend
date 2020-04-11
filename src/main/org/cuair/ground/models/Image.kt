@@ -6,6 +6,8 @@ import java.util.Objects
 import javax.persistence.Entity
 import javax.persistence.OneToOne
 import javax.persistence.CascadeType
+import com.fasterxml.jackson.databind.node.ObjectNode
+import com.fasterxml.jackson.databind.ObjectMapper
 
 import io.ebean.annotation.EnumValue
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -43,6 +45,20 @@ class Image(
         @JsonProperty("fixed") @EnumValue("0") FIXED("fixed"),
         @JsonProperty("tracking") @EnumValue("1") TRACKING("tracking"),
         @JsonProperty("off-axis") @EnumValue("2") OFFAXIS("off-axis")
+    }
+
+    /**
+     * TODO
+     * 
+     * Internal method for finding geotags for a given image id
+     *
+     * @return ObjectNode
+     */
+    @Suppress("DEPRECATION")
+    @JsonIgnore fun getLocations(): ObjectNode? {
+        val mapper = ObjectMapper()
+        val locs = mapper.createObjectNode() as ObjectNode
+        return locs
     }
 
     /**

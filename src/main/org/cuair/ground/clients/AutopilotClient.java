@@ -3,7 +3,6 @@ package org.cuair.ground.clients;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.net.URI;
 import org.cuair.ground.models.Image;
-import org.cuair.ground.models.plane.settings.*;
 import org.cuair.ground.util.Flags;
 import org.cuair.ground.util.RequestUtil;
 import org.json.*;
@@ -22,28 +21,16 @@ public class AutopilotClient {
 
   private AsyncRestTemplate template = new AsyncRestTemplate();
 
-  private String AUTOPILOT_GROUND_IP = Flags.AUTOPILOT_GROUND_IP;
+  private String autopilotAddress = "http://" + Flags.AUTOPILOT_GROUND_IP + ":" + Flags.AUTOPILOT_GROUND_PORT;
 
-  private String AUTOPILOT_GROUND_PORT = Flags.AUTOPILOT_GROUND_PORT;
-
-  private String AUTOPILOT_COVERAGE = Flags.AUTOPILOT_COVERAGE;
-
-  private String AUTOPILOT_GROUND_MDLC_ROIS = Flags.AUTOPILOT_GROUND_MDLC_ROIS;
-
-  private String OBC_IP = Flags.OBC_IP;
-
-  private String AIRAPI_PORT = Flags.CAM_GIM_PORT;
-
-  private String COVERAGE = Flags.AUTOPILOT_COVERAGE;
-
+  /** 
+   * Sends MDLC ROI's to autopilot ground station.
+   * 
+   * @param rois the JSON representation of the ROIS
+   */
   public void sendMDLCGroundROIS(JSONObject rois) {
     URI groundROIs =
-        URI.create(
-            "http://"
-                + AUTOPILOT_GROUND_IP
-                + ":"
-                + AUTOPILOT_GROUND_PORT
-                + AUTOPILOT_GROUND_MDLC_ROIS);
+        URI.create(autopilotAddress + Flags.AUTOPILOT_GROUND_MDLC_ROIS);
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
     HttpEntity<JSONObject> requestEntity = new HttpEntity<JSONObject>(rois, headers);
@@ -52,14 +39,18 @@ public class AutopilotClient {
     RequestUtil.futureCallback(groundROIs, groundROIfuture);
   }
 
+  /** 
+   * Sends coverage to autopilot ground station of the specified image.
+   * 
+   * @param image the image object to send coverage about
+   */
   public void sendCoverageData(Image image) {
     URI coverageURI =
-        URI.create(
-            "http://" + AUTOPILOT_GROUND_IP + ":" + AUTOPILOT_GROUND_PORT + AUTOPILOT_COVERAGE);
+        URI.create(autopilotAddress + Flags.AUTOPILOT_COVERAGE);
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
     HttpEntity<ObjectNode> requestEntity =
-        new HttpEntity<ObjectNode>(/* TODO image.getLocations()*/"", headers);
+        new HttpEntity<ObjectNode>(image.getLocations(), headers);
     ListenableFuture<ResponseEntity<String>> coverageFuture =
         template.exchange(coverageURI, HttpMethod.POST, requestEntity, String.class);
     RequestUtil.futureCallback(coverageURI, coverageFuture);
