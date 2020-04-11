@@ -12,9 +12,9 @@ public class AirdropClient extends SettingsClient<AirdropSettings> {
    * Client to communicate with airdrop server
    */
   public AirdropClient() {
-    this.SERVER_PORT = Flags.AIRDROP_PORT;
-    this.SET_MODE_ROUTE = Flags.SET_AIRDROP_SETTINGS_ROUTE;
-    this.GET_MODE_ROUTE = Flags.GET_AIRDROP_SETTINGS_ROUTE;
+    this.serverPort = Flags.AIRDROP_PORT;
+    this.setModeRoute = Flags.SET_AIRDROP_SETTINGS_ROUTE;
+    this.getModeRoute = Flags.GET_AIRDROP_SETTINGS_ROUTE;
   }
   
 }

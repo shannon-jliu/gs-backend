@@ -12,9 +12,9 @@ public class CameraGimbalClient extends SettingsClient<CameraGimbalSettings> {
    * Client to communicate with camera gimbal server
    */
   public CameraGimbalClient() {
-    this.SERVER_PORT = Flags.CAM_GIM_PORT;
-    this.SET_MODE_ROUTE = Flags.SET_CAM_GIM_MODE_SETTINGS_ROUTE;
-    this.GET_MODE_ROUTE = Flags.GET_CAM_GIM_MODE_SETTINGS_ROUTE;
+    this.serverPort = Flags.CAM_GIM_PORT;
+    this.setModeRoute = Flags.SET_CAM_GIM_MODE_SETTINGS_ROUTE;
+    this.getModeRoute = Flags.GET_CAM_GIM_MODE_SETTINGS_ROUTE;
   }
 
 }
