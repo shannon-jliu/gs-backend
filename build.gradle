@@ -74,6 +74,7 @@ dependencies {
     testImplementation("org.avaje.composite:junit:1.1")
 
     // Json
+    compile("org.json:json:20190722")
     implementation "com.fasterxml.jackson.core:jackson-databind:2.9.4"
 
     // Config
