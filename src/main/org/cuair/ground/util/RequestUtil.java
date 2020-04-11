@@ -1,7 +1,6 @@
 package org.cuair.ground.util;
 
 import java.net.URI;
-import org.json.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -44,18 +43,18 @@ public class RequestUtil {
    */
   public static void futureCallback(URI uri, ListenableFuture<ResponseEntity<String>> future) {
     future.addCallback(
-      new ListenableFutureCallback<ResponseEntity<String>>() {
+        new ListenableFutureCallback<ResponseEntity<String>>() {
 
-        @Override
-        public void onSuccess(ResponseEntity<String> result) {
-          printIfFlag("Request: " + uri.toString() + " succeeded!");
-        }
+          @Override
+          public void onSuccess(ResponseEntity<String> result) {
+            printIfFlag("Request: " + uri.toString() + " succeeded!");
+          }
 
-        @Override
-        public void onFailure(Throwable ex) {
-          logger.error("Request: " + uri.toString() + " failed: " + ex.getMessage());
-        }
-      });
+          @Override
+          public void onFailure(Throwable ex) {
+            logger.error("Request: " + uri.toString() + " failed: " + ex.getMessage());
+          }
+        });
   }
 
   /** 
@@ -73,18 +72,18 @@ public class RequestUtil {
       SuccessCallback successCallback,
       FailureCallback failureCallback) {
     future.addCallback(
-      new ListenableFutureCallback<ResponseEntity<String>>() {
+        new ListenableFutureCallback<ResponseEntity<String>>() {
 
-        @Override
-        public void onSuccess(ResponseEntity<String> result) {
-          successCallback.callbackFunction(result);
-        }
+          @Override
+          public void onSuccess(ResponseEntity<String> result) {
+            successCallback.callbackFunction(result);
+          }
 
-        @Override
-        public void onFailure(Throwable ex) {
-          failureCallback.callbackFunction(ex);
-        }
-      });
+          @Override
+          public void onFailure(Throwable ex) {
+            failureCallback.callbackFunction(ex);
+          }
+        });
   }
 
   /** 
@@ -97,18 +96,18 @@ public class RequestUtil {
   public static void futureCallback(
       URI uri, ListenableFuture<ResponseEntity<String>> future, SuccessCallback successCallback) {
     future.addCallback(
-      new ListenableFutureCallback<ResponseEntity<String>>() {
+        new ListenableFutureCallback<ResponseEntity<String>>() {
 
-        @Override
-        public void onSuccess(ResponseEntity<String> result) {
-          successCallback.callbackFunction(result);
-        }
+          @Override
+          public void onSuccess(ResponseEntity<String> result) {
+            successCallback.callbackFunction(result);
+          }
 
-        @Override
-        public void onFailure(Throwable ex) {
-          logger.error("Request: " + uri.toString() + " failed: " + ex.getMessage());
-        }
-      });
+          @Override
+          public void onFailure(Throwable ex) {
+            logger.error("Request: " + uri.toString() + " failed: " + ex.getMessage());
+          }
+        });
   }
 
   /** 
@@ -121,18 +120,18 @@ public class RequestUtil {
   public static void futureCallback(
       URI uri, ListenableFuture<ResponseEntity<String>> future, FailureCallback failureCallback) {
     future.addCallback(
-      new ListenableFutureCallback<ResponseEntity<String>>() {
+        new ListenableFutureCallback<ResponseEntity<String>>() {
 
-        @Override
-        public void onSuccess(ResponseEntity<String> result) {
-          printIfFlag("Request: " + uri.toString() + " succeeded!");
-        }
+          @Override
+          public void onSuccess(ResponseEntity<String> result) {
+            printIfFlag("Request: " + uri.toString() + " succeeded!");
+          }
 
-        @Override
-        public void onFailure(Throwable ex) {
-          failureCallback.callbackFunction(ex);
-        }
-      });
+          @Override
+          public void onFailure(Throwable ex) {
+            failureCallback.callbackFunction(ex);
+          }
+        });
   }
 
   /** 
@@ -143,6 +142,7 @@ public class RequestUtil {
     headers.setContentType(MediaType.APPLICATION_JSON);
     return headers;
   }
+  
   /** 
    * Helper method to provide default HTTP headers with the cookie attached to request headers. 
    * Used to send requests to interop.
