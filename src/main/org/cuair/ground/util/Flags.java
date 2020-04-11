@@ -38,6 +38,16 @@ public class Flags {
 
   public static boolean CUAIR_INTEROP_REQUESTS = true;
 
+  public static String INTEROP_IP = "localhost";
+
+  public static String INTEROP_PORT = "8000";
+
+  public static String INTEROP_LOGIN = "/api/login";
+
+  public static String INTEROP_USERNAME = "testadmin";
+
+  public static String INTEROP_PASSWORD = "testpass";
+
   public static String MISSION_INFO = "/api/missions";
 
   public static int MISSION_ID = 1;

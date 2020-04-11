@@ -77,17 +77,7 @@ public class InteropClient {
 
   private AsyncRestTemplate template = new AsyncRestTemplate();
 
-  public String INTEROP_IP = "localhost";
-
-  public String INTEROP_PORT = "8000";
-
-  public String INTEROP_ADDRESS = "http://" + INTEROP_IP + ":" + INTEROP_PORT;
-
-  public String LOGIN = "/api/login";
-
-  public String USERNAME = "testadmin";
-
-  public String PASSWORD = "testpass";
+  public String INTEROP_ADDRESS = "http://" + Flags.INTEROP_IP + ":" + Flags.INTEROP_PORT;
 
   public String TARGET_ROUTE = Flags.TARGET_ROUTE;
 
@@ -496,11 +486,11 @@ public class InteropClient {
   }
 
   public void startInteropSequence() {
-    URI interopURI = URI.create(INTEROP_ADDRESS + LOGIN);
+    URI interopURI = URI.create(INTEROP_ADDRESS + Flags.INTEROP_LOGIN);
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
     Credentials credentials =
-        Credentials.newBuilder().setUsername(USERNAME).setPassword(PASSWORD).build();
+        Credentials.newBuilder().setUsername(Flags.INTEROP_USERNAME).setPassword(Flags.INTEROP_PASSWORD).build();
     try {
       HttpEntity<String> requestEntity =
           new HttpEntity<String>(JsonFormat.printer().print(credentials), headers);
