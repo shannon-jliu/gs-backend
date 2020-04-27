@@ -44,7 +44,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping(value = "/image")
 public class ImageController {
   /** Database accessor object for image database */
-  private ImageDatabaseAccessor imageDao = (ImageDatabaseAccessor) DAOFactory.getDAO(DAOFactory.ModellessDAOType.IMAGE_DATABASE_ACCESSOR);
+  private ImageDatabaseAccessor imageDao = (ImageDatabaseAccessor) DAOFactory
+      .getDAO(DAOFactory.ModellessDAOType.IMAGE_DATABASE_ACCESSOR);
 
   /** String path to the folder where all the images are stored */
   private String planeImageDir = Flags.PLANE_IMAGE_DIR;
@@ -113,14 +114,16 @@ public class ImageController {
       try {
         in = new FileInputStream(planeImageDir + file);
       } catch (FileNotFoundException e) {
-        ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File not found: " + planeImageDir + file);
+        ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body("File not found: " + planeImageDir + file);
       }
 
       byte[] media = null;
       try {
         media = IOUtils.toByteArray(in);
-      } catch (IOException e) {
-        ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error reading file: " + planeImageDir + file);
+      } catch (Exception e) {
+        ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body("Error reading file: " + planeImageDir + file);
       }
       headers.setCacheControl(CacheControl.noCache().getHeaderValue());
 
@@ -229,28 +232,32 @@ public class ImageController {
     try {
       json = (ObjectNode) mapper.readTree(jsonString);
     } catch (IOException e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body("Error when parsing json from request: \n" + e);
     }
 
     Image i;
     try {
       i = mapper.treeToValue(json, Image.class);
     } catch (JsonProcessingException e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when converting json to Image instance: \n" + e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body("Error when converting json to Image instance: \n" + e);
     }
 
     File imageFile;
     try {
       imageFile = getImageFile(file);
     } catch (IOException e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when extracting image from request: \n" + e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body("Error when extracting image from request: \n" + e);
     }
 
     String contentType;
     try {
       contentType = Files.probeContentType(imageFile.toPath());
     } catch (IOException e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing contentType for image file: \n" + e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body("Error when parsing contentType for image file: \n" + e);
     }
 
     // this is necessary because the Files.probeContentType method above
@@ -273,7 +280,8 @@ public class ImageController {
     } catch (FileExistsException e) {
       return badRequest().body("File with timestamp already exists");
     } catch (IOException e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when moving image file: \n" + e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body("Error when moving image file: \n" + e);
     }
 
     i.setImageUrl("/api/v1/image/file/" + imageFileName);
@@ -416,14 +424,16 @@ public class ImageController {
     try {
       json = (ObjectNode) mapper.readTree(jsonString);
     } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body("Error when parsing json from request: \n" + e);
     }
 
     Image i;
     try {
       i = mapper.treeToValue(json, Image.class);
     } catch (JsonProcessingException e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when converting json to Image instance: \n" + e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body("Error when converting json to Image instance: \n" + e);
     }
 
     if (i.getId() != null) {
@@ -434,7 +444,8 @@ public class ImageController {
     try {
       defaultValues(i);
     } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when adding default values to Image instance: \n" + e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body("Error when adding default values to Image instance: \n" + e);
     }
 
     imageDao.create(i);

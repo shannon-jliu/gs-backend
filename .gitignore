@@ -23,3 +23,6 @@ gradle/wrapper/gradle-wrapper.properties
 gradle/
 gradlew*
 *DS_Store
+
+# Gradle local properties file
+local.properties

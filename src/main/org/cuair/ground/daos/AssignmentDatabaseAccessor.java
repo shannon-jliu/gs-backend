@@ -78,7 +78,7 @@ public class AssignmentDatabaseAccessor extends TimestampDatabaseAccessor<Assign
    * Retrieves all instances of Assignments that have the same image. Returns an empty list if no
    * such assignments exist in the database.
    *
-   * @return List<Assignment> of all instances that don't have a Target
+   * @return list of all assignment instances that have the same image
    */
   public List<Assignment> getAllForImageId(Long imageId) {
     return Ebean.find(getModelClass()).where().eq("image_id", imageId).findList();

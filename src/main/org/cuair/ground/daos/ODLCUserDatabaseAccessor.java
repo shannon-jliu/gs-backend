@@ -62,7 +62,8 @@ public class ODLCUserDatabaseAccessor extends DatabaseAccessor<ODLCUser> {
    * @return the ODLCUser object associated with the MDLC operator, if it doesn't exist then null
    */
   public ODLCUser getMDLCOperatorUser() {
-    return Ebean.find(ODLCUser.class).where().eq("userType", ODLCUser.UserType.MDLCOPERATOR).findOne();
+    return Ebean.find(ODLCUser.class).where().eq("userType", ODLCUser.UserType.MDLCOPERATOR)
+        .findOne();
   }
 
   /**
@@ -81,7 +82,8 @@ public class ODLCUserDatabaseAccessor extends DatabaseAccessor<ODLCUser> {
    */
 
   public List<ODLCUser> getMDLCTaggers() {
-    return Ebean.find(ODLCUser.class).where().or().eq("userType", ODLCUser.UserType.MDLCOPERATOR).eq("userType", ODLCUser.UserType.MDLCTAGGER).endOr().findList();
+    return Ebean.find(ODLCUser.class).where().or().eq("userType", ODLCUser.UserType.MDLCOPERATOR)
+        .eq("userType", ODLCUser.UserType.MDLCTAGGER).endOr().findList();
   }
 
   /**
@@ -94,7 +96,9 @@ public class ODLCUserDatabaseAccessor extends DatabaseAccessor<ODLCUser> {
     if (Flags.USERS_ENABLED) {
       return null;
     }
-    ODLCUser user = Ebean.find(ODLCUser.class).where().eq("userType", ODLCUser.UserType.MDLCOPERATOR).eq("username", Flags.DEFAULT_USERNAME).findOne();
+    ODLCUser user =
+        Ebean.find(ODLCUser.class).where().eq("userType", ODLCUser.UserType.MDLCOPERATOR)
+            .eq("username", Flags.DEFAULT_USERNAME).findOne();
     if (user == null) {
       user = new ODLCUser(Flags.DEFAULT_USERNAME, "localhost", ODLCUser.UserType.MDLCOPERATOR);
       this.create(user);

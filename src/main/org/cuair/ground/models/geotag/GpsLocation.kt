@@ -6,6 +6,8 @@ import javax.persistence.Embeddable
 import javax.validation.constraints.NotNull
 import org.cuair.ground.models.exceptions.InvalidGpsLocationException
 import kotlin.math.abs
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /** Represents a GPS location in the world */
 @Embeddable
@@ -108,6 +110,61 @@ class GpsLocation
         const val ABS_LATITUDE_BOUND = 90.0
         /** Maximum valid longitude  */
         const val ABS_LONGITUDE_BOUND = 180.0
+
+        val logger = LoggerFactory.getLogger(GpsLocation.javaClass)
+
+        /**
+         * Get the average of a variable number of GPS locations
+         *
+         * @param locations a variable number of GPS locations, passed in as varargs or an array
+         * @return a new GPS location representing the average
+         */
+        @JvmStatic fun average(@NotNull locations: Array<GpsLocation>):GpsLocation? {
+          if (locations.size == 0) {
+            return null
+          }
+
+          var lats = mutableListOf<Double>()
+          var lons = mutableListOf<Double>()
+
+          var count = 0;
+          for (i in 0..locations.size-1) {
+            var gps = locations[i]
+            if (gps != null
+                && gps.getLatitude() != null
+                && gps.getLongitude() != null
+                && !gps.getLatitude().isNaN()
+                && !gps.getLongitude().isNaN()) {
+              lats.add(gps.getLatitude())
+              lons.add(gps.getLongitude())
+              count++
+            }
+          }
+
+          if (count == 0) {
+            return null
+          }
+
+          var medLat = getMedian(lats)
+          var medLon = getMedian(lons)
+
+          // var average = null
+
+          try {
+            return GpsLocation(medLat ?: 0.0, medLon ?: 0.0)
+          } catch (e: InvalidGpsLocationException) {
+            logger.error("Invalid GPS Location. Average lat: " + medLat + " and Average lon: " + medLon)
+            return null
+          }
+          // return average
+        }
+
+        fun getMedian(@NotNull list: MutableList<Double>):Double? {
+          if (list.size == 0) return null
+          list.sort()
+          var medianIndex = list.size / 2
+          return if (list.size % 2 == 0) (list.get(medianIndex) + list.get(medianIndex - 1)) / 2 else list.get(medianIndex)
+        }
 
         // TODO add in the rest of these methods later
     }

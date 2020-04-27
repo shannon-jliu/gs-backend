@@ -26,7 +26,7 @@ public class DatabaseAccessor<T extends CUAirModel> {
   /**
    * Retrieves the class of the model that this Database Accessor object is operating on
    *
-   * @return Class<T> the class of the model
+   * @return the class of the model
    */
   public Class<T> getModelClass() {
     return this.modelClass;
@@ -36,7 +36,7 @@ public class DatabaseAccessor<T extends CUAirModel> {
    * Retrieves all instances of T models from the database. Returns an empty list if no such models
    * exist in the database.
    *
-   * @return List<T> of all instances
+   * @return list of all instances
    */
   public List<T> getAll() {
     return Ebean.find(modelClass).findList();
@@ -59,7 +59,7 @@ public class DatabaseAccessor<T extends CUAirModel> {
   /**
    * Retrieves the list of ids corresponding to each instance of the model in the database
    *
-   * @return List<Long> of all the ids
+   * @return list of all the ids
    */
   public List<Long> getAllIds() {
     return Ebean.find(modelClass)

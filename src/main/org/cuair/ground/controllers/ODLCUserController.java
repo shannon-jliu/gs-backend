@@ -20,7 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/odlcuser")
 public class ODLCUserController {
-  private ODLCUserDatabaseAccessor odlcUserDao = (ODLCUserDatabaseAccessor) DAOFactory.getDAO(DAOFactory.ModellessDAOType.ODLCUSER_DATABASE_ACCESSOR);
+  private ODLCUserDatabaseAccessor odlcUserDao = (ODLCUserDatabaseAccessor) DAOFactory
+      .getDAO(DAOFactory.ModellessDAOType.ODLCUSER_DATABASE_ACCESSOR);
 
   /**
    * @param username - the username to create, sent as a raw object
@@ -28,7 +29,8 @@ public class ODLCUserController {
    * @return 200 if the username is created successfully, otherwise 400 with a descriptive error message
    */
   @RequestMapping(value = "/create/mdlc", method = RequestMethod.GET)
-  public ResponseEntity create(@RequestHeader("Username") String username, HttpServletRequest request) {
+  public ResponseEntity create(@RequestHeader("Username") String username,
+                               HttpServletRequest request) {
     String address = request.getRemoteAddr();
     String otherAddr = odlcUserDao.getAddressFromUsername(username);
 
@@ -44,7 +46,8 @@ public class ODLCUserController {
     if (!Flags.ENABLE_MULTIPLE_USERS_PER_IP) {
       ODLCUser other = odlcUserDao.getODLCUserFromAddress(address);
       if (other != null) {
-        return badRequest().body("User " + other.getUsername() + " already exists from this host: " + address);
+        return badRequest()
+            .body("User " + other.getUsername() + " already exists from this host: " + address);
       }
     }
 
@@ -70,7 +73,8 @@ public class ODLCUserController {
     if (!Flags.ENABLE_MULTIPLE_USERS_PER_IP) {
       ODLCUser other = odlcUserDao.getODLCUserFromAddress(address);
       if (other != null) {
-        return badRequest().body("User " + other.getUsername() + " already exists from this host: " + address);
+        return badRequest()
+            .body("User " + other.getUsername() + " already exists from this host: " + address);
       }
     }
 

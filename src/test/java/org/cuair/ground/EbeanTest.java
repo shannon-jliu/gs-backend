@@ -37,7 +37,8 @@ public class EbeanTest {
   @Test
   public void saveTest() throws Exception {
     server.save(camGimSetting);
-    CameraGimbalSettings foundcamGimSetting = server.find(CameraGimbalSettings.class, camGimSetting.getId());
+    CameraGimbalSettings foundcamGimSetting =
+        server.find(CameraGimbalSettings.class, camGimSetting.getId());
     assertEquals(camGimSetting.getId(), foundcamGimSetting.getId());
 
     List<CameraGimbalSettings> settings = Ebean.find(CameraGimbalSettings.class).findList();
