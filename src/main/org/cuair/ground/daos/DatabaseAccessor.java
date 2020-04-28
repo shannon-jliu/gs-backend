@@ -36,7 +36,7 @@ public class DatabaseAccessor<T extends CUAirModel> {
    * Retrieves all instances of T models from the database. Returns an empty list if no such models
    * exist in the database.
    *
-   * @return list of all instances
+   * @return a list of all instances
    */
   public List<T> getAll() {
     return Ebean.find(modelClass).findList();
@@ -59,7 +59,7 @@ public class DatabaseAccessor<T extends CUAirModel> {
   /**
    * Retrieves the list of ids corresponding to each instance of the model in the database
    *
-   * @return list of all the ids
+   * @return a list of all the ids
    */
   public List<Long> getAllIds() {
     return Ebean.find(modelClass)
@@ -74,7 +74,7 @@ public class DatabaseAccessor<T extends CUAirModel> {
    * been entered in the database.
    *
    * @param object to be stored in the database
-   * @return boolean whether the object was successfully entered into the database
+   * @return whether the object was successfully entered into the database
    */
   public boolean create(T object) {
     if (get(object.getId()) != null) {
@@ -88,7 +88,7 @@ public class DatabaseAccessor<T extends CUAirModel> {
    * Updates {@code object} in the database
    *
    * @param object to be updated in the database
-   * @return boolean whether the object was successfully updated in the database
+   * @return whether the object was successfully updated in the database
    */
   public boolean update(T object) {
     if (get(object.getId()) == null) {
@@ -102,7 +102,7 @@ public class DatabaseAccessor<T extends CUAirModel> {
    * Deletes object with {@code id} from the database
    *
    * @param id id of the object to be deleted
-   * @return boolean whether the object was successfully deleted from the database
+   * @return whether the object was successfully deleted from the database
    */
   public boolean delete(Long id) {
     if (get(id) == null) {

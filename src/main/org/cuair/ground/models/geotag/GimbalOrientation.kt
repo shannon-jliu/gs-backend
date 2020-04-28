@@ -63,7 +63,7 @@ class GimbalOrientation
      * Determines if the given object is logically equal to this GimbalOrientation
      *
      * @param other The object to compare
-     * @return True if the object equals this GimbalOrientation
+     * @return true if the object equals this GimbalOrientation
      */
     override fun equals(other: Any?):Boolean {
         if(other !is GimbalOrientation) return false

@@ -42,8 +42,8 @@ dependencies {
     // Spring Boot dependencies
     implementation("org.springframework.boot:spring-boot-starter-web")
     runtime("org.springframework.boot:spring-boot-devtools")
-    testCompile("org.springframework.boot:spring-boot-starter-test")
-    testCompile("org.springframework.restdocs:spring-restdocs-mockmvc")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
 
     // KOTLIN
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
@@ -64,6 +64,9 @@ dependencies {
     // protobuf
     implementation("com.google.protobuf:protobuf-java:3.9.1")
 
+    // Json
+    implementation("org.json:json:20190722")
+
     // Ebean
     implementation "io.ebean:ebean:12.1.9"
     implementation "io.ebean:ebean-querybean:12.1.9"
@@ -81,7 +84,6 @@ dependencies {
 
     // Crypto
     implementation 'org.mindrot:jbcrypt:0.4'
-
 }
 
 ebean {

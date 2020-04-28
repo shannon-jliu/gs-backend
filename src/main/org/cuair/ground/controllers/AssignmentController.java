@@ -49,7 +49,7 @@ public class AssignmentController {
    * Gets an assignment given an id
    *
    * @param id the id of the assignment to fetch
-   * @return Result containing the assignment as json
+   * @return 200 with the resulting assignment as json, 404 otherwise
    */
   @RequestMapping(value = "/{id}", method = RequestMethod.GET)
   public ResponseEntity<Assignment> get(@PathVariable Long id) {
@@ -65,7 +65,8 @@ public class AssignmentController {
    * If the client is MDLC and Auth is enabled, it will get the next image that the user is not
    * already assigned to
    *
-   * @return Result containing the generated assignment as json
+   * @return 200 with the generated assignment as json on sucess, 204 if there are no new
+   * assignments, or 400 on error
    */
   @RequestMapping(value = "/work", method = RequestMethod.POST)
   public ResponseEntity createWork(@RequestHeader HttpHeaders headers) {
@@ -88,7 +89,7 @@ public class AssignmentController {
   /**
    * Gets all assignments, whether completed or not, for a given user
    *
-   * @return Result containing a list of assignments as json
+   * @return 200 with a list of assignments as json on success, 400 on error
    */
   @RequestMapping(method = RequestMethod.GET)
   public ResponseEntity getAllForUser(@RequestHeader HttpHeaders headers) {
@@ -109,7 +110,7 @@ public class AssignmentController {
    * Updates the status of an assignment, marking it as done
    *
    * @param id the id of the assignment to update
-   * @return Result containing the updated assignment as json
+   * @return 200 with the updated assignment as json, 204 or 400 on error
    */
   @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
   public ResponseEntity update(@PathVariable Long id, @RequestBody Assignment deserialized) {

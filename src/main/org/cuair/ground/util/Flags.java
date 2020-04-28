@@ -7,6 +7,9 @@ public class Flags {
   /** Image Directory */
   public static String PLANE_IMAGE_DIR = "images/";
 
+  /** Test image directory */
+  public static String TEST_IMAGE_DIR = "src/test/java/org/cuair/ground/controllers/test_images/";
+
   /** Constants */
   public static double FOV_HORIZONTAL_RADIANS = 0.7328394987;
   public static double FOV_VERTICAL_RADIANS = 0.560476881;

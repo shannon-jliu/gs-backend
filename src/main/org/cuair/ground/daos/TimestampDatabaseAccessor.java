@@ -23,7 +23,7 @@ public class TimestampDatabaseAccessor<T extends TimestampModel> extends Databas
    * Retrieves the most recent settings instance of Model T. Returns null if no settings exist in
    * the database
    *
-   * @return T the most recent settings model
+   * @return the most recent settings model
    */
   public T getRecent() {
     return Ebean.find(getModelClass()).orderBy().desc("timestamp").setMaxRows(1).findOne();

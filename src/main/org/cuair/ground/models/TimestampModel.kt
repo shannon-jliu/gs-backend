@@ -26,6 +26,11 @@ abstract class TimestampModel : CUAirModel(), Comparable<Any> {
         return this.timestamp!!.compareTo(other.timestamp!!)
     }
 
+    /**
+     * Returns true if the given object is logically equal to this TimestampModel
+     * @param other the object to compare
+     * @return true if the object equals this TimestampModel
+     */
     override fun equals(other: Any?): Boolean {
         if (!super.equals(other)) return false
 

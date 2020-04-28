@@ -27,8 +27,8 @@ public class AssignmentDatabaseAccessor extends TimestampDatabaseAccessor<Assign
    * Creates an assignment for the earliest image that still needs to be processed by the given
    * ODLCUser and commits it to the database.
    *
+   * @param user the ODLCUser this assignment is to be assigned to
    * @return an assignment that assigns the unprocessed image to the given ODLCUser
-   * @user the ODLCUser this assignment is to be assigned to
    */
   public Assignment getWork(ODLCUser user) {
     String propertyName;
