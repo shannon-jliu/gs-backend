@@ -1,6 +1,6 @@
 package org.cuair.ground.daos;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import java.util.List;
 import org.cuair.ground.models.ODLCUser;
 import org.cuair.ground.util.Flags;
@@ -18,7 +18,7 @@ public class ODLCUserDatabaseAccessor extends DatabaseAccessor<ODLCUser> {
    * @return the address this ODLCUser is associated with, or null if the ODLCUser does not exist
    */
   public String getAddressFromUsername(String username) {
-    ODLCUser odlcUserObj = Ebean.find(ODLCUser.class).where().eq("username", username).findOne();
+    ODLCUser odlcUserObj = DB.find(ODLCUser.class).where().eq("username", username).findOne();
     if (odlcUserObj != null) {
       return odlcUserObj.getAddress();
     }
@@ -33,7 +33,7 @@ public class ODLCUserDatabaseAccessor extends DatabaseAccessor<ODLCUser> {
    * @return the ODLCUser associated with this address, null if this address does not exist
    */
   public ODLCUser getODLCUserFromAddress(String address) {
-    return Ebean.find(ODLCUser.class).where().eq("address", address).findOne();
+    return DB.find(ODLCUser.class).where().eq("address", address).findOne();
   }
 
   /**
@@ -43,7 +43,7 @@ public class ODLCUserDatabaseAccessor extends DatabaseAccessor<ODLCUser> {
    * @return the ODLCUser object associated with username, if it doesn't exist then null.
    */
   public ODLCUser getODLCUserFromUsername(String username) {
-    return Ebean.find(ODLCUser.class).where().eq("username", username).findOne();
+    return DB.find(ODLCUser.class).where().eq("username", username).findOne();
   }
 
   /**
@@ -62,8 +62,7 @@ public class ODLCUserDatabaseAccessor extends DatabaseAccessor<ODLCUser> {
    * @return the ODLCUser object associated with the MDLC operator, if it doesn't exist then null
    */
   public ODLCUser getMDLCOperatorUser() {
-    return Ebean.find(ODLCUser.class).where().eq("userType", ODLCUser.UserType.MDLCOPERATOR)
-        .findOne();
+    return DB.find(ODLCUser.class).where().eq("userType", ODLCUser.UserType.MDLCOPERATOR).findOne();
   }
 
   /**
@@ -72,7 +71,7 @@ public class ODLCUserDatabaseAccessor extends DatabaseAccessor<ODLCUser> {
    * @return the ODLCUser object associated with the ADLC user, if it doesn't exist then null
    */
   public ODLCUser getADLCUser() {
-    return Ebean.find(ODLCUser.class).where().eq("userType", ODLCUser.UserType.ADLC).findOne();
+    return DB.find(ODLCUser.class).where().eq("userType", ODLCUser.UserType.ADLC).findOne();
   }
 
   /**
@@ -82,7 +81,7 @@ public class ODLCUserDatabaseAccessor extends DatabaseAccessor<ODLCUser> {
    */
 
   public List<ODLCUser> getMDLCTaggers() {
-    return Ebean.find(ODLCUser.class).where().or().eq("userType", ODLCUser.UserType.MDLCOPERATOR)
+    return DB.find(ODLCUser.class).where().or().eq("userType", ODLCUser.UserType.MDLCOPERATOR)
         .eq("userType", ODLCUser.UserType.MDLCTAGGER).endOr().findList();
   }
 
@@ -96,9 +95,8 @@ public class ODLCUserDatabaseAccessor extends DatabaseAccessor<ODLCUser> {
     if (Flags.USERS_ENABLED) {
       return null;
     }
-    ODLCUser user =
-        Ebean.find(ODLCUser.class).where().eq("userType", ODLCUser.UserType.MDLCOPERATOR)
-            .eq("username", Flags.DEFAULT_USERNAME).findOne();
+    ODLCUser user = DB.find(ODLCUser.class).where().eq("userType", ODLCUser.UserType.MDLCOPERATOR)
+        .eq("username", Flags.DEFAULT_USERNAME).findOne();
     if (user == null) {
       user = new ODLCUser(Flags.DEFAULT_USERNAME, "localhost", ODLCUser.UserType.MDLCOPERATOR);
       this.create(user);

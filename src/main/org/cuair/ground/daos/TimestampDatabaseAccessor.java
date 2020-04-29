@@ -1,6 +1,6 @@
 package org.cuair.ground.daos;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.cuair.ground.models.TimestampModel;
 
 /**
@@ -26,6 +26,6 @@ public class TimestampDatabaseAccessor<T extends TimestampModel> extends Databas
    * @return the most recent settings model
    */
   public T getRecent() {
-    return Ebean.find(getModelClass()).orderBy().desc("timestamp").setMaxRows(1).findOne();
+    return DB.find(getModelClass()).orderBy().desc("timestamp").setMaxRows(1).findOne();
   }
 }

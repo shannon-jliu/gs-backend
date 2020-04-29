@@ -2,7 +2,7 @@ package org.cuair.ground.controllers;
 
 import static org.springframework.http.ResponseEntity.ok;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.cuair.ground.util.Flags;
@@ -41,7 +41,7 @@ public class UtilController {
     };
     for (String name : names) {
       String sql = "TRUNCATE " + name + " RESTART IDENTITY CASCADE";
-      Ebean.createSqlUpdate(sql).execute();
+      DB.createSqlUpdate(sql).execute();
     }
 
     try {

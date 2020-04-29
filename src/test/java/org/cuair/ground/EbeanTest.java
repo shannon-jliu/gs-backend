@@ -2,7 +2,7 @@ package org.cuair.ground;
 
 import static org.junit.Assert.assertEquals;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.EbeanServer;
 import io.ebean.EbeanServerFactory;
 import io.ebean.config.ServerConfig;
@@ -41,7 +41,7 @@ public class EbeanTest {
         server.find(CameraGimbalSettings.class, camGimSetting.getId());
     assertEquals(camGimSetting.getId(), foundcamGimSetting.getId());
 
-    List<CameraGimbalSettings> settings = Ebean.find(CameraGimbalSettings.class).findList();
+    List<CameraGimbalSettings> settings = DB.find(CameraGimbalSettings.class).findList();
     assertEquals(1, settings.size());
   }
 }

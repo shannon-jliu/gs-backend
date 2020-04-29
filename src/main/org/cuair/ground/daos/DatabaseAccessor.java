@@ -1,6 +1,6 @@
 package org.cuair.ground.daos;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.cuair.ground.models.CUAirModel;
@@ -39,7 +39,7 @@ public class DatabaseAccessor<T extends CUAirModel> {
    * @return a list of all instances
    */
   public List<T> getAll() {
-    return Ebean.find(modelClass).findList();
+    return DB.find(modelClass).findList();
   }
 
   /**
@@ -53,7 +53,7 @@ public class DatabaseAccessor<T extends CUAirModel> {
     if (id == null) {
       return null;
     }
-    return Ebean.find(modelClass).where().eq("id", id).findOne();
+    return DB.find(modelClass).where().eq("id", id).findOne();
   }
 
   /**
@@ -62,7 +62,7 @@ public class DatabaseAccessor<T extends CUAirModel> {
    * @return a list of all the ids
    */
   public List<Long> getAllIds() {
-    return Ebean.find(modelClass)
+    return DB.find(modelClass)
         .findIds()
         .stream()
         .map(o -> (Long) o)
@@ -80,7 +80,7 @@ public class DatabaseAccessor<T extends CUAirModel> {
     if (get(object.getId()) != null) {
       return false;
     }
-    Ebean.save(object);
+    DB.save(object);
     return true;
   }
 
@@ -94,7 +94,7 @@ public class DatabaseAccessor<T extends CUAirModel> {
     if (get(object.getId()) == null) {
       return false;
     }
-    Ebean.update(object);
+    DB.update(object);
     return true;
   }
 
@@ -108,7 +108,7 @@ public class DatabaseAccessor<T extends CUAirModel> {
     if (get(id) == null) {
       return false;
     }
-    Ebean.delete(modelClass, id);
+    DB.delete(modelClass, id);
     return true;
   }
 }

@@ -95,7 +95,6 @@ Native solutions are no longer being maintained. Using Docker to run the backend
 
 When creating a new branch, please use the format of `<your-username>/<informative-branch-name>`. Do not commit to master (you shouldn't be able to anyway) and only squash PRs (you also shouldn't be able to do anything else either).
 
-
 ## Running (Native)
 Ensure that the following four files have the following four lines changed to below:
   - `application.properties`
@@ -108,3 +107,6 @@ Ensure that the following four files have the following four lines changed to be
       * `datasource.db.databaseUrl=jdbc:postgresql:groundservertest`
 
 Then run `./run` in order to start up the server on port `9000`!
+
+## Testing
+To enable logging while testing, run `gradle test` with the `--info` or `-i` flag if you are logging at the `INFO` level, or `--debug` or `d` if you are logging at the `DEBUG` level, etc. `System.out.println` will print out on the `INFO` level.

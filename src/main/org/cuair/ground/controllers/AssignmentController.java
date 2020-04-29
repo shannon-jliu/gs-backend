@@ -116,7 +116,7 @@ public class AssignmentController {
   public ResponseEntity update(@PathVariable Long id, @RequestBody Assignment deserialized) {
     Assignment a = assignmentDao.get(id);
     if (a == null) {
-      return noContent().build();
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
     if (deserialized != null) {
       if (!a.getId().equals(deserialized.getId())) {
