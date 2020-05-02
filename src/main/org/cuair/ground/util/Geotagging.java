@@ -49,16 +49,16 @@ public class Geotagging {
    * @param latitude        The latitude of the plane
    * @param longitude       The longitude of the plane
    * @param altitude        The altitude of the plane
-   * @param pixelX          The x-coordinate of the pixel center of the tag on the frontend with respect to the image
-   * @param pixelY          The y-coordinate of the pixel center of the tag on the frontend with respect to the image
+   * @param pixelx          The x-coordinate of the pixel center of the tag on the frontend with respect to the image
+   * @param pixely          The y-coordinate of the pixel center of the tag on the frontend with respect to the image
    * @param planeYawRadians The yaw of the plane in radians
    */
   public static GpsLocation getPixelCoordinates(
       double latitude,
       double longitude,
       double altitude,
-      double pixelX,
-      double pixelY,
+      double pixelx,
+      double pixely,
       double planeYawRadians) {
     // total horizontal distance imaged in meters
     double hdi =
@@ -79,8 +79,8 @@ public class Geotagging {
     double dppvert = vdi / IMAGE_HEIGHT;
 
     // finding distance from the center
-    double deltapixel_x = pixelX - (IMAGE_WIDTH / 2);
-    double deltapixel_y = (IMAGE_HEIGHT / 2) - pixelY;
+    double deltapixel_x = pixelx - (IMAGE_WIDTH / 2);
+    double deltapixel_y = (IMAGE_HEIGHT / 2) - pixely;
 
     double dppH = deltapixel_x * dpphoriz;
     double dppV = deltapixel_y * dppvert;

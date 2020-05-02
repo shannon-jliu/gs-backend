@@ -26,8 +26,8 @@ public class EmergentTargetSighting extends TargetSighting {
    */
   public EmergentTargetSighting(
       ODLCUser creator,
-      Integer pixelX,
-      Integer pixelY,
+      Integer pixelx,
+      Integer pixely,
       Integer width,
       Integer height,
       Geotag geotag,
@@ -39,8 +39,8 @@ public class EmergentTargetSighting extends TargetSighting {
       Assignment assignment) {
     super(
         creator,
-        pixelX,
-        pixelY,
+        pixelx,
+        pixely,
         width,
         height,
         geotag,
