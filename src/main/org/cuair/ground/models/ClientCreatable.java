@@ -1,6 +1,7 @@
 package org.cuair.ground.models;
 
 import java.util.Objects;
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 
 /** Model to represent any model that can be created by a ground server client */
@@ -8,6 +9,7 @@ import javax.persistence.MappedSuperclass;
 public abstract class ClientCreatable extends CUAirModel {
 
   /** Designates who created the model */
+  @ManyToOne
   private ODLCUser creator;
 
   /**

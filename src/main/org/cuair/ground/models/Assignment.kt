@@ -12,7 +12,8 @@ class Assignment : TimestampModel {
   @ManyToOne(cascade = arrayOf(CascadeType.ALL)) var image: Image?
 
   /** Represents the client this assignment has been assigned to  */
-  @ManyToOne(cascade = arrayOf(CascadeType.ALL)) var assignee: ODLCUser?
+  // TODO fix issue #61 (null fields on assignee after pulling from assignment dao)
+  @ManyToOne(cascade = arrayOf(CascadeType.ALL)) var assignee: ODLCUser
 
   /** Represents whether the image has been processed  */
   var done: Boolean

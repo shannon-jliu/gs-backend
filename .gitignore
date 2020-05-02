@@ -5,6 +5,7 @@ logs/
 /build/
 /pgdata/
 /images/*
+out/
 
 # Ignore auto-generated sql files
 *.sql

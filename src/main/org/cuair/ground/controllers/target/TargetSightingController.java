@@ -1,21 +1,22 @@
 package org.cuair.ground.controllers.target;
 
+import java.util.List;
+
 // TODO: Add back in once client code is complete
 // import org.cuair.ground.clients.ClientFactory;
 // import org.cuair.ground.clients.InteropClient;
 
-import static org.springframework.http.ResponseEntity.badRequest;
-import static org.springframework.http.ResponseEntity.notFound;
-import static org.springframework.http.ResponseEntity.ok;
-
 import org.cuair.ground.daos.AssignmentDatabaseAccessor;
 import org.cuair.ground.daos.DAOFactory;
+import org.cuair.ground.daos.ODLCUserDatabaseAccessor;
 import org.cuair.ground.daos.TargetSightingsDatabaseAccessor;
 import org.cuair.ground.models.Assignment;
 import org.cuair.ground.models.geotag.Geotag;
 import org.cuair.ground.models.plane.target.TargetSighting;
 import org.cuair.ground.util.Flags;
-import org.springframework.http.ResponseEntity;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 /** Controller to handle TargetSighting model objects */
 public abstract class TargetSightingController<T extends TargetSighting> {
@@ -24,6 +25,7 @@ public abstract class TargetSightingController<T extends TargetSighting> {
   private static final AssignmentDatabaseAccessor assignmentDao =
       (AssignmentDatabaseAccessor)
           DAOFactory.getDAO(DAOFactory.ModellessDAOType.ASSIGNMENT_DATABASE_ACCESSOR);
+
   private boolean cuairInteropRequests = Flags.CUAIR_INTEROP_REQUESTS;
 
   // TODO: Add back in once client code is complete, and add back the documentation
@@ -32,14 +34,26 @@ public abstract class TargetSightingController<T extends TargetSighting> {
   /** Gets the database accessor object for this target sighting */
   abstract TargetSightingsDatabaseAccessor<T> getTargetSightingDao();
 
+  /** Gets name of type for error messages (e.g. "alphanum" or "emergent") */
+  protected abstract String getTypeName();
+
   /**
-   * Constructs an HTTP response with all the target sightings
+   * Returns all target sightings
    *
    * @return a list of all target sightings in the db
    */
-  public ResponseEntity getAll() {
-    return ok(getTargetSightingDao().getAll());
+  public List<T> getAll() {
+    return getTargetSightingDao().getAll();
   }
+
+  /**
+   * Returns new ts after updating a target sighting given an id
+   *
+   * @param id Long id of target sighting
+   * @return Updated target sighting
+   * @throws ResponseStatusException if new target sighting is invalid
+   */
+  public abstract T update(Long id, T other) throws ResponseStatusException;
 
   /**
    * Creates a target sighting in this assigned image
@@ -48,21 +62,24 @@ public abstract class TargetSightingController<T extends TargetSighting> {
    * @return the created target sighting on success, 204 when the associated assignment
    * does not exist, or 400 when the request includes an id or geotag field or if the
    * creator field does not match the creator of the associated assignment
+   * @throws ResponseStatusException if new target sighting is invalid
    */
-  public ResponseEntity create(Long assignmentId, T ts) {
+  public T create(Long assignmentId, T ts) throws ResponseStatusException {
     Assignment a = assignmentDao.get(assignmentId);
     if (a == null) {
-      return notFound().build();
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+          String.format("Assignment with id %d not found", assignmentId));
     }
 
     if (ts.getId() != null) {
-      return badRequest().body("Don't pass in ids for creates");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Don't pass in ids for creates");
     }
     if (ts.getGeotag() != null) {
-      return badRequest().body("Don't pass geotag for creates");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Don't pass geotag for creates");
     }
-    if (!ts.getCreator().equals(a.getAssignee())) {
-      return badRequest().body("Creator ODLCUser does not match ODLCUser of assignment");
+    // full objects cannot be compared here because of issue #61
+    if (!ts.getCreator().getId().equals(a.getAssignee().getId())) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Creator ODLCUser does not match ODLCUser of assignment");
     }
     ts.setAssignment(a);
 
@@ -78,47 +95,41 @@ public abstract class TargetSightingController<T extends TargetSighting> {
         // interopClient.updateTarget(ts.getTarget());
       }
     }
-    return ok(ts);
+
+    return ts;
   }
 
   /**
-   * Constructs an HTTP response after updating a target sighting given an id
-   *
-   * @param id Long id of target sighting
-   * @return the updated target sighting
-   */
-  public abstract ResponseEntity update(Long id, T other);
-
-  /**
-   * Constructs an HTTP response after updating a target sighting given an updated target sighting
+   * Updates a target sighting given an updated target sighting
    *
    * @param ts    Target sighting to be updated
    * @param other Target sighting with updated fields
    * @return the updated target sighting on success, 400 if supplied target sighting with updated
-   * fields is incorrectly formatted
+   *    * fields is incorrectly formatted
+   * @throws ResponseStatusException if new target sighting is invalid
    */
-  ResponseEntity updateFromTargetSighting(T ts, T other) {
+  T updateFromTargetSighting(T ts, T other) {
     if (other.getId() != null) {
-      return badRequest().body("Don't pass ids for updates");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Don't pass ids for updates");
     }
     if (other.getCreator() != null) {
-      return badRequest().body("Don't pass creator for updates");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Don't pass creator for updates");
     }
     if (other.getGeotag() != null) {
-      return badRequest().body("Don't pass geotag for updates");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Don't pass geotag for updates");
     }
 
     if (other.getpixelx() != null && !other.getpixelx().equals(ts.getpixelx())) {
-      return badRequest().body("Don't change value of pixel_x. Current value is " + ts.getpixelx());
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Don't change value of pixel_x. Current value is " + ts.getpixelx());
     }
     if (other.getpixely() != null && !other.getpixely().equals(ts.getpixely())) {
-      return badRequest().body("Don't change value of pixel_y. Current value is " + ts.getpixely());
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Don't change value of pixel_y. Current value is " + ts.getpixely());
     }
     if (other.getWidth() != null && !other.getWidth().equals(ts.getWidth())) {
-      return badRequest().body("Don't change value of width. Current value is " + ts.getWidth());
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Don't change value of width. Current value is " + ts.getWidth());
     }
     if (other.getHeight() != null && !other.getHeight().equals(ts.getHeight())) {
-      return badRequest().body("Don't change value of height. Current value is " + ts.getHeight());
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Don't change value of height. Current value is " + ts.getHeight());
     }
     ts.updateFromTargetSighting(other);
 
@@ -131,16 +142,25 @@ public abstract class TargetSightingController<T extends TargetSighting> {
         // interopClient.updateTarget(ts.getTarget());
       }
     }
-    return ok(ts);
+
+    return ts;
   }
 
   /**
-   * Constructs an HTTP response after deleting a TargetSighting
+   * Deletes target sighting with id {@code id}
    *
-   * @param ts Target sighting
-   * @return the deleted target sighting
+   * @param id Long id of target sighting
+   * @throws ResponseStatusException if new target sighting is invalid
    */
-  public ResponseEntity delete(T ts) {
+  public abstract void delete(Long id) throws ResponseStatusException;
+
+  /**
+   * Deletes a target sighting. Target sighting passed in must be the exact version saved on the ground server.
+   *
+   * @param ts target sighting to be deleted
+   * @throws ResponseStatusException
+   */
+  protected void deleteFromSighting(T ts) throws ResponseStatusException {
     getTargetSightingDao().delete(ts.getId());
 
     if (ts.getTarget() != null) {
@@ -150,6 +170,5 @@ public abstract class TargetSightingController<T extends TargetSighting> {
         // interopClient.updateTarget(ts.getTarget());
       }
     }
-    return ok(ts);
   }
 }
