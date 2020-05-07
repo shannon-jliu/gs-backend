@@ -2,6 +2,7 @@ package org.cuair.ground.daos
 
 import org.cuair.ground.models.ClientCreatable
 import org.cuair.ground.models.CUAirModel
+import org.cuair.ground.models.plane.settings.PlaneSettingsModel
 import org.cuair.ground.models.TimestampModel
 import org.cuair.ground.models.Image
 import org.cuair.ground.models.plane.target.AlphanumTarget
@@ -39,10 +40,20 @@ class DAOFactory {
 
   /** Enumeration of all database accessor types that are parametrized on a model */
   enum class ModelDAOType {
+    CLIENT_CREATABLE_DATABASE_ACCESSOR {
+      override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
+        return ClientCreatableDatabaseAccessor(clazz.asSubclass(ClientCreatable::class.java))
+      }
+    },
     DATABASE_ACCESSOR {
       override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
         return DatabaseAccessor(clazz)
       }
+    },
+    PLANE_SETTINGS_MODEL_DATABASE_ACCESSOR {
+        override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
+            return PlaneSettingsModelDatabaseAccessor(clazz.asSubclass(PlaneSettingsModel::class.java))
+        }
     },
     ALPHANUM_TARGET_DATABASE_ACCESSOR {
       override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
@@ -52,11 +63,6 @@ class DAOFactory {
     ALPHANUM_TARGET_SIGHTINGS_DATABASE_ACCESSOR {
       override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
         return AlphanumTargetSightingsDatabaseAccessor(clazz.asSubclass(AlphanumTargetSighting::class.java))
-      }
-    },
-    CLIENT_CREATABLE_DATABASE_ACCESSOR {
-      override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
-        return ClientCreatableDatabaseAccessor(clazz.asSubclass(ClientCreatable::class.java))
       }
     },
     TARGET_DATABASE_ACCESSOR {

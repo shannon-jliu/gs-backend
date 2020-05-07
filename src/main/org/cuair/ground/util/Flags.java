@@ -28,4 +28,7 @@ public class Flags {
 
   /** Allows clients to create users if true. Otherwise, all will use default user */
   public static boolean USERS_ENABLED = true;
+
+  /** A constant used in the DBSCAN calculation for clustering ROIs */
+  public static Double CUAIR_CLUSTERING_EPSILON = 0.0003173611111111856;
 }

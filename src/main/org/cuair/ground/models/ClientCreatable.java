@@ -15,25 +15,25 @@ public abstract class ClientCreatable extends CUAirModel {
   /**
    * Creates a ClientCreatable
    *
-   * @param creator the ClientType of the model
+   * @param creator the ODLCUser creator of the model
    */
   public ClientCreatable(ODLCUser creator) {
     this.creator = creator;
   }
 
   /**
-   * Gets the ClientType of this model
+   * Gets the ODLCUser creator of this model
    *
-   * @return ClientType
+   * @return the ODLCUser creator of this model
    */
   public ODLCUser getCreator() {
     return creator;
   }
 
   /**
-   * Sets the ClientType of this model
+   * Sets the ODLCUser creator of this model
    *
-   * @param creator new ClientType of this model
+   * @param creator new ODLCUser creator of this model
    */
   public void setCreator(ODLCUser creator) {
     this.creator = creator;

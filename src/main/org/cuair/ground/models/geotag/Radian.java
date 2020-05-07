@@ -48,12 +48,12 @@ public class Radian {
   }
 
   /**
-   * Get the average of a variable number of radians
+   * Get the median of a variable number of radians
    *
    * @param radians A variable number of radians, passed in as varargs or an array
-   * @return A new Radian representing the average
+   * @return A new Radian representing the median
    */
-  public static Double average(Double... radians) {
+  public static Double median(Double... radians) {
     if (radians == null) {
       return null;
     }

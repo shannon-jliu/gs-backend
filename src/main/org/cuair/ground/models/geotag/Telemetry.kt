@@ -20,7 +20,6 @@ class Telemetry(
         @Embedded
         private var gimOrt: GimbalOrientation
 ) : CUAirModel() {
-    // TODO: Add the rest of the methods
 
     /**
      * Get the gps data of this Telemetry instance

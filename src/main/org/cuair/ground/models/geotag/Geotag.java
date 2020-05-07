@@ -162,7 +162,7 @@ public class Geotag extends CUAirModel {
             .map(TargetSighting::getGeotag)
             .filter(g -> g != null)
             .toArray(Geotag[]::new);
-    targ.setGeotag(Geotagging.average(geotags));
+    targ.setGeotag(Geotagging.median(geotags));
     updateTargetInDao(targ);
   }
 

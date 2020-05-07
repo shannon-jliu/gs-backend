@@ -121,12 +121,12 @@ public class Geotagging {
   }
 
   /**
-   * Average a variable number of geotags
+   * Median a variable number of geotags
    *
-   * @param geotags The geotag objects to average
-   * @return The averaged geotag object
+   * @param geotags The geotag objects to medianed
+   * @return The medianed geotag object
    */
-  public static Geotag average(Geotag... geotags) {
+  public static Geotag median(Geotag... geotags) {
     geotags =
         Arrays.stream(geotags)
             .filter(g -> g != null)
@@ -140,6 +140,6 @@ public class Geotagging {
         Arrays.stream(geotags).map(Geotag::getGpsLocation).toArray(GpsLocation[]::new);
     Double[] radians =
         Arrays.stream(geotags).map(Geotag::getClockwiseRadiansFromNorth).toArray(Double[]::new);
-    return new Geotag(GpsLocation.average(locations), Radian.average(radians));
+    return new Geotag(GpsLocation.median(locations), Radian.median(radians));
   }
 }
