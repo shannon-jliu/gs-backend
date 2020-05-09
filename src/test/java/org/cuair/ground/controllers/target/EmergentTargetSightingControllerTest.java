@@ -591,8 +591,8 @@ public class EmergentTargetSightingControllerTest {
         new ObjectMapper().readValue(result.getResponse().getContentAsString(), EmergentTargetSighting.class);
 
     assertEquals(update.getTarget(), actual.getTarget());
-    assertEquals(update.getpixelx(), actual.getpixelx());
-    assertEquals(update.getpixely(), actual.getpixely());
+    assertEquals(update.getPixelx(), actual.getPixelx());
+    assertEquals(update.getPixely(), actual.getPixely());
     assertEquals(update.getGeotag(), actual.getGeotag());
     assertEquals(original.getCreator(), actual.getCreator());
     assertEquals(update.getDescription(), actual.getDescription());
