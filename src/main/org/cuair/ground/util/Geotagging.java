@@ -1,6 +1,7 @@
 package org.cuair.ground.util;
 
 import java.util.Arrays;
+import java.util.Objects;
 import org.cuair.ground.models.exceptions.InvalidGpsLocationException;
 import org.cuair.ground.models.geotag.Geotag;
 import org.cuair.ground.models.geotag.GpsLocation;
@@ -129,11 +130,11 @@ public class Geotagging {
   public static Geotag median(Geotag... geotags) {
     geotags =
         Arrays.stream(geotags)
-            .filter(g -> g != null)
+            .filter(Objects::nonNull)
             .filter(g -> g.getGpsLocation() != null)
             .filter(g -> g.getClockwiseRadiansFromNorth() != null)
             .toArray(Geotag[]::new);
-    if (geotags == null || geotags.length == 0) {
+    if (geotags.length == 0) {
       return null;
     }
     GpsLocation[] locations =
