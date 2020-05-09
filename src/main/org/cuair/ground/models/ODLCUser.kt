@@ -27,7 +27,7 @@ data class ODLCUser(
     /**
      * Returns true if the ip address matches the other User object's ip address
      * @param other the object to compare
-     * @return true if the object equals this Username
+     * @return true if the object equals this ODLCUser
      */
     override fun equals(other: Any?): Boolean {
         if (other !is ODLCUser) return false

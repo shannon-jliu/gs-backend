@@ -61,7 +61,9 @@
             <property name="tokens"
              value="LITERAL_TRY, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE, LITERAL_SWITCH"/>
         </module>
-        <module name="NeedBraces"/>
+        <module name="NeedBraces">
+            <property name="allowSingleLineStatement" value="true"/>
+        </module>
         <module name="LeftCurly"/>
         <module name="RightCurly">
             <property name="id" value="RightCurlySame"/>
@@ -250,7 +252,7 @@
              value="Method name ''{0}'' must match pattern ''{1}''."/>
         </module>
         <module name="SingleLineJavadoc">
-            <property name="ignoreInlineTags" value="false"/>
+            <property name="ignoreInlineTags" value="true"/>
         </module>
         <module name="EmptyCatchBlock">
             <property name="exceptionVariableName" value="expected"/>

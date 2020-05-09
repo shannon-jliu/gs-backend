@@ -25,7 +25,8 @@ public class ODLCUserControllerTest {
   @Autowired
   private MockMvc mockMvc;
 
-  private ODLCUserDatabaseAccessor odlcdao = (ODLCUserDatabaseAccessor) DAOFactory.getDAO(DAOFactory.ModellessDAOType.ODLCUSER_DATABASE_ACCESSOR);
+  private ODLCUserDatabaseAccessor odlcdao = (ODLCUserDatabaseAccessor) DAOFactory
+      .getDAO(DAOFactory.ModellessDAOType.ODLCUSER_DATABASE_ACCESSOR);
 
   /**
    * Tests basic new user creation

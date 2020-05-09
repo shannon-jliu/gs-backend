@@ -1,6 +1,6 @@
 package org.cuair.ground.daos;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.cuair.ground.models.CUAirModel;
@@ -26,7 +26,7 @@ public class DatabaseAccessor<T extends CUAirModel> {
   /**
    * Retrieves the class of the model that this Database Accessor object is operating on
    *
-   * @return Class<T> the class of the model
+   * @return the class of the model
    */
   public Class<T> getModelClass() {
     return this.modelClass;
@@ -36,10 +36,10 @@ public class DatabaseAccessor<T extends CUAirModel> {
    * Retrieves all instances of T models from the database. Returns an empty list if no such models
    * exist in the database.
    *
-   * @return List<T> of all instances
+   * @return a list of all instances
    */
   public List<T> getAll() {
-    return Ebean.find(modelClass).findList();
+    return DB.find(modelClass).findList();
   }
 
   /**
@@ -53,16 +53,16 @@ public class DatabaseAccessor<T extends CUAirModel> {
     if (id == null) {
       return null;
     }
-    return Ebean.find(modelClass).where().eq("id", id).findOne();
+    return DB.find(modelClass).where().eq("id", id).findOne();
   }
 
   /**
    * Retrieves the list of ids corresponding to each instance of the model in the database
    *
-   * @return List<Long> of all the ids
+   * @return a list of all the ids
    */
   public List<Long> getAllIds() {
-    return Ebean.find(modelClass)
+    return DB.find(modelClass)
         .findIds()
         .stream()
         .map(o -> (Long) o)
@@ -74,13 +74,13 @@ public class DatabaseAccessor<T extends CUAirModel> {
    * been entered in the database.
    *
    * @param object to be stored in the database
-   * @return boolean whether the object was successfully entered into the database
+   * @return whether the object was successfully entered into the database
    */
   public boolean create(T object) {
     if (get(object.getId()) != null) {
       return false;
     }
-    Ebean.save(object);
+    DB.save(object);
     return true;
   }
 
@@ -88,13 +88,13 @@ public class DatabaseAccessor<T extends CUAirModel> {
    * Updates {@code object} in the database
    *
    * @param object to be updated in the database
-   * @return boolean whether the object was successfully updated in the database
+   * @return whether the object was successfully updated in the database
    */
   public boolean update(T object) {
     if (get(object.getId()) == null) {
       return false;
     }
-    Ebean.update(object);
+    DB.update(object);
     return true;
   }
 
@@ -102,13 +102,13 @@ public class DatabaseAccessor<T extends CUAirModel> {
    * Deletes object with {@code id} from the database
    *
    * @param id id of the object to be deleted
-   * @return boolean whether the object was successfully deleted from the database
+   * @return whether the object was successfully deleted from the database
    */
   public boolean delete(Long id) {
     if (get(id) == null) {
       return false;
     }
-    Ebean.delete(modelClass, id);
+    DB.delete(modelClass, id);
     return true;
   }
 }

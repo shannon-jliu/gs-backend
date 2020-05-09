@@ -1,0 +1,2 @@
+# Run every time *.proto files change, or if InteropApi.java is not present in src/main/org/cuair/ground/protobuf
+protoc --java_out=../src/main ../src/main/resources/interop_api.proto --proto_path=../src/main/resources

@@ -21,5 +21,4 @@ class CameraGimbalSettings(val mode: CameraGimbalMode) : PlaneSettingsModel() {
         if (other !is CameraGimbalSettings) return false
         return mode == other.mode
     }
-
 }

@@ -1,11 +1,22 @@
 package org.cuair.ground.util;
 
 public class Flags {
-  /** Image directory */
-  public static String PLANE_IMAGE_DIR = "images/";
-
   /** Special username */
   public static String MDLC_OPERATOR_USERNAME = "operator";
+
+  /** Image Directory */
+  public static String PLANE_IMAGE_DIR = "images/";
+
+  /** Test image directory */
+  public static String TEST_IMAGE_DIR = "src/test/java/org/cuair/ground/controllers/test_images/";
+
+  /** Constants */
+  public static double FOV_HORIZONTAL_RADIANS = 0.7328394987;
+  public static double FOV_VERTICAL_RADIANS = 0.560476881;
+  public static double IMAGE_WIDTH = 4912.0;
+  public static double IMAGE_HEIGHT = 3684.0;
+
+  /** Interop */
 
   /** Default username if no username specified as part of request */
   public static String DEFAULT_USERNAME = "<NO_USER>";
@@ -40,6 +51,8 @@ public class Flags {
 
   public static String AIRDROP_PORT = "5002";
 
+  public static double CUAIR_AIRDROP_THRESHOLD = 150.0;
+
   public static String SET_CAM_GIM_MODE_SETTINGS_ROUTE = "/api/mode";
 
   public static String SET_AIRDROP_SETTINGS_ROUTE = "/v1/airdrop/setting";
@@ -47,4 +60,33 @@ public class Flags {
   public static String GET_CAM_GIM_MODE_SETTINGS_ROUTE = "/api/state";
 
   public static String GET_AIRDROP_SETTINGS_ROUTE = "/v1/airdrop/state";
+
+  /** Interop */
+
+  public static boolean CUAIR_INTEROP_REQUESTS = true;
+
+  public static String INTEROP_IP = "localhost";
+
+  public static String INTEROP_PORT = "8000";
+
+  public static String INTEROP_LOGIN = "/api/login";
+
+  public static String INTEROP_USERNAME = "testadmin";
+
+  public static String INTEROP_PASSWORD = "testpass";
+
+  public static String MISSION_INFO = "/api/missions";
+
+  public static int MISSION_ID = 1;
+
+  public static String TARGET_ROUTE = "/api/odlcs";
+
+  public static int TARGETLOGGER_DELAY = 30000;
+
+  public static String INTEROP_TARGET_DIR = "images/";
+
+  public static String DEFAULT_EMERGENT_TARGET_DESC = "A lost hiker with a water bottle.";
+
+  /** A constant used in the DBSCAN calculation for clustering ROIs */
+  public static Double CUAIR_CLUSTERING_EPSILON = 0.0003173611111111856;
 }

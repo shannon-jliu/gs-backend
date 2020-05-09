@@ -1,6 +1,6 @@
 package org.cuair.ground.daos;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import java.util.List;
 import org.cuair.ground.models.Assignment;
 import org.cuair.ground.models.Image;
@@ -27,8 +27,8 @@ public class AssignmentDatabaseAccessor extends TimestampDatabaseAccessor<Assign
    * Creates an assignment for the earliest image that still needs to be processed by the given
    * ODLCUser and commits it to the database.
    *
+   * @param user the ODLCUser this assignment is to be assigned to
    * @return an assignment that assigns the unprocessed image to the given ODLCUser
-   * @user the ODLCUser this assignment is to be assigned to
    */
   public Assignment getWork(ODLCUser user) {
     String propertyName;
@@ -37,7 +37,7 @@ public class AssignmentDatabaseAccessor extends TimestampDatabaseAccessor<Assign
     } else {
       propertyName = "hasMdlcAssignment";
     }
-    List<Image> i_list = Ebean.find(Image.class)
+    List<Image> i_list = DB.find(Image.class)
         .where()
         .eq(propertyName, false)
         .orderBy()
@@ -66,7 +66,7 @@ public class AssignmentDatabaseAccessor extends TimestampDatabaseAccessor<Assign
    * @return a list of assignments that are assigned to the given user
    */
   public List<Assignment> getAllForUser(ODLCUser user) {
-    return Ebean.find(Assignment.class)
+    return DB.find(Assignment.class)
         .where()
         .eq("assignee", user)
         .orderBy()
@@ -78,9 +78,9 @@ public class AssignmentDatabaseAccessor extends TimestampDatabaseAccessor<Assign
    * Retrieves all instances of Assignments that have the same image. Returns an empty list if no
    * such assignments exist in the database.
    *
-   * @return List<Assignment> of all instances that don't have a Target
+   * @return list of all assignment instances that have the same image
    */
   public List<Assignment> getAllForImageId(Long imageId) {
-    return Ebean.find(getModelClass()).where().eq("image_id", imageId).findList();
+    return DB.find(getModelClass()).where().eq("image_id", imageId).findList();
   }
 }

@@ -9,12 +9,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.ServletContext;
 import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -25,15 +25,16 @@ import org.cuair.ground.models.geotag.GimbalOrientation;
 import org.cuair.ground.models.geotag.GpsLocation;
 import org.cuair.ground.models.geotag.Telemetry;
 import org.cuair.ground.util.Flags;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,21 +45,20 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping(value = "/image")
 public class ImageController {
   /** Database accessor object for image database */
-  private ImageDatabaseAccessor imageDao = (ImageDatabaseAccessor) DAOFactory.getDAO(DAOFactory.ModellessDAOType.IMAGE_DATABASE_ACCESSOR);
+  private ImageDatabaseAccessor imageDao = (ImageDatabaseAccessor) DAOFactory
+      .getDAO(DAOFactory.ModellessDAOType.IMAGE_DATABASE_ACCESSOR);
 
   /** String path to the folder where all the images are stored */
   private String planeImageDir = Flags.PLANE_IMAGE_DIR;
 
   private ObjectMapper mapper = new ObjectMapper();
 
-  /** required for obtaining this server's context to grab the location of the image file */
-  @Autowired
-  private ServletContext context;
-
   /**
-   * Constructs an HTTP response with all the images.
+   * Constructs an HTTP response with all the images after the given id.
    *
-   * @return HTTP response
+   * @param id Long id representing the id after which all images will be returned
+   * @return a list of images with ids after the given id on success, 404 when
+   * the most recent image in the db does not exist
    */
   @RequestMapping(value = "/all/{id}", method = RequestMethod.GET)
   public ResponseEntity getAllAfterId(@PathVariable Long id) {
@@ -78,7 +78,8 @@ public class ImageController {
   /**
    * Constructs an HTTP response with the most recent image that was captured by the plane.
    *
-   * @return HTTP response
+   * @return 200 with the most recent image that was captured by the plane on success, 404 when
+   * the most recent image in the db does not exist
    */
   @RequestMapping(value = "/recent", method = RequestMethod.GET)
   public ResponseEntity getRecent() {
@@ -90,7 +91,7 @@ public class ImageController {
    * Constructs a HTTP response with the image with id 'id'.
    *
    * @param id Long id for Image
-   * @return HTTP response
+   * @return 200 with the image with id 'id' on success, 404 on error
    */
   @RequestMapping(value = "/{id}", method = RequestMethod.GET)
   public ResponseEntity get(@PathVariable Long id) {
@@ -102,7 +103,8 @@ public class ImageController {
    * Constructs an HTTP response with the given filename.
    *
    * @param file String filename for the requested image file
-   * @return HTTP response
+   * @return 200 with the file with the given filename on success, 500 when error finding or reading
+   * the provided file, or 404 when the provided (image) file does not exist
    */
   @RequestMapping(value = "/file/{file}", method = RequestMethod.GET)
   public ResponseEntity getFile(@PathVariable String file) {
@@ -113,14 +115,16 @@ public class ImageController {
       try {
         in = new FileInputStream(planeImageDir + file);
       } catch (FileNotFoundException e) {
-        ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File not found: " + planeImageDir + file);
+        ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body("File not found: " + planeImageDir + file);
       }
 
       byte[] media = null;
       try {
         media = IOUtils.toByteArray(in);
-      } catch (IOException e) {
-        ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error reading file: " + planeImageDir + file);
+      } catch (Exception e) {
+        ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body("Error reading file: " + planeImageDir + file);
       }
       headers.setCacheControl(CacheControl.noCache().getHeaderValue());
 
@@ -137,10 +141,12 @@ public class ImageController {
    * @return the image file
    */
   private File getImageFile(MultipartFile file) throws IOException {
-    // save file to temp dir created by Spring context
-    File imgFile = new File(context.getRealPath(file.getOriginalFilename()));
-    file.transferTo(imgFile);
-    return imgFile;
+    File convFile = new File(file.getOriginalFilename());
+    convFile.createNewFile();
+    FileOutputStream fos = new FileOutputStream(convFile);
+    fos.write(file.getBytes());
+    fos.close();
+    return convFile;
   }
 
   /**
@@ -149,10 +155,12 @@ public class ImageController {
    *
    * @param jsonString the json part of the multipart request as a String
    * @param file       the file of the multipart request
-   * @return an HTTP response
+   * @return 200 with the uploaded image on success, 400 when request parts are missing or
+   * if the requset json is invalid, or 500 on errors converting file to an image and saving
+   * the image in the db
    */
   @RequestMapping(method = RequestMethod.POST)
-  public ResponseEntity upload(@RequestPart("json") String jsonString,
+  public ResponseEntity upload(@RequestParam("json") String jsonString,
                                @RequestPart("files") MultipartFile file) {
     if (file == null || file.isEmpty()) {
       return badRequest().body("Missing image file");
@@ -221,7 +229,7 @@ public class ImageController {
       return badRequest().body("Json part must include planeYaw within telemetry");
     }
 
-    if (json.size() > 9) {
+    if (json.size() > 4) {
       return badRequest().body("Json part contains invalid field");
     }
 
@@ -229,28 +237,32 @@ public class ImageController {
     try {
       json = (ObjectNode) mapper.readTree(jsonString);
     } catch (IOException e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body("Error when parsing json from request: \n" + e);
     }
 
     Image i;
     try {
       i = mapper.treeToValue(json, Image.class);
     } catch (JsonProcessingException e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when converting json to Image instance: \n" + e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body("Error when converting json to Image instance: \n" + e);
     }
 
     File imageFile;
     try {
       imageFile = getImageFile(file);
     } catch (IOException e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when extracting image from request: \n" + e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body("Error when extracting image from request: \n" + e);
     }
 
     String contentType;
     try {
       contentType = Files.probeContentType(imageFile.toPath());
     } catch (IOException e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing contentType for image file: \n" + e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body("Error when parsing contentType for image file: \n" + e);
     }
 
     // this is necessary because the Files.probeContentType method above
@@ -273,7 +285,8 @@ public class ImageController {
     } catch (FileExistsException e) {
       return badRequest().body("File with timestamp already exists");
     } catch (IOException e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when moving image file: \n" + e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body("Error when moving image file: \n" + e);
     }
 
     i.setImageUrl("/api/v1/image/file/" + imageFileName);
@@ -290,7 +303,7 @@ public class ImageController {
    * Ensures the provided image has non-null telemetry data
    *
    * @param i the image to be checked
-   * @return the (possibly modified) image
+   * @return the possibly modified image
    */
   private Image defaultValues(Image i) throws Exception {
     Image.ImgMode DEFAULT_IMAGE_MODE = Image.ImgMode.FIXED;
@@ -407,25 +420,11 @@ public class ImageController {
    * telemetry data or gimbal state. Constructs a HTTP response with the json of the image that was
    * created
    *
-   * @param jsonString the json request for this dummy create, as a string
-   * @return an HTTP response
+   * @return 200 with the uploaded image on success, 400 if id in in the request or 500 parsing request
+   * json, converting json to an Image instance, or adding default values
    */
   @RequestMapping(value = "/dummy", method = RequestMethod.POST)
-  public ResponseEntity dummyCreate(@RequestPart("json") String jsonString) {
-    ObjectNode json;
-    try {
-      json = (ObjectNode) mapper.readTree(jsonString);
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when parsing json from request: \n" + e);
-    }
-
-    Image i;
-    try {
-      i = mapper.treeToValue(json, Image.class);
-    } catch (JsonProcessingException e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when converting json to Image instance: \n" + e);
-    }
-
+  public ResponseEntity dummyCreate(@RequestBody Image i) {
     if (i.getId() != null) {
       return badRequest().body("Don't put id in json of image POST request");
     }
@@ -434,7 +433,8 @@ public class ImageController {
     try {
       defaultValues(i);
     } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error when adding default values to Image instance: \n" + e);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body("Error when adding default values to Image instance: \n" + e);
     }
 
     imageDao.create(i);
