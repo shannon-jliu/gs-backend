@@ -18,5 +18,3 @@ before_script:
 script:
   - java -jar checkstyle/checkstyle-8.24-all.jar -c checkstyle/google_checks.xml src/main
   - gradle check --info
-addons:
-  postgresql: "11.2"
