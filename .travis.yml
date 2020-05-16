@@ -6,6 +6,7 @@ jdk: openjdk11
 services:
   - postgresql
 before_install:
+  - sudo service postgresql stop
   - sudo apt-get update
   - sudo apt-get --yes remove postgresql\*
   - sudo apt-get install -y postgresql-11 postgresql-client-11
