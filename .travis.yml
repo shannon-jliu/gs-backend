@@ -14,6 +14,9 @@ before_install:
   - sudo service postgresql restart 11
 before_script:
   # install Gradle 6.2
+  - psql --version
+  - psql -c 'CREATE ROLE travis SUPERUSER LOGIN CREATEDB;' -U postgres
+  - cp config/database.yml.travis config/database.yml
   - wget https://services.gradle.org/distributions/gradle-6.2-bin.zip
   - unzip gradle-6.2-bin.zip
   - export GRADLE_HOME=$PWD/gradle-6.2
