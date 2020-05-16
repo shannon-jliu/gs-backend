@@ -17,6 +17,6 @@ before_script:
   - sudo sed -i '/127.0.0.1/ s/$/db/' /etc/hosts
 script:
   - java -jar checkstyle/checkstyle-8.24-all.jar -c checkstyle/google_checks.xml src/main
-  - gradle check
+  - gradle check --info
 addons:
   postgresql: "10"
