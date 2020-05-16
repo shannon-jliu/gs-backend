@@ -17,7 +17,7 @@ before_script:
   # - psql -c 'CREATE DATABASE groundserver' -U postgres
   # - psql -c 'CREATE DATABASE groundservertest' -U postgres
   # - psql -c 'CREATE ROLE travis SUPERUSER LOGIN CREATEDB;' -U postgres
-  - cp config/database.yml.travis config/database.yml
+  # - cp config/database.yml.travis config/database.yml
   - wget https://services.gradle.org/distributions/gradle-6.2-bin.zip
   - unzip gradle-6.2-bin.zip
   - export GRADLE_HOME=$PWD/gradle-6.2
