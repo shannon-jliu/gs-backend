@@ -10,7 +10,6 @@ import javax.persistence.CascadeType
 import javax.persistence.ManyToOne
 import javax.persistence.MappedSuperclass
 import javax.persistence.OneToOne
-import javax.persistence.Column
 
 /**
  * Model to represent a target sighting. The target sighting is the sighting of a target in a
@@ -20,9 +19,9 @@ import javax.persistence.Column
 abstract class TargetSighting(
         creator: ODLCUser?,
         /** The x pixel coordinate of the center of the target sighting in the specific Image  */
-        @Column(nullable=true) var pixelx: Int?,
+        var pixelx: Int?,
         /** The y pixel coordinate of the center of the target sighting in the specific Image  */
-        @Column(nullable=true) var pixely: Int?,
+        var pixely: Int?,
         /** The horizontal pixel width of the target sighting in the specific image  */
         var width: Int?,
         /** The vertical pixel height of the target sighting in the specific image  */
