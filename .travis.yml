@@ -5,9 +5,16 @@ install: true
 jdk: openjdk11
 services:
   - postgresql
+before_install:
+  - sudo apt-get update
+  - sudo apt-get --yes remove postgresql\*
+  - sudo apt-get install -y postgresql-11 postgresql-client-11
+  - sudo cp /etc/postgresql/{9.6,11}/main/pg_hba.conf
+  - sudo service postgresql restart 11
 before_script:
   # install Gradle 6.2
   - psql --version
+  - cp config/database.yml.travis config/database.yml
   - wget https://services.gradle.org/distributions/gradle-6.2-bin.zip
   - unzip gradle-6.2-bin.zip
   - export GRADLE_HOME=$PWD/gradle-6.2
