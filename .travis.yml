@@ -13,13 +13,16 @@ before_install:
   - sudo service postgresql restart 11
 before_script:
   # install Gradle 6.2
-  - psql --version
+  - psql -c 'CREATE DATABASE groundserver' -U postgres
+  - psql -c 'CREATE DATABASE groundservertest' -U postgres
+  - psql -c 'CREATE ROLE travis SUPERUSER LOGIN CREATEDB;' -U postgres
+  - cp config/database.yml.travis config/database.yml
   - wget https://services.gradle.org/distributions/gradle-6.2-bin.zip
   - unzip gradle-6.2-bin.zip
   - export GRADLE_HOME=$PWD/gradle-6.2
   - export PATH=$GRADLE_HOME/bin:$PATH
   # create the databases
-  - POSTGRES_MULTIPLE_DATABASES=groundserver,groundservertest ./pg-docker-script/create-multiple-databases.sh
+  # - POSTGRES_MULTIPLE_DATABASES=groundserver,groundservertest ./pg-docker-script/create-multiple-databases.sh
   # since we have no db container, need to alias localhost to db so it can find the db
   - sudo sed -i '/127.0.0.1/ s/$/db/' /etc/hosts
 script:
@@ -31,6 +34,3 @@ addons:
     packages:
     - postgresql-11
     - postgresql-client-11
-env:
-  global:
-  - PGPORT=5432
