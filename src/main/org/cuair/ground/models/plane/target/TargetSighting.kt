@@ -19,9 +19,9 @@ import javax.persistence.OneToOne
 abstract class TargetSighting(
         creator: ODLCUser?,
         /** The x pixel coordinate of the center of the target sighting in the specific Image  */
-        var pixelx: Int? = null,
+        var pixelx: Int? = 0,
         /** The y pixel coordinate of the center of the target sighting in the specific Image  */
-        var pixely: Int? = null,
+        var pixely: Int? = 0,
         /** The horizontal pixel width of the target sighting in the specific image  */
         var width: Int?,
         /** The vertical pixel height of the target sighting in the specific image  */
