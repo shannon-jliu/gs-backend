@@ -17,34 +17,34 @@ import javax.persistence.OneToOne
  */
 @MappedSuperclass
 abstract class TargetSighting(
-        creator: ODLCUser?,
+        creator: ODLCUser? = null,
         /** The x pixel coordinate of the center of the target sighting in the specific Image  */
-        var pixelx: Int? = 0,
+        var pixelx: Int? = null,
         /** The y pixel coordinate of the center of the target sighting in the specific Image  */
-        var pixely: Int? = 0,
+        var pixely: Int? = null,
         /** The horizontal pixel width of the target sighting in the specific image  */
-        var width: Int?,
+        var width: Int? = null,
         /** The vertical pixel height of the target sighting in the specific image  */
-        var height: Int?,
+        var height: Int? = null,
         /**
          * Represents the Geotag of this target sighting that records the gps location and the direction
          * that the target sighting is facing
          */
-        @field:OneToOne(cascade = [CascadeType.ALL]) var geotag: Geotag?,
+        @field:OneToOne(cascade = [CascadeType.ALL]) var geotag: Geotag? = null,
         /**
          * The orientation of the target sighting with respect to the top of the image. This means that
          * the vector below is 0 and the radians increase in a counterclockwise fashion.
          */
-        val radiansFromTop: Double?,
+        val radiansFromTop: Double? = null,
         /** The confidence the vision system has in the target orientation identification  */
-        open var orientationConfidence: Double?,
+        open var orientationConfidence: Double? = null,
         /** The confidence MDLC taggers have in the classification accuracy  */
-        var mdlcClassConf: Confidence?,
+        var mdlcClassConf: Confidence? = null,
         /**
          * The assignment from which this target sighting was created (contains the image that this target
          * sighting was tagged in)
          */
-        @field:ManyToOne var assignment: Assignment?
+        @field:ManyToOne var assignment: Assignment? = null
 ) : ClientCreatable(creator) {
     /**
      * Given another target sighting, it updates all fields of this instance if there are any
