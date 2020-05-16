@@ -7,11 +7,15 @@
   - [Installation](#installation)
     - [Mac OS](#mac-os)
       - [Gradle](#gradle)
-      - [Java 13/JDK 13](#java-13jdk-13)
+      - [Java 11/JDK 11](#java-11jdk-11)
       - [Postgres](#postgres)
   - [Setup](#setup)
-  - [Running](#running)
+  - [DISCLAIMER](#disclaimer)
+  - [Docker](#docker)
+  - [Setup (Native)](#setup-native)
   - [Development guide](#development-guide)
+  - [Running (Native)](#running-native)
+  - [Testing](#testing)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -19,7 +23,7 @@
 Ground Server for the Platform infrastructure, Spring-ified
 
 ## Requirements
-- Java 13
+- Java 11
 - `gradle`
 - Python 3 for `pre-commit`
 - PostgresSQL
@@ -30,14 +34,14 @@ Ground Server for the Platform infrastructure, Spring-ified
 #### Gradle
   - `brew install gradle`
 
-#### Java 13/JDK 13
+#### Java 11/JDK 11
 This assumes you already have some version of Java installed.
-  - Go to [OpenJDK](https://jdk.java.net/13/) to download JDK 13.
+  - Go to [OpenJDK](https://jdk.java.net/archive/) to download JDK 11 (Download `11.0.2 (build 11.0.2+9)`).
   - Navigate to where you downloaded the JDK tar, and then run:
       -  `tar -xf <file>.tar.gz`
   - then move the JDK into your JDK folder:
       -  `sudo mv jdk-<...>.jdk/ /Library/Java/JavaVirtualMachines/`
-  - run `java --version` to confirm that it is openJDK 13 running
+  - run `java --version` to confirm that it is openJDK 11 running
 
 
 #### Postgres

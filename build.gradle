@@ -31,7 +31,7 @@ sourceSets {
 
 group = "org.cuair.ground"
 version = "0.0.1-SNAPSHOT"
-sourceCompatibility = 13.0
+sourceCompatibility = 11.0
 
 repositories {
     mavenCentral()
