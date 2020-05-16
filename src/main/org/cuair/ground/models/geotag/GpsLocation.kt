@@ -126,7 +126,7 @@ class GpsLocation
       /** Maximum valid longitude  */
       const val ABS_LONGITUDE_BOUND = 180.0
 
-      val logger = LoggerFactory.getLogger(GpsLocation.javaClass)
+      val logger = LoggerFactory.getLogger(GpsLocation::class.java)
 
       /**
        * Get the median of a variable number of GPS locations
