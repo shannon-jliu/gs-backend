@@ -78,6 +78,7 @@ Native solutions are no longer being maintained. Using Docker to run the backend
       * `postgres -D <path-to-postgres-installation>`
   - Create a user
       * `createuser --createdb --pwprompt --superuser --createrole postgres`
+      * Note for Linux users: The password must be set to `admin`
   - Enter the Postgres terminal
       * `psql -U postgres`
   - Create the main database
