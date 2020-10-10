@@ -59,10 +59,12 @@ public class AlphanumTargetSightingController
 
   @Override
   @RequestMapping(value = "/assignment/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  public AlphanumTargetSighting create(@PathVariable Long id, @RequestBody AlphanumTargetSighting ts) {
+  public AlphanumTargetSighting create(@PathVariable Long id,
+                                       @RequestBody AlphanumTargetSighting ts) {
     if (ts.isOffaxis() != null && ts.isOffaxis()) {
       if (ts.getTarget() != null) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Don't pass targets for off-axis sighting creates");
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            "Don't pass targets for off-axis sighting creates");
       }
       ts.setTarget(alphaTargetDao.getOffaxisTarget());
     }
@@ -87,7 +89,8 @@ public class AlphanumTargetSightingController
 
   @Override
   @RequestMapping(value = "/{id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-  public AlphanumTargetSighting update(@PathVariable Long id, @RequestBody AlphanumTargetSighting other) {
+  public AlphanumTargetSighting update(@PathVariable Long id,
+                                       @RequestBody AlphanumTargetSighting other) {
     AlphanumTargetSighting ts = alphaTargetSightingDao.get(id);
     if (ts == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -96,7 +99,8 @@ public class AlphanumTargetSightingController
     // checks if the target is offaxis or updated to offaxis and if a target is set
     if (((ts.isOffaxis() && other.isOffaxis() == null) || (Boolean.TRUE.equals(other.isOffaxis())))
         && other.getTarget() != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Don't pass targets for off-axis sighting updates");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+          "Don't pass targets for off-axis sighting updates");
     }
 
     if (Boolean.TRUE.equals(other.isOffaxis())) {

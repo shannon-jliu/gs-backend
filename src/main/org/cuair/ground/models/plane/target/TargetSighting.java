@@ -266,7 +266,9 @@ public abstract class TargetSighting extends ClientCreatable {
 
     if (!Objects.deepEquals(this.radiansFromTop, other.getRadiansFromTop())) return false;
 
-    if (!Objects.deepEquals(this.orientationConfidence, other.getOrientationConfidence())) return false;
+    if (!Objects.deepEquals(this.orientationConfidence, other.getOrientationConfidence())) {
+      return false;
+    }
 
     if (!Objects.deepEquals(this.mdlcClassConf, other.getMdlcClassConf())) return false;
 

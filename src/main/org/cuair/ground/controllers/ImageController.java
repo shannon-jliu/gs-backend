@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -97,6 +98,21 @@ public class ImageController {
   public ResponseEntity get(@PathVariable Long id) {
     Image image = imageDao.get(id);
     return (image != null) ? ok(image) : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+  }
+
+  /**
+   * Constructs a HTTP response with gps locations of the four corners of an image based on Geotag index 0 - top
+   * left; index 1 - top right; index 2 - bottom left; index 3 - bottom right;
+   *
+   * @param id Long id for Image for which the client wants geotag information
+   * @return 200 with the gps locations of the four corners of the image with id 'id' based on Geotag, 404 on error
+   */
+  @RequestMapping(value = "/geotag/{id}", method = RequestMethod.GET)
+  public ResponseEntity getGeotagCoordinates(@PathVariable Long id) {
+    Image image = imageDao.get(id);
+    if (image == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Image with given id doesn't exist");
+    Map<String,Object> locations = image.getLocations();
+    return (locations != null) ? ok(locations) : ResponseEntity.status(HttpStatus.NOT_FOUND).body("The geotag information doesn't exist yet");
   }
 
   /**

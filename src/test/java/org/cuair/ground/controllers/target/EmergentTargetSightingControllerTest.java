@@ -41,7 +41,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 @AutoConfigureMockMvc
 public class EmergentTargetSightingControllerTest {
 
-  private static final Logger logger = LoggerFactory.getLogger(EmergentTargetSightingController.class);
+  private static final Logger logger =
+      LoggerFactory.getLogger(EmergentTargetSightingController.class);
 
   @Autowired
   private MockMvc mvc;
@@ -60,11 +61,13 @@ public class EmergentTargetSightingControllerTest {
   private DatabaseAccessor<EmergentTarget> targetDao =
       DAOFactory.getDAO(DAOFactory.ModelDAOType.DATABASE_ACCESSOR, EmergentTarget.class);
   private AssignmentDatabaseAccessor assignmentDao =
-      (AssignmentDatabaseAccessor) DAOFactory.getDAO(DAOFactory.ModellessDAOType.ASSIGNMENT_DATABASE_ACCESSOR);
+      (AssignmentDatabaseAccessor) DAOFactory
+          .getDAO(DAOFactory.ModellessDAOType.ASSIGNMENT_DATABASE_ACCESSOR);
   private DatabaseAccessor<Geotag> geotagDao =
       DAOFactory.getDAO(DAOFactory.ModelDAOType.DATABASE_ACCESSOR, Geotag.class);
   private ODLCUserDatabaseAccessor userDao =
-      (ODLCUserDatabaseAccessor) DAOFactory.getDAO(DAOFactory.ModellessDAOType.ODLCUSER_DATABASE_ACCESSOR);
+      (ODLCUserDatabaseAccessor) DAOFactory
+          .getDAO(DAOFactory.ModellessDAOType.ODLCUSER_DATABASE_ACCESSOR);
   private EmergentTarget emergentTarget;
 
   /** Initializes the emergent target */
@@ -101,13 +104,17 @@ public class EmergentTargetSightingControllerTest {
   }
 
   /** Asserts that sending a GET request to emergent target sighting route {@code route} yields {@code expected} */
-  private void assertListGetRequestYields(String route, List<EmergentTargetSighting> expected) throws Exception {
-    ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get(route).accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk());
+  private void assertListGetRequestYields(String route, List<EmergentTargetSighting> expected)
+      throws Exception {
+    ResultActions resultActions =
+        mvc.perform(MockMvcRequestBuilders.get(route).accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
 
     MvcResult result = resultActions.andReturn();
-    List<EmergentTargetSighting> actual = new ObjectMapper().readValue(result.getResponse().getContentAsString(),
-        TypeFactory.defaultInstance().constructCollectionType(List.class, EmergentTargetSighting.class));
+    List<EmergentTargetSighting> actual =
+        new ObjectMapper().readValue(result.getResponse().getContentAsString(),
+            TypeFactory.defaultInstance()
+                .constructCollectionType(List.class, EmergentTargetSighting.class));
 
     assertEquals(expected, actual);
   }
@@ -284,7 +291,8 @@ public class EmergentTargetSightingControllerTest {
 
     ObjectMapper mapper = new ObjectMapper();
     MvcResult result = mvc
-        .perform(MockMvcRequestBuilders.post(String.format("/emergent_target_sighting/assignment/%d", assignment.getId()))
+        .perform(MockMvcRequestBuilders
+            .post(String.format("/emergent_target_sighting/assignment/%d", assignment.getId()))
             .accept(MediaType.APPLICATION_JSON)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .content(mapper.writeValueAsString(t1)))
@@ -292,7 +300,8 @@ public class EmergentTargetSightingControllerTest {
         .andReturn();
 
     EmergentTargetSighting actual =
-        new ObjectMapper().readValue(result.getResponse().getContentAsString(), EmergentTargetSighting.class);
+        new ObjectMapper()
+            .readValue(result.getResponse().getContentAsString(), EmergentTargetSighting.class);
 
     // judge target id excluded from json so added back
     actual.getTarget().setJudgeTargetId_TESTS_ONLY(emergentTarget.getJudgeTargetId());
@@ -340,7 +349,8 @@ public class EmergentTargetSightingControllerTest {
 
     MockHttpServletResponse response = resultActions.andReturn().getResponse();
     assertEquals("", response.getContentAsString());
-    assertEquals(response.getErrorMessage(), "Creator ODLCUser does not match ODLCUser of assignment");
+    assertEquals(response.getErrorMessage(),
+        "Creator ODLCUser does not match ODLCUser of assignment");
     assertEquals(0, emergentTargetSightingDao.getAllIds().size());
   }
 
@@ -532,7 +542,8 @@ public class EmergentTargetSightingControllerTest {
 
     ObjectMapper mapper = new ObjectMapper();
     MvcResult result = mvc
-        .perform(MockMvcRequestBuilders.post(String.format("/emergent_target_sighting/assignment/%d", assignment.getId()))
+        .perform(MockMvcRequestBuilders
+            .post(String.format("/emergent_target_sighting/assignment/%d", assignment.getId()))
             .accept(MediaType.APPLICATION_JSON)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .content(mapper.writeValueAsString(t1)))
@@ -540,7 +551,8 @@ public class EmergentTargetSightingControllerTest {
         .andReturn();
 
     assertEquals("", result.getResponse().getContentAsString());
-    assertEquals("Only MDLC should be creating Emergent Target Sightings", result.getResponse().getErrorMessage());
+    assertEquals("Only MDLC should be creating Emergent Target Sightings",
+        result.getResponse().getErrorMessage());
   }
 
   /** tests successfully updating an emergent ts */
@@ -581,14 +593,16 @@ public class EmergentTargetSightingControllerTest {
 
     ObjectMapper mapper = new ObjectMapper();
     MvcResult result = mvc
-        .perform(MockMvcRequestBuilders.put(String.format("/emergent_target_sighting/%d", original.getId()))
+        .perform(MockMvcRequestBuilders
+            .put(String.format("/emergent_target_sighting/%d", original.getId()))
             .accept(MediaType.APPLICATION_JSON)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .content(mapper.writeValueAsString(update)))
         .andExpect(status().isOk())
         .andReturn();
     EmergentTargetSighting actual =
-        new ObjectMapper().readValue(result.getResponse().getContentAsString(), EmergentTargetSighting.class);
+        new ObjectMapper()
+            .readValue(result.getResponse().getContentAsString(), EmergentTargetSighting.class);
 
     assertEquals(update.getTarget(), actual.getTarget());
     assertEquals(update.getpixelx(), actual.getpixelx());
@@ -599,7 +613,8 @@ public class EmergentTargetSightingControllerTest {
   }
 
   /** Asserts update to emergent ts with id 1 is invalid */
-  private void assertInvalidUpdates(Long id, String expectedError, EmergentTargetSighting invalidUpdate) throws Exception {
+  private void assertInvalidUpdates(Long id, String expectedError,
+                                    EmergentTargetSighting invalidUpdate) throws Exception {
     ObjectMapper mapper = new ObjectMapper();
     MvcResult result = mvc
         .perform(MockMvcRequestBuilders.put(String.format("/emergent_target_sighting/%d", id))
@@ -650,7 +665,8 @@ public class EmergentTargetSightingControllerTest {
             null);
 
     // tests
-    assertInvalidUpdates(original.getId(), "Don't pass targets for emergent target sighting " + "update", update);
+    assertInvalidUpdates(original.getId(),
+        "Don't pass targets for emergent target sighting " + "update", update);
   }
 
   /** Test invalid update, cannot pass id in json */
@@ -801,7 +817,8 @@ public class EmergentTargetSightingControllerTest {
             null,
             null);
 
-    assertInvalidUpdates(original.getId(), "Don't change value of pixel_x. Current value is 3", update);
+    assertInvalidUpdates(original.getId(), "Don't change value of pixel_x. Current value is 3",
+        update);
   }
 
   /** Test invalid update, cannot pass non-matching pixel_y in json */
@@ -838,7 +855,8 @@ public class EmergentTargetSightingControllerTest {
             null,
             null);
 
-    assertInvalidUpdates(original.getId(), "Don't change value of pixel_y. Current value is 3", update);
+    assertInvalidUpdates(original.getId(), "Don't change value of pixel_y. Current value is 3",
+        update);
   }
 
   /** Test invalid update, cannot pass non-matching width in json */
@@ -875,7 +893,8 @@ public class EmergentTargetSightingControllerTest {
             null,
             null);
 
-    assertInvalidUpdates(original.getId(), "Don't change value of width. Current value is 100", update);
+    assertInvalidUpdates(original.getId(), "Don't change value of width. Current value is 100",
+        update);
   }
 
   /** Test invalid update, cannot pass non-matching height in json */
@@ -912,7 +931,8 @@ public class EmergentTargetSightingControllerTest {
             null,
             null);
 
-    assertInvalidUpdates(original.getId(), "Don't change value of height. Current value is 100", update);
+    assertInvalidUpdates(original.getId(), "Don't change value of height. Current value is 100",
+        update);
   }
 
   /** Tests update by id call when model with specific id doesn't exist */
@@ -970,7 +990,8 @@ public class EmergentTargetSightingControllerTest {
     emergentTargetSightingDao.create(ts);
 
 
-    mvc.perform(MockMvcRequestBuilders.delete(String.format("/emergent_target_sighting/%d", ts.getId())))
+    mvc.perform(
+        MockMvcRequestBuilders.delete(String.format("/emergent_target_sighting/%d", ts.getId())))
         .andExpect(status().isOk());
 
     assertNull(emergentTargetSightingDao.get(ts.getId()));
@@ -1010,7 +1031,9 @@ public class EmergentTargetSightingControllerTest {
     t.setthumbnailTsid(ts.getId());
     targetDao.update(t);
 
-    mvc.perform(MockMvcRequestBuilders.delete(String.format("/emergent_target_sighting/%d", ts.getId()))).andExpect(status().isOk());
+    mvc.perform(
+        MockMvcRequestBuilders.delete(String.format("/emergent_target_sighting/%d", ts.getId())))
+        .andExpect(status().isOk());
 
     EmergentTarget newT = targetDao.get(t.getId());
     assertEquals(0L, newT.getthumbnailTsid().longValue());

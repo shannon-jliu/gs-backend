@@ -435,7 +435,9 @@ public class AlphanumTargetSighting extends TargetSighting {
 
     if (!Objects.deepEquals(this.shapeConfidence, other.getShapeConfidence())) return false;
 
-    if (!Objects.deepEquals(this.shapeColorConfidence, other.getShapeColorConfidence())) return false;
+    if (!Objects.deepEquals(this.shapeColorConfidence, other.getShapeColorConfidence())) {
+      return false;
+    }
 
     if (!Objects.deepEquals(this.alphaConfidence, other.getAlphaConfidence())) return false;
 

@@ -79,7 +79,8 @@ public abstract class TargetSightingController<T extends TargetSighting> {
     }
     // full objects cannot be compared here because of issue #61
     if (!ts.getCreator().getId().equals(a.getAssignee().getId())) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Creator ODLCUser does not match ODLCUser of assignment");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+          "Creator ODLCUser does not match ODLCUser of assignment");
     }
     ts.setAssignment(a);
 
@@ -105,7 +106,7 @@ public abstract class TargetSightingController<T extends TargetSighting> {
    * @param ts    Target sighting to be updated
    * @param other Target sighting with updated fields
    * @return the updated target sighting on success, 400 if supplied target sighting with updated
-   *    * fields is incorrectly formatted
+   * * fields is incorrectly formatted
    * @throws ResponseStatusException if new target sighting is invalid
    */
   T updateFromTargetSighting(T ts, T other) {
@@ -120,16 +121,20 @@ public abstract class TargetSightingController<T extends TargetSighting> {
     }
 
     if (other.getpixelx() != null && !other.getpixelx().equals(ts.getpixelx())) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Don't change value of pixel_x. Current value is " + ts.getpixelx());
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+          "Don't change value of pixel_x. Current value is " + ts.getpixelx());
     }
     if (other.getpixely() != null && !other.getpixely().equals(ts.getpixely())) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Don't change value of pixel_y. Current value is " + ts.getpixely());
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+          "Don't change value of pixel_y. Current value is " + ts.getpixely());
     }
     if (other.getWidth() != null && !other.getWidth().equals(ts.getWidth())) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Don't change value of width. Current value is " + ts.getWidth());
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+          "Don't change value of width. Current value is " + ts.getWidth());
     }
     if (other.getHeight() != null && !other.getHeight().equals(ts.getHeight())) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Don't change value of height. Current value is " + ts.getHeight());
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+          "Don't change value of height. Current value is " + ts.getHeight());
     }
     ts.updateFromTargetSighting(other);
 

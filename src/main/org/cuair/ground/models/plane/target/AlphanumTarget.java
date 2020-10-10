@@ -261,9 +261,13 @@ public class AlphanumTarget extends Target {
 
     rootNode.put("alphanumeric", this.alpha);
 
-    if (this.shapeColor != null) rootNode.put("background_color", this.shapeColor.name().toLowerCase());
+    if (this.shapeColor != null) {
+      rootNode.put("background_color", this.shapeColor.name().toLowerCase());
+    }
 
-    if (this.alphaColor != null) rootNode.put("alphanumeric_color", this.alphaColor.name().toLowerCase());
+    if (this.alphaColor != null) {
+      rootNode.put("alphanumeric_color", this.alphaColor.name().toLowerCase());
+    }
     rootNode.put("autonomous", this.getCreator().getUserType() == ODLCUser.UserType.ADLC);
 
     return rootNode;

@@ -2,6 +2,7 @@ package org.cuair.ground.models
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.cuair.ground.models.geotag.Telemetry
+import org.cuair.ground.util.Geotagging
 import java.util.Objects
 import javax.persistence.Entity
 import javax.persistence.OneToOne
@@ -43,6 +44,44 @@ class Image(
         @JsonProperty("fixed") @EnumValue("0") FIXED("fixed"),
         @JsonProperty("tracking") @EnumValue("1") TRACKING("tracking"),
         @JsonProperty("off-axis") @EnumValue("2") OFFAXIS("off-axis")
+    }
+
+    /**
+     * Internal method for finding geotags for a given image id
+     *
+     * @return ObjectNode
+     */
+    @JsonIgnore fun getLocations(): MutableMap<String, Any?>? {
+      val imageTelemetry = this.telemetry ?: return null
+      val imageGPS = imageTelemetry.getGps() ?: return null
+      val centerLatitude = imageGPS.getLatitude()
+      val centerLongitude = imageGPS.getLongitude()
+      if (imageTelemetry.getPlaneYaw() == null) return null
+      var planeYaw = imageTelemetry.getPlaneYaw() * Math.PI / 180
+      val altitude = imageTelemetry.getAltitude() ?: return null
+
+      val topLeft = Geotagging.getPixelCoordinates(centerLatitude, centerLongitude, altitude, 0.0, 0.0, planeYaw)
+      val topRight = Geotagging.getPixelCoordinates(
+          centerLatitude, centerLongitude, altitude, Geotagging.IMAGE_WIDTH, 0.0, planeYaw)
+      val bottomLeft = Geotagging.getPixelCoordinates(
+          centerLatitude, centerLongitude, altitude, 0.0, Geotagging.IMAGE_HEIGHT, planeYaw)
+      val bottomRight = Geotagging.getPixelCoordinates(
+          centerLatitude,
+          centerLongitude,
+          altitude,
+          Geotagging.IMAGE_WIDTH,
+          Geotagging.IMAGE_HEIGHT,
+          planeYaw)
+
+      val locs = mutableMapOf<String, Any?>()
+      locs.put("topLeft", topLeft)
+      locs.put("topRight", topRight)
+      locs.put("bottomLeft", bottomLeft)
+      locs.put("bottomRight", bottomRight)
+      locs.put("orientation", planeYaw)
+      locs.put("url", this.imageUrl)
+
+      return locs
     }
 
     /**

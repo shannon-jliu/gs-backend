@@ -56,13 +56,16 @@ public class EmergentTargetSightingController
 
   @Override
   @RequestMapping(value = "/assignment/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  public EmergentTargetSighting create(@PathVariable Long id, @RequestBody EmergentTargetSighting ts) {
+  public EmergentTargetSighting create(@PathVariable Long id,
+                                       @RequestBody EmergentTargetSighting ts) {
     // TODO: Fix: This threw a NullPointerException when moving a target sighting to a target. Neither were emergent though
     // The console on the frontend also threw an error: "index.js:1437 Warning: Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in the componentWillUnmount method.
     // in MergeSightingPreview (at mergeTarget.js:314)""
     EmergentTarget t = eTargetDao.getAll().get(0);
-    if (ts.getCreator().getUserType() != ODLCUser.UserType.MDLCTAGGER && ts.getCreator().getUserType() != ODLCUser.UserType.MDLCOPERATOR) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only MDLC should be creating Emergent Target Sightings");
+    if (ts.getCreator().getUserType() != ODLCUser.UserType.MDLCTAGGER
+        && ts.getCreator().getUserType() != ODLCUser.UserType.MDLCOPERATOR) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+          "Only MDLC should be creating Emergent Target Sightings");
     }
     ts.setTarget(t);
     return super.create(id, ts);
@@ -70,9 +73,11 @@ public class EmergentTargetSightingController
 
   @Override
   @RequestMapping(value = "/{id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-  public EmergentTargetSighting update(@PathVariable Long id, @RequestBody EmergentTargetSighting other) {
+  public EmergentTargetSighting update(@PathVariable Long id,
+                                       @RequestBody EmergentTargetSighting other) {
     if (other.getTarget() != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Don't pass targets for emergent target sighting update");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+          "Don't pass targets for emergent target sighting update");
     }
     EmergentTargetSighting ts = eSightingDao.get(id);
     if (ts == null) {
