@@ -110,9 +110,12 @@ public class ImageController {
   @RequestMapping(value = "/geotag/{id}", method = RequestMethod.GET)
   public ResponseEntity getGeotagCoordinates(@PathVariable Long id) {
     Image image = imageDao.get(id);
-    if (image == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Image with given id doesn't exist");
-    Map<String,Object> locations = image.getLocations();
-    return (locations != null) ? ok(locations) : ResponseEntity.status(HttpStatus.NOT_FOUND).body("The geotag information doesn't exist yet");
+    if (image == null) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Image with given id doesn't exist");
+    }
+    Map<String, Object> locations = image.getLocations();
+    return (locations != null) ? ok(locations) : ResponseEntity.status(HttpStatus.NOT_FOUND)
+        .body("The geotag information doesn't exist yet");
   }
 
   /**

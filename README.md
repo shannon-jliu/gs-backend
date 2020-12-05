@@ -55,9 +55,9 @@ This assumes you already have some version of Java installed.
 3. See [IntelliJ Setup](docs/intellij_setup.md).
 
 ## DISCLAIMER
-Native solutions are no longer being maintained. Using Docker to run the backend is highly recommended. If you must run/develop the backend natively, instructions are provided later on in the README.
+Certain properties are defaulted to allow for native development. If you would like to develop using Docker, read the next section. Details for native setup follow.
 
-## Docker
+## Setup (Docker)
 1. Ensure that the following four files have the following four lines changed to below:
   - `application.properties`
       * `spring.datasource.url=jdbc:postgresql://db:5432/groundserver`
