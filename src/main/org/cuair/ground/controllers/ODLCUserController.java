@@ -60,29 +60,6 @@ public class ODLCUserController {
   }
 
   /**
-   * @param request - the request object that will contain the remoteAddr of this request
-   * @return 200 with "adlc" as a plaintext body if the user is first created, otherwise 400
-   */
-  @RequestMapping(value = "/create/adlc", method = RequestMethod.GET)
-  public ResponseEntity create(HttpServletRequest request) {
-    if (odlcUserDao.getADLCUser() != null) {
-      return badRequest().body("ADLC user already exists!");
-    }
-
-    String address = request.getRemoteAddr();
-    if (!Flags.ENABLE_MULTIPLE_USERS_PER_IP) {
-      ODLCUser other = odlcUserDao.getODLCUserFromAddress(address);
-      if (other != null) {
-        return badRequest()
-            .body("User " + other.getUsername() + " already exists from this host: " + address);
-      }
-    }
-
-    odlcUserDao.create(new ODLCUser("adlc", address, ODLCUser.UserType.ADLC));
-    return ok("adlc");
-  }
-
-  /**
    * @return 200 with true if users are enabled, false if users are not enabled
    */
   @RequestMapping(value = "/enabled", method = RequestMethod.GET)

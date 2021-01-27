@@ -6,6 +6,7 @@ import javax.annotation.PreDestroy;
 import org.cuair.ground.daos.AlphanumTargetDatabaseAccessor;
 import org.cuair.ground.daos.ClientCreatableDatabaseAccessor;
 import org.cuair.ground.daos.DAOFactory;
+import org.cuair.ground.daos.ODLCUserDatabaseAccessor;
 import org.cuair.ground.models.ODLCUser;
 import org.cuair.ground.models.plane.target.AlphanumTarget;
 import org.cuair.ground.models.plane.target.EmergentTarget;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Component;
 /* Lifecycle component, contains startup and shutdown logic for server. */
 @Component
 public class Lifecycle {
-
   private static AlphanumTargetDatabaseAccessor<AlphanumTarget> alphaTargetDao =
       (AlphanumTargetDatabaseAccessor<AlphanumTarget>)
           DAOFactory.getDAO(
@@ -25,6 +25,9 @@ public class Lifecycle {
       (ClientCreatableDatabaseAccessor<EmergentTarget>)
           DAOFactory.getDAO(
               DAOFactory.ModelDAOType.CLIENT_CREATABLE_DATABASE_ACCESSOR, EmergentTarget.class);
+
+  private ODLCUserDatabaseAccessor odlcUserDao = (ODLCUserDatabaseAccessor) DAOFactory
+      .getDAO(DAOFactory.ModellessDAOType.ODLCUSER_DATABASE_ACCESSOR);
 
   private static String DEFAULT_EMERGENT_TARGET_DESC = Flags.DEFAULT_EMERGENT_TARGET_DESC;
 
@@ -79,12 +82,21 @@ public class Lifecycle {
     }
   }
 
+  /**
+   * Runs all necessary startup functions
+   */
   @PostConstruct
   public void startUp() {
     initializeOffaxisTargetDatabase();
     initializeEmergentTargetDatabase();
+    if (odlcUserDao.getADLCUser() == null) {
+      odlcUserDao.create(new ODLCUser("adlc", "", ODLCUser.UserType.ADLC));
+    }
   }
 
+  /**
+   * Runs all necessary shutdown functions
+   */
   @PreDestroy
   public void shutDown() {
 
