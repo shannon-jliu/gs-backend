@@ -20,11 +20,11 @@ import javax.persistence.Entity
 /** Represents the position and orientation of an object on the ground  */
 @Entity
 class Geotag(
-    /** The GPS coordinates of this geotag  */
-    @Embedded
-    var gpsLocation: GpsLocation?,
-    /** The orientation of this geotag represented as radians from north clockwise (NE is clockwise from N, etc.)  */
-    var clockwiseRadiansFromNorth: Double?
+        /** The GPS coordinates of this geotag  */
+        @Embedded
+        var gpsLocation: GpsLocation?,
+        /** The orientation of this geotag represented as radians from north clockwise (NE is clockwise from N, etc.)  */
+        var clockwiseRadiansFromNorth: Double?
 ) : CUAirModel() {
 
     /**
@@ -67,6 +67,7 @@ class Geotag(
 
     companion object {
         private val logger = LoggerFactory.getLogger(GpsLocation::class.java)
+
         /** The database access object for the assignment table  */
         private val alphaTargetSightingDao = getDAO(
                 DAOFactory.ModelDAOType.TARGET_SIGHTINGS_DATABASE_ACCESSOR,

@@ -11,48 +11,48 @@ import org.cuair.ground.models.plane.PlaneModel
  * this class. It consists of a timestamp indicating when it was created.
  */
 @MappedSuperclass
-open class PlaneSettingsModel: PlaneModel() {
-  public enum class PlaneModelStatus (val status: String) {
-    // model was successfully sent to the plane
-    @EnumValue("0")
-    sent("sent"),
+open class PlaneSettingsModel : PlaneModel() {
+    public enum class PlaneModelStatus(val status: String) {
+        // model was successfully sent to the plane
+        @EnumValue("0")
+        sent("sent"),
 
-    // model was successfully sent to the plane but was invalid
-    @EnumValue("1")
-    failed("failed"),
+        // model was successfully sent to the plane but was invalid
+        @EnumValue("1")
+        failed("failed"),
 
-    // model is queued to be sent to the plane
-    @EnumValue("2")
-    queued("queued")
-  }
-
-  /** Status enum to indicate whether or not the model was sent to the plane */
-  private var status: PlaneModelStatus = PlaneModelStatus.queued
-
-  /**
-   * Gets the state of whether or not the model was sent to the plane
-   *
-   * @return the boolean state of whether or not the model was sent
-   */
-  fun getStatus(): PlaneModelStatus {
-    return status
-  }
-
-  /**
-   * Sets the status of whether or not the model was sent to the plane
-   *
-   * @param status the status of whether or not the model was sent
-   */
-  fun setStatus(status: PlaneModelStatus): Unit {
-    this.status = status
-  }
-
-  override fun equals(o: Any?): Boolean {
-    if (o == null || !super.equals(o)) {
-      return false
+        // model is queued to be sent to the plane
+        @EnumValue("2")
+        queued("queued")
     }
-    val other: PlaneSettingsModel = o as PlaneSettingsModel
 
-    return Objects.deepEquals(this.status, other.getStatus())
-  }
+    /** Status enum to indicate whether or not the model was sent to the plane */
+    private var status: PlaneModelStatus = PlaneModelStatus.queued
+
+    /**
+     * Gets the state of whether or not the model was sent to the plane
+     *
+     * @return the boolean state of whether or not the model was sent
+     */
+    fun getStatus(): PlaneModelStatus {
+        return status
+    }
+
+    /**
+     * Sets the status of whether or not the model was sent to the plane
+     *
+     * @param status the status of whether or not the model was sent
+     */
+    fun setStatus(status: PlaneModelStatus): Unit {
+        this.status = status
+    }
+
+    override fun equals(o: Any?): Boolean {
+        if (o == null || !super.equals(o)) {
+            return false
+        }
+        val other: PlaneSettingsModel = o as PlaneSettingsModel
+
+        return Objects.deepEquals(this.status, other.getStatus())
+    }
 }

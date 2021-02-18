@@ -37,13 +37,20 @@ class Image(
     ) : this(imageUrl, telemetry, ImgMode.FIXED, false, false, fov)
 
     /** The filesystem path this image lives on relative to the server directory */
-    @Transient var localImageUrl: String? = null
+    @Transient
+    var localImageUrl: String? = null
 
     /** The possible image modes: fixed, tracking, and off-axis */
-    enum class ImgMode (val mode: String) {
-        @JsonProperty("fixed") @EnumValue("0") FIXED("fixed"),
-        @JsonProperty("tracking") @EnumValue("1") TRACKING("tracking"),
-        @JsonProperty("off-axis") @EnumValue("2") OFFAXIS("off-axis")
+    enum class ImgMode(val mode: String) {
+        @JsonProperty("fixed")
+        @EnumValue("0")
+        FIXED("fixed"),
+        @JsonProperty("tracking")
+        @EnumValue("1")
+        TRACKING("tracking"),
+        @JsonProperty("off-axis")
+        @EnumValue("2")
+        OFFAXIS("off-axis")
     }
 
     /**
@@ -51,37 +58,38 @@ class Image(
      *
      * @return ObjectNode
      */
-    @JsonIgnore fun getLocations(): MutableMap<String, Any?>? {
-      val imageTelemetry = this.telemetry ?: return null
-      val imageGPS = imageTelemetry.getGps() ?: return null
-      val centerLatitude = imageGPS.getLatitude()
-      val centerLongitude = imageGPS.getLongitude()
-      if (imageTelemetry.getPlaneYaw() == null) return null
-      var planeYaw = imageTelemetry.getPlaneYaw() * Math.PI / 180
-      val altitude = imageTelemetry.getAltitude() ?: return null
+    @JsonIgnore
+    fun getLocations(): MutableMap<String, Any?>? {
+        val imageTelemetry = this.telemetry ?: return null
+        val imageGPS = imageTelemetry.getGps() ?: return null
+        val centerLatitude = imageGPS.getLatitude()
+        val centerLongitude = imageGPS.getLongitude()
+        if (imageTelemetry.getPlaneYaw() == null) return null
+        var planeYaw = imageTelemetry.getPlaneYaw() * Math.PI / 180
+        val altitude = imageTelemetry.getAltitude() ?: return null
 
-      val topLeft = Geotagging.getPixelCoordinates(centerLatitude, centerLongitude, altitude, 0.0, 0.0, planeYaw)
-      val topRight = Geotagging.getPixelCoordinates(
-          centerLatitude, centerLongitude, altitude, Geotagging.IMAGE_WIDTH, 0.0, planeYaw)
-      val bottomLeft = Geotagging.getPixelCoordinates(
-          centerLatitude, centerLongitude, altitude, 0.0, Geotagging.IMAGE_HEIGHT, planeYaw)
-      val bottomRight = Geotagging.getPixelCoordinates(
-          centerLatitude,
-          centerLongitude,
-          altitude,
-          Geotagging.IMAGE_WIDTH,
-          Geotagging.IMAGE_HEIGHT,
-          planeYaw)
+        val topLeft = Geotagging.getPixelCoordinates(centerLatitude, centerLongitude, altitude, 0.0, 0.0, planeYaw)
+        val topRight = Geotagging.getPixelCoordinates(
+                centerLatitude, centerLongitude, altitude, Geotagging.IMAGE_WIDTH, 0.0, planeYaw)
+        val bottomLeft = Geotagging.getPixelCoordinates(
+                centerLatitude, centerLongitude, altitude, 0.0, Geotagging.IMAGE_HEIGHT, planeYaw)
+        val bottomRight = Geotagging.getPixelCoordinates(
+                centerLatitude,
+                centerLongitude,
+                altitude,
+                Geotagging.IMAGE_WIDTH,
+                Geotagging.IMAGE_HEIGHT,
+                planeYaw)
 
-      val locs = mutableMapOf<String, Any?>()
-      locs.put("topLeft", topLeft)
-      locs.put("topRight", topRight)
-      locs.put("bottomLeft", bottomLeft)
-      locs.put("bottomRight", bottomRight)
-      locs.put("orientation", planeYaw)
-      locs.put("url", this.imageUrl)
+        val locs = mutableMapOf<String, Any?>()
+        locs.put("topLeft", topLeft)
+        locs.put("topRight", topRight)
+        locs.put("bottomLeft", bottomLeft)
+        locs.put("bottomRight", bottomRight)
+        locs.put("orientation", planeYaw)
+        locs.put("url", this.imageUrl)
 
-      return locs
+        return locs
     }
 
     /**

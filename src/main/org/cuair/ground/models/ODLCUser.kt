@@ -11,17 +11,20 @@ import io.ebean.annotation.EnumValue
  */
 @Entity
 data class ODLCUser(
-    @Column(unique = true) val username: String,
-    @Column val address: String,
-    @Column val userType: UserType
+        @Column(unique = true) val username: String,
+        @Column val address: String,
+        @Column val userType: UserType
 ) : CUAirModel() {
 
 
     /** The possible user types: tagger, operator and adlc */
-    enum class UserType (val mode: String) {
-        @EnumValue("0") MDLCTAGGER("tagger"),
-        @EnumValue("1") MDLCOPERATOR("operator"),
-        @EnumValue("2") ADLC("adlc")
+    enum class UserType(val mode: String) {
+        @EnumValue("0")
+        MDLCTAGGER("tagger"),
+        @EnumValue("1")
+        MDLCOPERATOR("operator"),
+        @EnumValue("2")
+        ADLC("adlc")
     }
 
     /**

@@ -78,8 +78,8 @@ abstract class TargetController<T : Target> {
      */
     fun update(t: T, other: T): ResponseEntity<Any> {
         val targetSightingDao = DAOFactory.getDAO(
-            DAOFactory.ModelDAOType.TARGET_SIGHTINGS_DATABASE_ACCESSOR,
-            t.fetchAssociatedTargetSightingClass()) as TargetSightingsDatabaseAccessor<out TargetSighting>
+                DAOFactory.ModelDAOType.TARGET_SIGHTINGS_DATABASE_ACCESSOR,
+                t.fetchAssociatedTargetSightingClass()) as TargetSightingsDatabaseAccessor<out TargetSighting>
 
         if (other.id !== null) {
             return badRequest().body("Don't pass ids for updates")
@@ -116,8 +116,8 @@ abstract class TargetController<T : Target> {
         if (t === null) return notFound().build()
 
         val targetSightingDao = DAOFactory.getDAO(
-            DAOFactory.ModelDAOType.TARGET_SIGHTINGS_DATABASE_ACCESSOR,
-            t.fetchAssociatedTargetSightingClass()) as TargetSightingsDatabaseAccessor<out TargetSighting>
+                DAOFactory.ModelDAOType.TARGET_SIGHTINGS_DATABASE_ACCESSOR,
+                t.fetchAssociatedTargetSightingClass()) as TargetSightingsDatabaseAccessor<out TargetSighting>
 
         // TODO: Add client code
         // if (CUAIR_INTEROP_REQUESTS) interopClient.deleteTarget(t)

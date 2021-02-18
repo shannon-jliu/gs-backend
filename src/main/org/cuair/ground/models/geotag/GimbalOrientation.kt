@@ -10,18 +10,18 @@ import kotlin.math.abs
 /** Represents the orientation of the gimbal */
 @Embeddable
 class GimbalOrientation
-    /**
-     * Creates a new GimbalOrientation given the pitch and roll in degrees
-     *
-     * @param pitch The pitch of the gimbal in degrees. 0 is pointing down and positive is pointing forward
-     * @param roll The roll of the gimbal in degrees. 0 is pointing down and positive is pointing to the right
-     */
-    constructor(
+/**
+ * Creates a new GimbalOrientation given the pitch and roll in degrees
+ *
+ * @param pitch The pitch of the gimbal in degrees. 0 is pointing down and positive is pointing forward
+ * @param roll The roll of the gimbal in degrees. 0 is pointing down and positive is pointing to the right
+ */
+constructor(
         @field:Basic(optional = true)
         private var pitch: Double,
         @field:Basic(optional = true)
         private var roll: Double
-    ) {
+) {
 
     /**
      * Get the pitch of this GimbalOrientation
@@ -65,8 +65,8 @@ class GimbalOrientation
      * @param other The object to compare
      * @return true if the object equals this GimbalOrientation
      */
-    override fun equals(other: Any?):Boolean {
-        if(other !is GimbalOrientation) return false
+    override fun equals(other: Any?): Boolean {
+        if (other !is GimbalOrientation) return false
         if (this.pitch != other.pitch) return false
         if (this.roll != other.roll) return false
         return true
