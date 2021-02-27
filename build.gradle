@@ -88,6 +88,9 @@ dependencies {
 
     // PowerMock
     implementation "org.powermock:powermock-reflect:2.0.6"
+
+    // Humble Video
+    implementation "io.humble:humble-video-all:0.3.0"
 }
 
 ebean {
