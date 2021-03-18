@@ -10,8 +10,8 @@ public class Flags {
   /** Test image directory */
   public static String TEST_IMAGE_DIR = "src/test/java/org/cuair/ground/controllers/test_images/";
 
-  /** Stream image Directory */
-  public static String STREAM_IMAGE_DIR = "stream_images/";
+  /** Stream segment directory */
+  public static String STREAM_SEGMENT_DIR = "stream_segments/";
 
   /** Constants */
   public static double FOV_HORIZONTAL_RADIANS = 0.7328394987;
