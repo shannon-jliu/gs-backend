@@ -1,6 +1,7 @@
 package org.cuair.ground.clients;
 
 import java.net.URI;
+import org.json.JSONObject;
 import org.cuair.ground.util.Flags;
 import org.cuair.ground.util.RequestUtil;
 import org.springframework.http.HttpHeaders;
@@ -27,7 +28,7 @@ public class InteropClient {
   private final String Password = Flags.INTEROP_PASSWORD;
 
   public InteropClient() {
-
+    // Nothing here yet
   }
 
   public void attemptLogin() {
@@ -45,7 +46,10 @@ public class InteropClient {
     
     // Create listenable future to listen for response of login post request
     ListenableFuture<ResponseEntity<String>> responseFuture =
-      template.exchange(interopLocation, HttpMethod.POST, requestEntity, String.class);
+      template.exchange(interopLocation, 
+                        HttpMethod.POST, 
+                        requestEntity, 
+                        String.class);
     
     // Print out success or failure when complete
     // Status code 200 -> OK, not 200 -> something happened (interop readme)
