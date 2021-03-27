@@ -58,8 +58,8 @@ public class InteropClient {
 
   private String createJsonLogin() {
     JSONObject login = new JSONObject();
-    json.put("password", Password);
-    json.put("username", Username);
+    login.put("password", Password);
+    login.put("username", Username);
     return login.toString();
   }
 }
