@@ -47,7 +47,7 @@ public class Lifecycle {
               new ODLCUser("interop", "localhost", ODLCUser.UserType.MDLCOPERATOR),
               null,
               null,
-              'A',
+              "A",
               null,
               true,
               null,

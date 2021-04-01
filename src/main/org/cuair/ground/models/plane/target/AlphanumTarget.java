@@ -23,7 +23,7 @@ public class AlphanumTarget extends Target {
   private Color shapeColor;
 
   /** The alphanumeric of this target. */
-  private Character alpha;
+  private String alpha;
 
   /** The color of the alphanumeric */
   private Color alphaColor;
@@ -48,7 +48,7 @@ public class AlphanumTarget extends Target {
       ODLCUser creator,
       Shape shape,
       Color shapeColor,
-      Character alpha,
+      String alpha,
       Color alphaColor,
       Boolean offaxis,
       Geotag geotag,
@@ -143,7 +143,7 @@ public class AlphanumTarget extends Target {
    *
    * @return Character alphanumeric
    */
-  public Character getAlpha() {
+  public String getAlpha() {
     return alpha;
   }
 
@@ -152,7 +152,7 @@ public class AlphanumTarget extends Target {
    *
    * @param alpha Character new alphanumeric of the Target
    */
-  public void setAlpha(Character alpha) {
+  public void setAlpha(String alpha) {
     this.alpha = alpha;
   }
 
