@@ -1,9 +1,9 @@
-package org.cuair.ground;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+package org.cuair.ground.controllers;
 
 import org.cuair.ground.util.Flags;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.concurrent.TimeUnit;
 import org.freedesktop.gstreamer.Gst;
 import org.freedesktop.gstreamer.Pipeline;
 import org.freedesktop.gstreamer.Version;
@@ -11,8 +11,9 @@ import org.freedesktop.gstreamer.Version;
 import java.io.File;
 import java.util.stream.Stream;
 
-@SpringBootApplication
-public class Application {
+@RequestMapping("/stream")
+public class StreamController {
+
   private static Pipeline pipeline;
 
   public static void main(String[] args) {
@@ -20,13 +21,12 @@ public class Application {
 
     Gst.init(Version.BASELINE, "BasicPipeline", args);
 
-    pipeline = (Pipeline) Gst.parseLaunch(Flags.PIPELINE_COMMAND);
+    pipeline = (Pipeline) Gst.parseLaunch("videotestsrc ! autovideosink");
 
     pipeline.play();
 
     Gst.main();
 
-    SpringApplication.run(Application.class, args);
   }
 
   public static void configurePaths() {
@@ -41,4 +41,5 @@ public class Application {
       }
     }
   }
+
 }

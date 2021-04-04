@@ -26,7 +26,9 @@ public class Flags {
   /** Allow multiple users on a single IP if set to true. */
   public static boolean ENABLE_MULTIPLE_USERS_PER_IP = true;
 
-  /** Allows clients to create users if true. Otherwise, all will use default user */
+  /**
+   * Allows clients to create users if true. Otherwise, all will use default user
+   */
   public static boolean USERS_ENABLED = true;
 
   /** Autopilot */
@@ -44,6 +46,11 @@ public class Flags {
   public static String SET_AIRDROP_SETTINGS_ROUTE = "/v1/airdrop/setting";
   public static String GET_CAM_GIM_MODE_SETTINGS_ROUTE = "/api/state";
   public static String GET_AIRDROP_SETTINGS_ROUTE = "/v1/airdrop/state";
+
+  /** Streaming */
+  public static String STREAM_CLIP_DIR = "src/main/org/cuair/ground/stream_segments/";
+  public static String PIPELINE_COMMAND =
+      "udpsrc port=5000 caps = \" application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)H264, payload=(int)96 \" ! rtph264depay ! decodebin ! videoconvert ! x264enc tune = zerolatency ! mpegtsmux ! hlssink playlist-location=src/main/org/cuair/ground/stream_segments/playlist.m3u8 location=src/main/org/cuair/ground/stream_segments/segment_%05d.ts target-duration=5 max-files=0";
 
   /** A constant used in the DBSCAN calculation for clustering ROIs */
   public static Double CUAIR_CLUSTERING_EPSILON = 0.0003173611111111856;
