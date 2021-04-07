@@ -33,7 +33,7 @@ public class InteropClient {
 
   public void attemptLogin() {
     // Create URI for interop server location
-    URI interopLocation = URI.create(InteropAddress);
+    URI interopLocation = URI.create(InteropAddress + "/api/login");
 
     // Create Http Headers to pass information (username/password) as json
     // with the login request
@@ -47,7 +47,7 @@ public class InteropClient {
     // Create listenable future to listen for response of login post request
     ListenableFuture<ResponseEntity<String>> responseFuture =
       template.exchange(interopLocation, 
-                        HttpMethod.POST, 
+                        HttpMethod.POST,
                         requestEntity, 
                         String.class);
     
@@ -58,8 +58,8 @@ public class InteropClient {
 
   private String createJsonLogin() {
     JSONObject login = new JSONObject();
-    login.put("password", Password);
     login.put("username", Username);
+    login.put("password", Password);
     return login.toString();
   }
 }
