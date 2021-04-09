@@ -49,8 +49,7 @@ public class Flags {
 
   /** Streaming */
   public static String STREAM_CLIP_DIR = "src/main/org/cuair/ground/stream_segments/";
-  public static String PIPELINE_COMMAND =
-      "udpsrc port=5000 caps = \" application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)H264, payload=(int)96 \" ! rtph264depay ! decodebin ! videoconvert ! x264enc tune = zerolatency ! mpegtsmux ! hlssink playlist-location=src/main/org/cuair/ground/stream_segments/playlist.m3u8 location=src/main/org/cuair/ground/stream_segments/segment_%05d.ts target-duration=5 max-files=0";
+  public static String PIPELINE_COMMAND = "tcpclientsrc host=10.42.0.16 port=5000 ! gdpdepay ! rtph264depay ! avdec_h264 ! videoconvert ! x264enc tune = zerolatency ! mpegtsmux ! hlssink playlist-location=src/main/org/cuair/ground/stream_segments/playlist.m3u8 location=src/main/org/cuair/ground/stream_segments/segment_%05d.ts target-duration=5 max-files=0";
 
   /** A constant used in the DBSCAN calculation for clustering ROIs */
   public static Double CUAIR_CLUSTERING_EPSILON = 0.0003173611111111856;
