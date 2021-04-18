@@ -26,19 +26,22 @@ public class InteropClient {
     "http://" + Flags.INTEROP_IP + ":" + Flags.INTEROP_PORT;
   private final String Username = Flags.INTEROP_USERNAME;
   private final String Password = Flags.INTEROP_PASSWORD;
+  private final String MissionId = "1";
 
   public InteropClient() {
     // Nothing here yet
   }
 
+  /**
+   * Attempts to login to interop.
+   */
   public void attemptLogin() {
-    // Create URI for interop server location
-    URI interopLocation = URI.create(InteropAddress + "/api/login");
+    // Create URI for interop server location to login
+    URI loginLocation = URI.create(InteropAddress + "/api/login");
 
     // Create Http Headers to pass information (username/password) as json
     // with the login request
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
+    HttpHeaders headers = RequestUtil.getDefaultHeaders();
 
     // Build the request entity to hold the request
     HttpEntity<String> requestEntity =
@@ -46,14 +49,36 @@ public class InteropClient {
     
     // Create listenable future to listen for response of login post request
     ListenableFuture<ResponseEntity<String>> responseFuture =
-      template.exchange(interopLocation, 
+      template.exchange(loginLocation,
                         HttpMethod.POST,
                         requestEntity, 
                         String.class);
     
     // Print out success or failure when complete
     // Status code 200 -> OK, not 200 -> something happened (interop readme)
-    RequestUtil.futureCallback(interopLocation, responseFuture);
+    RequestUtil.futureCallback(loginLocation, responseFuture);
+  }
+
+  /**
+   * Get mission data from interop.
+   */
+  public void getMissionData() {
+    // Create URI for mission information route
+    URI missionLocation = URI.create(InteropAddress + "/api/missions/" + MissionId);
+
+    // Create Http Headers to receive mission data in json format
+    HttpHeaders headers = RequestUtil.getDefaultHeaders();
+
+    // Build the request entity to hold the request
+    // (no body as we simply want to receive mission data)
+    HttpEntity<String> requestEntity =
+        new HttpEntity<String>(headers);
+
+    // Create listenable future to listen for response of login post request
+    ListenableFuture<ResponseEntity<String>> responseFuture =
+        template.getForEntity(missionLocation, String.class);
+
+    RequestUtil.futureCallback(missionLocation, responseFuture);
   }
 
   private String createJsonLogin() {
