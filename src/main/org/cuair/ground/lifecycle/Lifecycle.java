@@ -90,7 +90,6 @@ public class Lifecycle {
    */
   @PostConstruct
   public void startUp() {
-    interopClient.attemptLogin();
     interopClient.getMissionData();
     initializeOffaxisTargetDatabase();
     initializeEmergentTargetDatabase();

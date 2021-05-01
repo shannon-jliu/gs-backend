@@ -20,6 +20,7 @@ public class InteropClient {
 
   // Template for async client-side http access
   private AsyncRestTemplate template = new AsyncRestTemplate();
+  private boolean loggedIn = false;
 
   
   private final String InteropAddress = 
@@ -29,13 +30,13 @@ public class InteropClient {
   private final String MissionId = "1";
 
   public InteropClient() {
-    // Nothing here yet
+    attemptLogin();
   }
 
   /**
    * Attempts to login to interop.
    */
-  public void attemptLogin() {
+  private void attemptLogin() {
     // Create URI for interop server location to login
     URI loginLocation = URI.create(InteropAddress + "/api/login");
 
@@ -53,10 +54,17 @@ public class InteropClient {
                         HttpMethod.POST,
                         requestEntity, 
                         String.class);
-    
-    // Print out success or failure when complete
-    // Status code 200 -> OK, not 200 -> something happened (interop readme)
+
+    // Adds callback function to print success or failure when complete
     RequestUtil.futureCallback(loginLocation, responseFuture);
+
+    // Waits until completion of login post request (we need to wait until login is completed before
+    // attempting any other requests)
+    try {
+      responseFuture.get();
+    } catch (Exception e) {
+      System.out.println("Exception was thrown.");
+    }
   }
 
   /**
@@ -81,6 +89,9 @@ public class InteropClient {
     RequestUtil.futureCallback(missionLocation, responseFuture);
   }
 
+  /**
+   * Returns a string containing the json for login.
+   */
   private String createJsonLogin() {
     JSONObject login = new JSONObject();
     login.put("username", Username);
