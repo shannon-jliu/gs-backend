@@ -68,7 +68,7 @@ import java.awt.EventQueue;
 
 @CrossOrigin
 @RestController
-@RequestMapping("value = /stream")
+@RequestMapping(value = "/stream")
 public class StreamController {
 
   /** String path to the folder where all the images are stored */
