@@ -29,7 +29,7 @@ public class Flags {
   /**
    * Allows clients to create users if true. Otherwise, all will use default user
    */
-  public static boolean USERS_ENABLED = false;
+  public static boolean USERS_ENABLED = true;
 
   /** Autopilot */
   public static String AUTOPILOT_GROUND_IP = "192.168.0.22";
