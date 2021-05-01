@@ -56,6 +56,7 @@ import java.lang.InterruptedException;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.springframework.core.io.UrlResource;
+import org.springframework.core.io.ClassPathResource;
 import java.net.MalformedURLException;
 import org.springframework.http.MediaType;
 import org.springframework.core.io.Resource;
@@ -68,9 +69,8 @@ import java.awt.EventQueue;
 
 @CrossOrigin
 @RestController
-@RequestMapping("value = /stream")
+@RequestMapping(value = "/stream")
 public class StreamController {
-
   /** String path to the folder where all the images are stored */
   private String streamSegmentDir = Flags.STREAM_CLIP_DIR;
 
@@ -107,6 +107,8 @@ public class StreamController {
     Path path = Paths.get(streamSegmentDir + "playlist.m3u8");
     Resource resource = null;
     try {
+      // resource = new ClassPathResource(streamSegmentDir + "playlist.m3u8");
+      // resource = new FileSystemResource(streamSegmentDir + "playlist.m3u8");
       resource = new UrlResource(path.toUri());
     } catch (MalformedURLException e) {
       e.printStackTrace();
