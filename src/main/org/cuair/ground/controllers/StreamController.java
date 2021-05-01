@@ -87,7 +87,7 @@ public class StreamController {
 
     pipeline.play();
 
-    Gst.main();
+    // Gst.main();
   }
 
   public static void configurePaths() {
