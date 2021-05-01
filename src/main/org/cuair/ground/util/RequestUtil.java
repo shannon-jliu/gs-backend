@@ -120,7 +120,7 @@ public class RequestUtil {
    * Helper method to provide default HTTP headers with the cookie attached to request headers.
    * Used to send requests to interop.
    *
-   * @param cookieValue cookie recevied by interop on authentication
+   * @param cookieValue cookie received by interop on authentication
    */
   public static HttpHeaders getDefaultCookieHeaders(String cookieValue) {
     HttpHeaders headers = new HttpHeaders();
