@@ -163,6 +163,8 @@ public class InteropClient {
             creation ? HttpMethod.POST : HttpMethod.PUT,
             requestEntity,
             String.class);
+
+    RequestUtil.futureCallback(targetRoute, responseFuture);
   }
 
   // Performs a post request to interop to add a new target
