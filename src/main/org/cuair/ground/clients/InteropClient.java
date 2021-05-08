@@ -157,9 +157,10 @@ public class InteropClient {
         new HttpEntity<String>(target.toJson().toString(), headers);
 
     // Create listenable future to listen for response
+    // Request method is either POST on creation or PUT for updating
     ListenableFuture<ResponseEntity<String>> responseFuture =
         template.exchange(targetRoute,
-            HttpMethod.POST,
+            creation ? HttpMethod.POST : HttpMethod.PUT,
             requestEntity,
             String.class);
   }
