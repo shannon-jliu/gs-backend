@@ -5,6 +5,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.cuair.ground.models.plane.target.Target;
 import org.json.JSONObject;
 import org.cuair.ground.util.Flags;
 import org.cuair.ground.util.RequestUtil;
@@ -29,8 +30,7 @@ public class InteropClient {
   private String sessionCookies = "";
 
   // Create logger for interop client
-  Logger interopLogger = LoggerFactory.getLogger(InteropClient.class);
-
+  private Logger interopLogger = LoggerFactory.getLogger(InteropClient.class);
 
   // Constants
   private final String InteropAddress = 
@@ -119,8 +119,7 @@ public class InteropClient {
     // Create URI for mission information route
     URI missionLocation = URI.create(InteropAddress + "/api/missions/" + MissionId);
 
-    // Create Http Headers to receive mission data in json format
-    // Need to have cookies from session
+    // Create Http Headers with session cookies to stay authenticated
     HttpHeaders headers = RequestUtil.getDefaultCookieHeaders(sessionCookies);
 
     // Build the request entity to hold the request
@@ -133,5 +132,45 @@ public class InteropClient {
         template.exchange(missionLocation, HttpMethod.GET, requestEntity, String.class);
 
     RequestUtil.futureCallback(missionLocation, responseFuture);
+  }
+
+  /**
+   * Helper function to send a target to interop.
+   * @param target - the target we need to send
+   * @param creation - true if we are creating the target (sending it to interop for the first time)
+   *                 and false if we are updating a target we previously send to interop
+   */
+  private void sendTarget(Target target, boolean creation) {
+    // Build the target route
+    String targetRouteString = InteropAddress + "/odlcs";
+    if (!creation) {
+      // If we are not creating a target, we need to specify the id in the target route
+      targetRouteString += Long.toString(target.getJudgeTargetId());
+    }
+    URI targetRoute = URI.create(targetRouteString);
+
+    // Create Http Headers with session cookies to stay authenticated
+    HttpHeaders headers = RequestUtil.getDefaultCookieHeaders(sessionCookies);
+
+    // Build the request entity with the target json
+    HttpEntity<String> requestEntity =
+        new HttpEntity<String>(target.toJson().toString(), headers);
+
+    // Create listenable future to listen for response
+    ListenableFuture<ResponseEntity<String>> responseFuture =
+        template.exchange(targetRoute,
+            HttpMethod.POST,
+            requestEntity,
+            String.class);
+  }
+
+  // Performs a post request to interop to add a new target
+  public void createTarget(Target target) {
+    sendTarget(target, true);
+  }
+
+  // Performs a post request to interop to update a target
+  public void updateTarget(Target target) {
+    sendTarget(target, false);
   }
 }
