@@ -61,10 +61,16 @@ public class Flags {
   // location=src/main/org/cuair/ground/stream_segments/segment_%05d.ts
   // target-duration=5 max-files=0";
 
-  // udpsrc port=5001 caps =
-  // "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96"
-  // ! rtph264depay ! avdec_h264 ! autovideoconvert ! videoflip method=rotate-180
-  // ! autovideosink
+  // gst-launch-1.0 udpsrc port=5001 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink
+
+  // gst-launch-1.0 udpsrc port=5000 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink
+
+  // gst-launch-1.0 udpsrc port=5002 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink
+
+  // gst-launch-1.0 \
+  // videotestsrc pattern=ball ! videoconvert ! x264enc tune=zerolatency bitrate=500 speed-preset=superfast ! rtph264pay ! udpsink host=127.0.0.1 port=5000 \
+  // videotestsrc ! videoconvert ! x264enc tune=zerolatency bitrate=500 speed-preset=superfast ! rtph264pay ! udpsink host=127.0.0.1 port=5001 \
+  // autovideosrc ! videoconvert ! x264enc tune=zerolatency bitrate=500 speed-preset=superfast ! rtph264pay ! udpsink host=127.0.0.1 port=5002
   /** A constant used in the DBSCAN calculation for clustering ROIs */
   public static Double CUAIR_CLUSTERING_EPSILON = 0.0003173611111111856;
 }

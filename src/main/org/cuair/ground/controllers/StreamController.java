@@ -107,8 +107,6 @@ public class StreamController {
     Path path = Paths.get(streamSegmentDir + "playlist.m3u8");
     Resource resource = null;
     try {
-      // resource = new ClassPathResource(streamSegmentDir + "playlist.m3u8");
-      // resource = new FileSystemResource(streamSegmentDir + "playlist.m3u8");
       resource = new UrlResource(path.toUri());
     } catch (MalformedURLException e) {
       e.printStackTrace();
