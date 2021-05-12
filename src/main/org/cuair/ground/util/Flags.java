@@ -51,26 +51,43 @@ public class Flags {
   public static String STREAM_CLIP_DIR = "src/main/org/cuair/ground/stream_segments/";
   public static String PIPELINE_COMMAND = "udpsrc port=5000 caps = \"application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)H264, payload=(int)96\" ! rtph264depay ! decodebin ! videoconvert ! x264enc tune=zerolatency ! mpegtsmux ! hlssink playlist-location=src/main/org/cuair/ground/stream_segments/playlist.m3u8 location=src/main/org/cuair/ground/stream_segments/segment_%05d.ts target-duration=1 playlist-length=0 max-files=0";
 
-  // src/main/org/cuair/ground/stream_segments/segment_%05d.ts
-
-  // "udpsrc port=5000 caps =
-  // \"application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96\"
-  // ! rtph264depay ! avdec_h264 ! autovideoconvert ! videoflip method=rotate-180
-  // ! autovideoconvert ! hlssink
-  // playlist-location=src/main/org/cuair/ground/stream_segments/playlist.m3u8
-  // location=src/main/org/cuair/ground/stream_segments/segment_%05d.ts
-  // target-duration=5 max-files=0";
-
-  // gst-launch-1.0 udpsrc port=5001 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink
-
+  //receive on port 5000
   // gst-launch-1.0 udpsrc port=5000 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink
 
+  //receive on port 5001
+  // gst-launch-1.0 udpsrc port=5001 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink
+
+  //receive on port 5002
   // gst-launch-1.0 udpsrc port=5002 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink
 
+  //receive on ports 5000-5024
   // gst-launch-1.0 \
-  // videotestsrc pattern=ball ! videoconvert ! x264enc tune=zerolatency bitrate=500 speed-preset=superfast ! rtph264pay ! udpsink host=127.0.0.1 port=5000 \
-  // videotestsrc ! videoconvert ! x264enc tune=zerolatency bitrate=500 speed-preset=superfast ! rtph264pay ! udpsink host=127.0.0.1 port=5001 \
-  // autovideosrc ! videoconvert ! x264enc tune=zerolatency bitrate=500 speed-preset=superfast ! rtph264pay ! udpsink host=127.0.0.1 port=5002
+  // udpsrc port=5000 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink \
+  // udpsrc port=5001 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink \
+  // udpsrc port=5002 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink \
+  // udpsrc port=5003 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink \
+  // udpsrc port=5004 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink \
+  // udpsrc port=5005 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink \
+  // udpsrc port=5006 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink \
+  // udpsrc port=5007 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink \
+  // udpsrc port=5008 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink \
+  // udpsrc port=5009 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink \
+  // udpsrc port=5010 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink \
+  // udpsrc port=5011 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink \
+  // udpsrc port=5012 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink \
+  // udpsrc port=5013 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink \
+  // udpsrc port=5014 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink \
+  // udpsrc port=5015 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink \
+  // udpsrc port=5016 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink \
+  // udpsrc port=5017 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink \
+  // udpsrc port=5018 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink \
+  // udpsrc port=5019 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink \
+  // udpsrc port=5020 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink \
+  // udpsrc port=5021 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink \
+  // udpsrc port=5022 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink \
+  // udpsrc port=5023 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink \
+  // udpsrc port=5024 caps = "application/x-rtp,media=video,clock-rate=90000,encoding-name=H264,payload=96" ! rtph264depay ! avdec_h264 ! autovideoconvert ! autovideosink \
+
   /** A constant used in the DBSCAN calculation for clustering ROIs */
   public static Double CUAIR_CLUSTERING_EPSILON = 0.0003173611111111856;
 }
