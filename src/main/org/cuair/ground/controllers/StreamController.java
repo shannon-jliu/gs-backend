@@ -74,7 +74,18 @@ public class StreamController {
   /** String path to the folder where all the images are stored */
   private String streamSegmentDir = Flags.STREAM_CLIP_DIR;
 
-  private static Pipeline pipeline;
+  private static List<Pipeline> pipelines = new ArrayList<Pipeline>();
+
+  private void createFolder(int number) {
+    String PATH = Flags.STREAM_CLIP_DIR + "stream" + String.valueOf(number) + "_segments";
+
+    File directory = new File(PATH);
+    if (!directory.exists()) {
+      directory.mkdir();
+      // If you require it to make the entire directory path including parents,
+      // use directory.mkdirs(); here instead.
+    }
+  }
 
   @PostConstruct
   public void init() {
@@ -83,9 +94,21 @@ public class StreamController {
 
     Gst.init(Version.BASELINE, "BasicPipeline");
 
-    pipeline = (Pipeline) Gst.parseLaunch(Flags.PIPELINE_COMMAND);
+    // initialize pipelines and folders
+    for (int i = 0; i < Flags.NUM_CAMERAS; i++) {
+      createFolder(i);
+      String command = Flags.PIPELINE_COMMAND(i);
+      System.out.println(command);
+      pipelines.add((Pipeline) Gst.parseLaunch(Flags.PIPELINE_COMMAND(i)));
+    }
 
-    pipeline.play();
+    // play pipelines
+    for (int i = 0; i < Flags.NUM_CAMERAS; i++) {
+      pipelines.get(i).play();
+    }
+
+    // pipeline = (Pipeline) Gst.parseLaunch(Flags.PIPELINE_COMMAND);
+    // pipeline.play();
 
     // Gst.main();
   }
