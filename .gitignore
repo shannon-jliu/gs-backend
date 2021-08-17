@@ -6,6 +6,7 @@ logs/
 /pgdata/
 /images/*
 out/
+*_segments/
 
 # Ignore auto-generated sql files
 *.sql
