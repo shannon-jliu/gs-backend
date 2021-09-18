@@ -71,6 +71,7 @@ import java.awt.EventQueue;
 @RestController
 @RequestMapping(value = "/stream")
 public class StreamController {
+
   /** String path to the folder where all the images are stored */
   private String streamSegmentDir = Flags.STREAM_CLIP_DIR;
 
@@ -82,8 +83,6 @@ public class StreamController {
     File directory = new File(PATH);
     if (!directory.exists()) {
       directory.mkdir();
-      // If you require it to make the entire directory path including parents,
-      // use directory.mkdirs(); here instead.
     }
   }
 
@@ -95,22 +94,16 @@ public class StreamController {
     Gst.init(Version.BASELINE, "BasicPipeline");
 
     // initialize pipelines and folders
-    for (int i = 0; i < Flags.NUM_CAMERAS; i++) {
+    for (int i = 0; i < Flags.MAX_CAMERAS; i++) {
       createFolder(i);
-      String command = Flags.PIPELINE_COMMAND(i);
-      System.out.println(command);
+
       pipelines.add((Pipeline) Gst.parseLaunch(Flags.PIPELINE_COMMAND(i)));
     }
 
     // play pipelines
-    for (int i = 0; i < Flags.NUM_CAMERAS; i++) {
+    for (int i = 0; i < Flags.MAX_CAMERAS; i++) {
       pipelines.get(i).play();
     }
-
-    // pipeline = (Pipeline) Gst.parseLaunch(Flags.PIPELINE_COMMAND);
-    // pipeline.play();
-
-    // Gst.main();
   }
 
   public static void configurePaths() {
@@ -126,8 +119,8 @@ public class StreamController {
   }
 
   @RequestMapping(value = "/playlist", method = RequestMethod.GET)
-  public ResponseEntity getPlaylist() {
-    Path path = Paths.get(streamSegmentDir + "playlist.m3u8");
+  public ResponseEntity getPlaylist(@RequestParam("number") int i) {
+    Path path = Paths.get(String.format("%sstream%d_segments/playlist.m3u8", streamSegmentDir, i));
     Resource resource = null;
     try {
       resource = new UrlResource(path.toUri());
@@ -143,7 +136,9 @@ public class StreamController {
    */
   @RequestMapping(value = "/{segment}", method = RequestMethod.GET)
   public ResponseEntity getSegment(@PathVariable String segment) {
-    Path path = Paths.get(streamSegmentDir + segment);
+    String[] segment_parts = segment.split("_", 2);
+    String playlist_number = segment_parts[0];
+    Path path = Paths.get(String.format("%sstream%s_segments/%s", streamSegmentDir, playlist_number, segment));
     Resource resource = null;
     try {
       resource = new UrlResource(path.toUri());
