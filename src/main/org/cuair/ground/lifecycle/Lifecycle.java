@@ -91,6 +91,7 @@ public class Lifecycle {
   @PostConstruct
   public void startUp() {
     interopClient.getMissionData();
+    interopClient.getSentTargets();
     initializeOffaxisTargetDatabase();
     initializeEmergentTargetDatabase();
     if (odlcUserDao.getADLCUser() == null) {

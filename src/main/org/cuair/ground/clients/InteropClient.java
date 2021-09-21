@@ -176,4 +176,26 @@ public class InteropClient {
   public void updateTarget(Target target) {
     sendTarget(target, false);
   }
+
+  /**
+   * Get sent targets from interop
+   */
+  public void getSentTargets(){
+//    URI for the target locations
+    URI getTargetLocation = URI.create(InteropAddress + "/api/odlcs");
+
+    // Create Http Headers with session cookies to stay authenticated
+    HttpHeaders headers = RequestUtil.getDefaultCookieHeaders(sessionCookies);
+
+    // Build the request entity to hold the request
+    // (no body as we simply want to receive mission data)
+    HttpEntity<String> requestEntity =
+            new HttpEntity<String>(headers);
+
+    // Create listenable future to listen for response of login post request
+    ListenableFuture<ResponseEntity<String>> responseFuture =
+            template.exchange(getTargetLocation, HttpMethod.GET, requestEntity, String.class);
+
+    RequestUtil.futureCallback(getTargetLocation, responseFuture);
+  }
 }
