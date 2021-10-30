@@ -18,6 +18,7 @@ public class InteropClientTest {
     @Test
     public void something() {
         System.out.println("Test");
+        System.out.println("wow");
     }
 
     @Test
