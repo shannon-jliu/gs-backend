@@ -49,7 +49,7 @@ public class Flags {
 
   /** Streaming */
   public static String STREAM_CLIP_DIR = "src/main/org/cuair/ground/";
-  public static int MAX_CAMERAS = 26;
+  public static int MAX_CAMERAS = 5;
 
   public static String PIPELINE_COMMAND(int i) {
     int port_start = 5000;
