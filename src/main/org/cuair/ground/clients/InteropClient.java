@@ -191,7 +191,13 @@ public class InteropClient {
     return postPutInterop(targetRoute, body, creation);
   }
 
-  // Performs a post request to interop to add a new target
+  /**
+   * Performs a post request to add a new specified target to interop
+   * @param target The target being added to interop
+   * @return The response for this get request (the accepted json object)
+   * @throws ExecutionException
+   * @throws InterruptedException
+   */
   public ListenableFuture<ResponseEntity<String>> createTarget(Target target) throws ExecutionException, InterruptedException {
     ListenableFuture<ResponseEntity<String>> response = sendTarget(target, true);
 //    parse the response
@@ -203,13 +209,18 @@ public class InteropClient {
     return sendTarget(target, true);
   }
 
-  // Performs a post request to interop to update a target
+  /**
+   * Performs a post request to update a specified target
+   * @param target The target being updated
+   */
   public void updateTarget(Target target) {
     sendTarget(target, false);
   }
 
   /**
    * Get sent targets from interop
+   * @return ListenableFuture response that includes information of first 100 sent
+   * targets from interop
    */
   public ListenableFuture<ResponseEntity<String>> getSentTargets(){
 //    URI for the target locations
@@ -218,6 +229,11 @@ public class InteropClient {
     return getInterop(getTargetLocation);
   }
 
+  /**
+   * Get sent target from interop by id
+   * @param id The id of the target you are trying to recieve
+   * @return ListenableFuture which includes information on particular odlc
+   */
   public ListenableFuture<ResponseEntity<String>> getSentTarget(long id){
     URI getTargetByID = URI.create(InteropAddress + "/api/odlcs/" + id);
     return getInterop(getTargetByID);

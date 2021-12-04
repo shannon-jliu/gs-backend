@@ -104,12 +104,6 @@ public class InteropClientTest {
         System.out.println("getSentTargets: " + (iopClient.getSentTargets()).get());
     }
 
-    @Test
-    public void testAttemptLogin() {
-//        iopClient.updateTarget();
-    }
-
-
     @After
     public void tearDown() throws Exception {
     }
