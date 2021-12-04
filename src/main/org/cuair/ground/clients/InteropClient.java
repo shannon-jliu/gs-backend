@@ -4,6 +4,8 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.cuair.ground.models.plane.target.Target;
 import org.json.JSONObject;
@@ -190,9 +192,14 @@ public class InteropClient {
   }
 
   // Performs a post request to interop to add a new target
-  public ListenableFuture<ResponseEntity<String>> createTarget(Target target) {
+  public ListenableFuture<ResponseEntity<String>> createTarget(Target target) throws ExecutionException, InterruptedException {
     ListenableFuture<ResponseEntity<String>> response = sendTarget(target, true);
-    target.setJudgeTargetId_TESTS_ONLY();
+    JSONObject jsonResp = new JSONObject(response.get().getBody());
+//    target.setJudgeTargetId_TESTS_ONLY((long) jsonResp.get("id"));
+    Long l = (long) (int) jsonResp.get("id");
+//    TODO: help me!
+    target.setJudgeTargetId_TESTS_ONLY(l);
+//    System.out.println("RESPONSE: " + l);
     return sendTarget(target, true);
   }
 

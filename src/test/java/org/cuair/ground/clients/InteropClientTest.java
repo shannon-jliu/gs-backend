@@ -65,6 +65,8 @@ public class InteropClientTest {
 
         ListenableFuture<ResponseEntity<String>> afterTarget = iopClient.getSentTargets();
         System.out.println("response: " + afterTarget.get().getBody());
+
+
     }
 
     @Test
@@ -74,7 +76,7 @@ public class InteropClientTest {
 
     @Test
     public void testAttemptLogin() {
-        iopClient.updateTarget();
+//        iopClient.updateTarget();
     }
 
 
