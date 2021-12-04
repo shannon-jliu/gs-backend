@@ -65,9 +65,39 @@ public class InteropClientTest {
 
         ListenableFuture<ResponseEntity<String>> afterTarget = iopClient.getSentTargets();
         System.out.println("response: " + afterTarget.get().getBody());
+        System.out.println("target id: " + original.getJudgeTargetId());
 
 
     }
+
+    @Test
+    public void testUpdateTargets() throws ExecutionException, InterruptedException, InvalidGpsLocationException {
+        ODLCUser odlcUser = new ODLCUser("testUser2", "testAddr2", ODLCUser.UserType.MDLCOPERATOR);
+
+        GpsLocation gps = new GpsLocation(80, 70.2);
+        Geotag geotag  =  new Geotag(gps, 1.0);
+
+        ListenableFuture<ResponseEntity<String>> beforeTarget = iopClient.getSentTargets();
+        System.out.println("response: " + beforeTarget.get());
+
+        AlphanumTarget original = new AlphanumTarget(
+                odlcUser,
+                Shape.SQUARE,
+                Color.BLUE,
+                'A',
+                Color.BLACK,
+                false,
+                geotag,
+                12L,
+                1L
+        );
+
+        iopClient.createTarget(original);
+        original.setShapeColor(Color.RED);
+        iopClient.updateTarget(original);
+        System.out.println(iopClient.getSentTarget((original.getJudgeTargetId())).get().getBody());
+    }
+
 
     @Test
     public void testGetSentTargets() throws ExecutionException, InterruptedException {

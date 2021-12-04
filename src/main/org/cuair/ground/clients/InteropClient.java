@@ -182,7 +182,7 @@ public class InteropClient {
     String targetRouteString = InteropAddress + "/api/odlcs";
     if (!creation) {
       // If we are not creating a target, we need to specify the id in the target route
-      targetRouteString += Long.toString(target.getJudgeTargetId());
+      targetRouteString += "/" + Long.toString(target.getJudgeTargetId());
     }
     URI targetRoute = URI.create(targetRouteString);
 //    Generate the body from the target we wish to either update or post to interop
@@ -194,12 +194,12 @@ public class InteropClient {
   // Performs a post request to interop to add a new target
   public ListenableFuture<ResponseEntity<String>> createTarget(Target target) throws ExecutionException, InterruptedException {
     ListenableFuture<ResponseEntity<String>> response = sendTarget(target, true);
+//    parse the response
     JSONObject jsonResp = new JSONObject(response.get().getBody());
-//    target.setJudgeTargetId_TESTS_ONLY((long) jsonResp.get("id"));
     Long l = (long) (int) jsonResp.get("id");
 //    TODO: help me!
+//    update the target to have the judge id so we can perform updates later
     target.setJudgeTargetId_TESTS_ONLY(l);
-//    System.out.println("RESPONSE: " + l);
     return sendTarget(target, true);
   }
 
@@ -216,5 +216,10 @@ public class InteropClient {
     URI getTargetLocation = URI.create(InteropAddress + "/api/odlcs");
 //    return the request to get targets
     return getInterop(getTargetLocation);
+  }
+
+  public ListenableFuture<ResponseEntity<String>> getSentTarget(long id){
+    URI getTargetByID = URI.create(InteropAddress + "/api/odlcs/" + id);
+    return getInterop(getTargetByID);
   }
 }
