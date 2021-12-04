@@ -13,6 +13,7 @@ import org.cuair.ground.models.ODLCUser;
 import org.cuair.ground.models.Shape;
 import org.cuair.ground.models.geotag.CardinalDirection;
 import org.cuair.ground.models.geotag.Geotag;
+import org.cuair.ground.util.Flags;
 
 /** Alphanum Target is target that is associated with Alphanumeric Target Sightings. */
 @Entity
@@ -235,11 +236,15 @@ public class AlphanumTarget extends Target {
   public JsonNode toJson() {
     ObjectNode rootNode = new ObjectMapper().createObjectNode();
 
-    if (offaxis) {
-      rootNode.put("type", "off_axis");
-    } else {
-      rootNode.put("type", "STANDARD");
-    }
+//    if (offaxis) {
+//      rootNode.put("type", "off_axis");
+//    } else {
+//      rootNode.put("type", "STANDARD");
+//    }
+
+    rootNode.put("type", "STANDARD");
+
+
 
     if (this.getGeotag() != null && !this.isOffaxis()) {
       if (this.getGeotag().getGpsLocation() != null
@@ -275,9 +280,11 @@ public class AlphanumTarget extends Target {
     return rootNode;
   }
 
-  public JsonNode toInteropJson(int missionNum) {
+  public JsonNode toInteropJson() {
+
     ObjectNode rootNode = (ObjectNode) toJson();
-    rootNode.put("mission", missionNum);
+    //    TODO: not sure if this should go here or somewhere else (ie) the interop section
+    rootNode.put("mission", Flags.MISSION_NUMBER);
     return rootNode;
     }
 

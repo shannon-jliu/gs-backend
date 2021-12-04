@@ -37,7 +37,7 @@ public class InteropClient {
     "http://" + Flags.INTEROP_IP + ":" + Flags.INTEROP_PORT;
   private final String Username = Flags.INTEROP_USERNAME;
   private final String Password = Flags.INTEROP_PASSWORD;
-  private final String MissionId = "1";
+  private final int MissionId = Flags.MISSION_NUMBER;
 
   // Attempt login on initialization
   public InteropClient() {
@@ -113,25 +113,60 @@ public class InteropClient {
   }
 
   /**
-   * Get mission data from interop.
+   * Performs a get request to the specified URI
+   * @param uri The URI that is the target of the request
+   * @return a ListenableFuture of the get request to interop
    */
-  public void getMissionData() {
-    // Create URI for mission information route
-    URI missionLocation = URI.create(InteropAddress + "/api/missions/" + MissionId);
-
+  private ListenableFuture<ResponseEntity<String>> getInterop(URI uri){
     // Create Http Headers with session cookies to stay authenticated
     HttpHeaders headers = RequestUtil.getDefaultCookieHeaders(sessionCookies);
 
     // Build the request entity to hold the request
     // (no body as we simply want to receive mission data)
     HttpEntity<String> requestEntity =
-        new HttpEntity<String>(headers);
+            new HttpEntity<String>(headers);
 
-    // Create listenable future to listen for response of login post request
     ListenableFuture<ResponseEntity<String>> responseFuture =
-        template.exchange(missionLocation, HttpMethod.GET, requestEntity, String.class);
+            template.exchange(uri, HttpMethod.GET, requestEntity, String.class);
 
-    RequestUtil.futureCallback(missionLocation, responseFuture);
+    RequestUtil.futureCallback(uri, responseFuture);
+
+    return responseFuture;
+  }
+
+  /**
+   * Performs post/put requests to a specified uri
+   * @param uri the URI to direct a request to
+   * @param body the body of the post/put request
+   * @param post True if post request, False is put request
+   * @return Listenable Future of the response from request
+   */
+  private ListenableFuture<ResponseEntity<String>> postPutInterop(URI uri, String body, Boolean post){
+    HttpHeaders headers = RequestUtil.getDefaultCookieHeaders(sessionCookies);
+
+    HttpEntity<String> requestEntity =
+            new HttpEntity<String>(body, headers);
+
+    // Create listenable future to listen for response
+    // Request method is either POST on creation or PUT for updating
+    ListenableFuture<ResponseEntity<String>> responseFuture =
+            template.exchange(uri,
+                    post ? HttpMethod.POST : HttpMethod.PUT,
+                    requestEntity,
+                    String.class);
+    RequestUtil.futureCallback(uri, responseFuture);
+
+    return responseFuture;
+  }
+
+  /**
+   * Get mission data from interop.
+   */
+  public ListenableFuture<ResponseEntity<String>> getMissionData() {
+    // Create URI for mission information route
+    URI missionLocation = URI.create(InteropAddress + "/api/missions/" + MissionId);
+//    Get mission data from interop
+    return getInterop(missionLocation);
   }
 
   /**
@@ -148,40 +183,16 @@ public class InteropClient {
       targetRouteString += Long.toString(target.getJudgeTargetId());
     }
     URI targetRoute = URI.create(targetRouteString);
-
-    // Create Http Headers with session cookies to stay authenticated
-    HttpHeaders headers = RequestUtil.getDefaultCookieHeaders(sessionCookies);
-
-    // Build the request entity with the target json
-    HttpEntity<String> requestEntity =
-        new HttpEntity<String>(target.toInteropJson(1).toString(), headers);
-//          new HttpEntity<String>("{\n" +
-//                  "  \"mission\": 1,\n" +
-//                  "  \"type\": \"STANDARD\",\n" +
-////                  "  \"latitude\": 38,\n" +
-////                  "  \"longitude\": -76,\n" +
-////                  "  \"orientation\": \"N\",\n" +
-////                  "  \"shape\": \"RECTANGLE\",\n" +
-////                  "  \"shapeColor\": \"RED\",\n" +
-//                  "  \"autonomous\": false\n" +
-//                  "}", headers);
-
-
-    // Create listenable future to listen for response
-    // Request method is either POST on creation or PUT for updating
-    ListenableFuture<ResponseEntity<String>> responseFuture =
-        template.exchange(targetRoute,
-            creation ? HttpMethod.POST : HttpMethod.PUT,
-            requestEntity,
-            String.class);
-    RequestUtil.futureCallback(targetRoute, responseFuture);
-
-      return responseFuture;
-
+//    Generate the body from the target we wish to either update or post to interop
+    String body = target.toInteropJson().toString();
+//    update/post target to interop
+    return postPutInterop(targetRoute, body, creation);
   }
 
   // Performs a post request to interop to add a new target
   public ListenableFuture<ResponseEntity<String>> createTarget(Target target) {
+    ListenableFuture<ResponseEntity<String>> response = sendTarget(target, true);
+    target.setJudgeTargetId_TESTS_ONLY();
     return sendTarget(target, true);
   }
 
@@ -196,21 +207,7 @@ public class InteropClient {
   public ListenableFuture<ResponseEntity<String>> getSentTargets(){
 //    URI for the target locations
     URI getTargetLocation = URI.create(InteropAddress + "/api/odlcs");
-
-    // Create Http Headers with session cookies to stay authenticated
-    HttpHeaders headers = RequestUtil.getDefaultCookieHeaders(sessionCookies);
-
-    // Build the request entity to hold the request
-    // (no body as we simply want to receive mission data)
-    HttpEntity<String> requestEntity =
-            new HttpEntity<String>(headers);
-
-    // Create listenable future to listen for response of login post request
-    ListenableFuture<ResponseEntity<String>> responseFuture =
-            template.exchange(getTargetLocation, HttpMethod.GET, requestEntity, String.class);
-
-    RequestUtil.futureCallback(getTargetLocation, responseFuture);
-
-    return responseFuture;
+//    return the request to get targets
+    return getInterop(getTargetLocation);
   }
 }

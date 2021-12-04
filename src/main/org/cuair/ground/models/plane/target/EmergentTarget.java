@@ -8,6 +8,7 @@ import java.util.Objects;
 import javax.persistence.Entity;
 import org.cuair.ground.models.ODLCUser;
 import org.cuair.ground.models.geotag.Geotag;
+import org.cuair.ground.util.Flags;
 
 /** Emergent Target that is associated with an Emergent Target Sighting. Has a description. */
 @Entity
@@ -125,10 +126,11 @@ public class EmergentTarget extends Target {
 
 
 //  TODO factor this out to the abstract class?
-  public JsonNode toInteropJson(int missionNum){
-    ObjectNode root = (ObjectNode) toJson();
-    root.put("mission", missionNum);
-    return root;
+  public JsonNode toInteropJson(){
+    ObjectNode rootNode = (ObjectNode) toJson();
+    //    TODO: not sure if this should go here or somewhere else (ie) the interop section
+    rootNode.put("mission", Flags.MISSION_NUMBER);
+    return rootNode;
   }
 
 }

@@ -31,8 +31,8 @@ public class InteropClientTest {
     }
 
     @Test
-    public void getMissionDataEmpty() {
-        iopClient.getMissionData();
+    public void getMissionData() throws ExecutionException, InterruptedException {
+        System.out.println(iopClient.getMissionData().get().getBody());
     }
 
     @Test
@@ -57,7 +57,7 @@ public class InteropClientTest {
                 1L
         );
 
-        System.out.println(original.toInteropJson(1));
+        System.out.println(original.toInteropJson());
         ListenableFuture k = iopClient.createTarget(original);
         System.out.println("ERROR: " + k);
         TimeUnit.SECONDS.sleep(4);
@@ -74,7 +74,7 @@ public class InteropClientTest {
 
     @Test
     public void testAttemptLogin() {
-
+        iopClient.updateTarget();
     }
 
 

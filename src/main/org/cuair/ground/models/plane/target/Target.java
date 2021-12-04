@@ -63,10 +63,9 @@ public abstract class Target extends ClientCreatable {
 
   /**
    * Creates a JSON object with a mission number
-   * @param missionNum
    * @return
    */
-  public abstract JsonNode toInteropJson(int missionNum);
+  public abstract JsonNode toInteropJson();
 
   /**
    * Returns the class of targetSighting associated with this target
