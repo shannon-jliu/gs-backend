@@ -140,9 +140,9 @@ public class InteropClient {
    * @param creation - true if we are creating the target (sending it to interop for the first time)
    *                 and false if we are updating a target we previously send to interop
    */
-  private void sendTarget(Target target, boolean creation) {
+  private ListenableFuture<ResponseEntity<String>> sendTarget(Target target, boolean creation) {
     // Build the target route
-    String targetRouteString = InteropAddress + "/odlcs";
+    String targetRouteString = InteropAddress + "/api/odlcs";
     if (!creation) {
       // If we are not creating a target, we need to specify the id in the target route
       targetRouteString += Long.toString(target.getJudgeTargetId());
@@ -154,7 +154,18 @@ public class InteropClient {
 
     // Build the request entity with the target json
     HttpEntity<String> requestEntity =
-        new HttpEntity<String>(target.toJson().toString(), headers);
+        new HttpEntity<String>(target.toInteropJson(1).toString(), headers);
+//          new HttpEntity<String>("{\n" +
+//                  "  \"mission\": 1,\n" +
+//                  "  \"type\": \"STANDARD\",\n" +
+////                  "  \"latitude\": 38,\n" +
+////                  "  \"longitude\": -76,\n" +
+////                  "  \"orientation\": \"N\",\n" +
+////                  "  \"shape\": \"RECTANGLE\",\n" +
+////                  "  \"shapeColor\": \"RED\",\n" +
+//                  "  \"autonomous\": false\n" +
+//                  "}", headers);
+
 
     // Create listenable future to listen for response
     // Request method is either POST on creation or PUT for updating
@@ -163,13 +174,15 @@ public class InteropClient {
             creation ? HttpMethod.POST : HttpMethod.PUT,
             requestEntity,
             String.class);
-
     RequestUtil.futureCallback(targetRoute, responseFuture);
+
+      return responseFuture;
+
   }
 
   // Performs a post request to interop to add a new target
-  public void createTarget(Target target) {
-    sendTarget(target, true);
+  public ListenableFuture<ResponseEntity<String>> createTarget(Target target) {
+    return sendTarget(target, true);
   }
 
   // Performs a post request to interop to update a target
@@ -180,7 +193,7 @@ public class InteropClient {
   /**
    * Get sent targets from interop
    */
-  public void getSentTargets(){
+  public ListenableFuture<ResponseEntity<String>> getSentTargets(){
 //    URI for the target locations
     URI getTargetLocation = URI.create(InteropAddress + "/api/odlcs");
 
@@ -197,5 +210,7 @@ public class InteropClient {
             template.exchange(getTargetLocation, HttpMethod.GET, requestEntity, String.class);
 
     RequestUtil.futureCallback(getTargetLocation, responseFuture);
+
+    return responseFuture;
   }
 }

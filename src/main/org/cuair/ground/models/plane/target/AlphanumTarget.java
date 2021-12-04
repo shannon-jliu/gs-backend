@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import java.util.Locale;
 import java.util.Objects;
 import javax.persistence.Entity;
 import org.cuair.ground.models.Color;
@@ -236,7 +238,7 @@ public class AlphanumTarget extends Target {
     if (offaxis) {
       rootNode.put("type", "off_axis");
     } else {
-      rootNode.put("type", "standard");
+      rootNode.put("type", "STANDARD");
     }
 
     if (this.getGeotag() != null && !this.isOffaxis()) {
@@ -257,19 +259,27 @@ public class AlphanumTarget extends Target {
                 .getAbbreviation());
       }
     }
-    if (this.shape != null) rootNode.put("shape", this.shape.getName());
+    if (this.shape != null) rootNode.put("shape", this.shape.getName().toUpperCase());
 
-    rootNode.put("alphanumeric", this.alpha);
+    rootNode.put("alphanumeric", this.alpha.toString().toUpperCase());
 
     if (this.shapeColor != null) {
-      rootNode.put("background_color", this.shapeColor.name().toLowerCase());
+      rootNode.put("shape_color", this.shapeColor.name().toUpperCase());
     }
 
     if (this.alphaColor != null) {
-      rootNode.put("alphanumeric_color", this.alphaColor.name().toLowerCase());
+      rootNode.put("alphanumeric_color", this.alphaColor.name().toUpperCase());
     }
     rootNode.put("autonomous", this.getCreator().getUserType() == ODLCUser.UserType.ADLC);
 
     return rootNode;
   }
+
+  public JsonNode toInteropJson(int missionNum) {
+    ObjectNode rootNode = (ObjectNode) toJson();
+    rootNode.put("mission", missionNum);
+    return rootNode;
+    }
+
+
 }

@@ -122,4 +122,13 @@ public class EmergentTarget extends Target {
     rootNode.put("autonomous", this.getCreator().getUserType() == ODLCUser.UserType.ADLC);
     return rootNode;
   }
+
+
+//  TODO factor this out to the abstract class?
+  public JsonNode toInteropJson(int missionNum){
+    ObjectNode root = (ObjectNode) toJson();
+    root.put("mission", missionNum);
+    return root;
+  }
+
 }
