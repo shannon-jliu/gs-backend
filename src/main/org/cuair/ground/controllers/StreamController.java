@@ -67,6 +67,10 @@ import org.freedesktop.gstreamer.Pipeline;
 import org.freedesktop.gstreamer.Version;
 import java.awt.EventQueue;
 
+/**
+ * Controls starting stream download over udp through gstreamer
+ * Handles requests from gs-frontend for stream clips
+ */
 @CrossOrigin
 @RestController
 @RequestMapping(value = "/stream")
@@ -86,6 +90,7 @@ public class StreamController {
     }
   }
 
+  /** Initialize stream controller - create and play gst pipelines */
   @PostConstruct
   public void init() {
 
@@ -106,6 +111,7 @@ public class StreamController {
     }
   }
 
+  /** Configure paths for gstreamer libraries */
   public static void configurePaths() {
     String gstPath = System.getProperty("gstreamer.path", "/Library/Frameworks/GStreamer.framework/Libraries/");
     if (!gstPath.isEmpty()) {
@@ -118,6 +124,12 @@ public class StreamController {
     }
   }
 
+  /**
+   * Constructs an HTTP response with the stream playlist file
+   * 
+   * @param i stream id
+   * @return path to requested playlist
+   */
   @RequestMapping(value = "/playlist", method = RequestMethod.GET)
   public ResponseEntity getPlaylist(@RequestParam("number") int i) {
     Path path = Paths.get(String.format("%sstream%d_segments/playlist.m3u8", streamSegmentDir, i));
@@ -132,7 +144,9 @@ public class StreamController {
   }
 
   /**
+   * Constructs an HTTP response with a stream segment
    *
+   * @return path to requested segment
    */
   @RequestMapping(value = "/{segment}", method = RequestMethod.GET)
   public ResponseEntity getSegment(@PathVariable String segment) {
@@ -147,20 +161,5 @@ public class StreamController {
     }
     return ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
         .body(resource);
-  }
-
-  /**
-   *
-   */
-  @RequestMapping(method = RequestMethod.POST)
-  public ResponseEntity uploadFile(@RequestParam("file") MultipartFile file) {
-    String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-    Path path = Paths.get(streamSegmentDir + fileName);
-    try {
-      Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return ok("The file has been saved");
   }
 }
