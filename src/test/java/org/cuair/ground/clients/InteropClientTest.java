@@ -58,8 +58,10 @@ public class InteropClientTest {
         );
 
         System.out.println(original.toInteropJson());
-        ListenableFuture k = iopClient.createTarget(original);
-        System.out.println("ERROR: " + k);
+//        NOTE: if the database already has NO information comment this out for the test
+//        This assumes that the database begins EMPTY
+//        ListenableFuture k = iopClient.createTarget(original);
+//        System.out.println("ERROR: " + k);
         TimeUnit.SECONDS.sleep(4);
 
 
@@ -88,7 +90,7 @@ public class InteropClientTest {
                 Color.BLACK,
                 false,
                 geotag,
-                12L,
+                18L,
                 1L
         );
 
@@ -98,11 +100,63 @@ public class InteropClientTest {
         System.out.println(iopClient.getSentTarget((original.getJudgeTargetId())).get().getBody());
     }
 
+    @Test
+    public void getSentTarget() throws ExecutionException, InterruptedException {
+        System.out.println(iopClient.getSentTarget(12).get().getBody());
+    }
+
 
     @Test
     public void testGetSentTargets() throws ExecutionException, InterruptedException {
         System.out.println("getSentTargets: " + (iopClient.getSentTargets()).get());
     }
+
+    public boolean testTargetCreate(AlphanumTarget t) throws ExecutionException, InterruptedException {
+        try{
+            iopClient.createTarget(t);
+        }
+        catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean testTargetUpdate(AlphanumTarget t){
+        try {
+            iopClient.updateTarget(t);
+        }
+        catch (Exception e){
+            return false;
+        }
+        return true;
+    }
+
+    @Test
+    public void testManyTarget() throws InvalidGpsLocationException, ExecutionException, InterruptedException {
+        ODLCUser odlcUser = new ODLCUser("testUser2", "testAddr2", ODLCUser.UserType.MDLCOPERATOR);
+
+        GpsLocation gps = new GpsLocation(80, 70.2);
+        Geotag geotag  =  new Geotag(gps, 1.0);
+
+        ListenableFuture<ResponseEntity<String>> beforeTarget = iopClient.getSentTargets();
+//        System.out.println("response: " + beforeTarget.get());
+
+        AlphanumTarget original = new AlphanumTarget(
+                odlcUser,
+                Shape.SQUARE,
+                Color.BLUE,
+                'A',
+                Color.BLACK,
+                false,
+                geotag,
+                12L,
+                1L
+        );
+        assertTrue(testTargetCreate(original));
+        original.setAlpha('A');
+        assertTrue(testTargetUpdate(original));
+    }
+
 
     @After
     public void tearDown() throws Exception {
