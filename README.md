@@ -5,22 +5,21 @@
 - [gs-backend](#gs-backend)
   - [Requirements](#requirements)
   - [Installation](#installation)
-    - [Mac OS](#mac-os)
       - [Gradle](#gradle)
       - [Java 11/JDK 11](#java-11jdk-11)
       - [Postgres](#postgres)
   - [Setup](#setup)
   - [DISCLAIMER](#disclaimer)
-  - [Docker](#docker)
+  - [Setup (Docker)](#setup-docker)
   - [Setup (Native)](#setup-native)
-  - [Development guide](#development-guide)
   - [Running (Native)](#running-native)
+  - [Development guide](#development-guide)
   - [Testing](#testing)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # gs-backend
-Ground Server for the Platform infrastructure, Spring-ified
+The Imaging Ground Server, written with Spring Boot.
 
 ## Requirements
 - Java 11
@@ -30,9 +29,9 @@ Ground Server for the Platform infrastructure, Spring-ified
 - IntelliJ Ultimate
 
 ## Installation
-### Mac OS
 #### Gradle
-  - `brew install gradle`
+  - Linux: `sdk install gradle`
+  - MacOS: `brew install gradle`
 
 #### Java 11/JDK 11
 This assumes you already have some version of Java installed.
@@ -45,7 +44,8 @@ This assumes you already have some version of Java installed.
 
 
 #### Postgres
-  - `brew install postgres`
+  - Linux: `sudo apt-get -y install postgresql`
+  - MacOS: `brew install postgres`
 
 ## Setup
 1. To install `pre-commit`, run
@@ -55,7 +55,7 @@ This assumes you already have some version of Java installed.
 3. See [IntelliJ Setup](docs/intellij_setup.md).
 
 ## DISCLAIMER
-Certain properties are defaulted to allow for native development. If you would like to develop using Docker, read the next section. Details for native setup follow.
+Certain properties are defaulted to allow for native development. You should setup/run natively unless told otherwise. If you would like to develop using Docker, read the next section. Details for native setup follow.
 
 ## Setup (Docker)
 1. Ensure that the following four files have the following four lines changed to below:
@@ -75,12 +75,19 @@ Certain properties are defaulted to allow for native development. If you would l
 ## Setup (Native)
 1. Setup the database
   - Begin the postgres server:
-      * `postgres -D <path-to-postgres-installation>`
-  - Create a user
-      * `createuser --createdb --pwprompt --superuser --createrole postgres`
-      * Note for Linux users: The password must be set to `admin`
-  - Enter the Postgres terminal
-      * `psql -U postgres`
+      * Linux: `sudo service postgresql start`
+      * MacOS: `postgres -D <path-to-postgres-installation>`
+        * Alternatively can do `brew info postgres` and find the command listed after `"if you don't want/need a background service you can just run:"`
+  - Create a user and enter the Postgres terminal
+      * Linux: 
+         ```
+         sudo -u postgres psql
+         ```
+      * MacOS:
+        ```
+        createuser --createdb --pwprompt --superuser --createrole postgres
+        psql -U postgres
+        ```
   - Create the main database
       * ```
         CREATE DATABASE groundserver
@@ -95,10 +102,8 @@ Certain properties are defaulted to allow for native development. If you would l
         OWNER=postgres
         CONNECTION LIMIT=-1;
         ```
-
-## Development guide
-
-When creating a new branch, please use the format of `<your-username>/<informative-branch-name>`. Do not commit to master (you shouldn't be able to anyway) and only squash PRs (you also shouldn't be able to do anything else either).
+  - If on Linux, set the postgres password to admin:
+      * `ALTER ROLE postgres WITH PASSWORD 'admin';`
 
 ## Running (Native)
 Ensure that the following four files have the following four lines changed to below:
@@ -112,6 +117,10 @@ Ensure that the following four files have the following four lines changed to be
       * `datasource.db.databaseUrl=jdbc:postgresql:groundservertest`
 
 Then run `./run` in order to start up the server on port `9000`!
+
+## Development guide
+
+When creating a new branch, please use the format of `<your-username>/<informative-branch-name>`. Do not commit to master (you shouldn't be able to anyway) and only squash PRs (you also shouldn't be able to do anything else either).
 
 ## Testing
 To enable logging while testing, run `gradle test` with the `--info` or `-i` flag if you are logging at the `INFO` level, or `--debug` or `d` if you are logging at the `DEBUG` level, etc. `System.out.println` will print out on the `INFO` level.
