@@ -203,7 +203,7 @@ public class InteropClient {
 //    parse the response
     JSONObject jsonResp = new JSONObject(response.get().getBody());
     Long l = (long) (int) jsonResp.get("id");
-//    TODO: help me!
+//    TODO: I dont remember why I decided that this would be test only
 //    update the target to have the judge id so we can perform updates later
     target.setJudgeTargetId_TESTS_ONLY(l);
     return sendTarget(target, true);
