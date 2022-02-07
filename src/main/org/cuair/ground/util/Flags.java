@@ -50,18 +50,8 @@ public class Flags {
   /** Streaming */
   public static String STREAM_CLIP_DIR = "src/main/org/cuair/ground/";
   public static int MAX_CAMERAS = 5;
-
-  public static String PIPELINE_COMMAND(int i) {
-    int port_start = 5000;
-    String start = "udpsrc port=";
-    String port = String.valueOf(port_start + i);
-    String caps = " caps = \"application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)H264, payload=(int)96\" ! rtph264depay ! decodebin ! videoconvert ! x264enc tune=zerolatency ! mpegtsmux !";
-    String playlist_location = String
-        .format(" hlssink playlist-location=src/main/org/cuair/ground/stream%d_segments/playlist.m3u8", i);
-    String clips_location = " location=src/main/org/cuair/ground/stream" + String.valueOf(i) + "_segments/"
-        + String.valueOf(i) + "_segment_%05d.ts target-duration=1 playlist-length=0 max-files=0";
-    return start + port + caps + playlist_location + clips_location;
-  }
+  public static int PORT_START = 5000;
+  public static String STREAMING_CAPS = " caps = \"application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)H264, payload=(int)96\" ! rtph264depay ! decodebin ! videoconvert ! x264enc tune=zerolatency ! mpegtsmux !";
 
   /** A constant used in the DBSCAN calculation for clustering ROIs */
   public static Double CUAIR_CLUSTERING_EPSILON = 0.0003173611111111856;

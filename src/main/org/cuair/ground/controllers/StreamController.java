@@ -79,6 +79,16 @@ public class StreamController {
   /** String path to the folder where all the images are stored */
   private String streamSegmentDir = Flags.STREAM_CLIP_DIR;
 
+  private static String ConstructPipeline(int i) {
+    String start = "udpsrc port=";
+    String port = String.valueOf(Flags.PORT_START + i);
+    String playlistLocation = String
+        .format(" hlssink playlist-location=src/main/org/cuair/ground/stream%d_segments/playlist.m3u8", i);
+    String clipsLocation = " location=src/main/org/cuair/ground/stream" + String.valueOf(i) + "_segments/"
+        + String.valueOf(i) + "_segment_%05d.ts target-duration=1 playlist-length=0 max-files=0";
+    return start + port + Flags.STREAMING_CAPS + playlistLocation + clipsLocation;
+  }
+
   private static List<Pipeline> pipelines = new ArrayList<Pipeline>();
 
   private void createFolder(int number) {
@@ -102,7 +112,7 @@ public class StreamController {
     for (int i = 0; i < Flags.MAX_CAMERAS; i++) {
       createFolder(i);
 
-      pipelines.add((Pipeline) Gst.parseLaunch(Flags.PIPELINE_COMMAND(i)));
+      pipelines.add((Pipeline) Gst.parseLaunch(ConstructPipeline(i)));
     }
 
     // play pipelines
@@ -150,9 +160,9 @@ public class StreamController {
    */
   @RequestMapping(value = "/{segment}", method = RequestMethod.GET)
   public ResponseEntity getSegment(@PathVariable String segment) {
-    String[] segment_parts = segment.split("_", 2);
-    String playlist_number = segment_parts[0];
-    Path path = Paths.get(String.format("%sstream%s_segments/%s", streamSegmentDir, playlist_number, segment));
+    String[] segmentParts = segment.split("_", 2);
+    String playlistNumber = segmentParts[0];
+    Path path = Paths.get(String.format("%sstream%s_segments/%s", streamSegmentDir, playlistNumber, segment));
     Resource resource = null;
     try {
       resource = new UrlResource(path.toUri());
