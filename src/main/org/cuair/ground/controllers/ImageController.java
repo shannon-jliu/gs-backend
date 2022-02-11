@@ -179,7 +179,7 @@ public class ImageController {
    * the image in the db
    */
   @RequestMapping(method = RequestMethod.POST)
-  public ResponseEntity upload(@RequestParam("json") String jsonString,
+  public ResponseEntity upload(@RequestPart("json") String jsonString,
                                @RequestPart("files") MultipartFile file) {
     if (file == null || file.isEmpty()) {
       return badRequest().body("Missing image file");
