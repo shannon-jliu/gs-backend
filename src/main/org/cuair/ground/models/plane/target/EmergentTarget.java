@@ -124,13 +124,4 @@ public class EmergentTarget extends Target {
     return rootNode;
   }
 
-
-//  TODO factor this out to the abstract class?
-  public JsonNode toInteropJson(){
-    ObjectNode rootNode = (ObjectNode) toJson();
-    //    TODO: not sure if this should go here or somewhere else (ie) the interop section
-    rootNode.put("mission", Flags.MISSION_NUMBER);
-    return rootNode;
-  }
-
 }

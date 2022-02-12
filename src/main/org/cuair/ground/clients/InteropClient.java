@@ -167,7 +167,7 @@ public class InteropClient {
   public ListenableFuture<ResponseEntity<String>> getMissionData() {
     // Create URI for mission information route
     URI missionLocation = URI.create(InteropAddress + "/api/missions/" + MissionId);
-//    Get mission data from interop
+    // Get mission data from interop
     return getInterop(missionLocation);
   }
 
@@ -185,9 +185,9 @@ public class InteropClient {
       targetRouteString += "/" + Long.toString(target.getJudgeTargetId());
     }
     URI targetRoute = URI.create(targetRouteString);
-//    Generate the body from the target we wish to either update or post to interop
+    // Generate the body from the target we wish to either update or post to interop
     String body = target.toInteropJson().toString();
-//    update/post target to interop
+    //  update/post target to interop
     return postPutInterop(targetRoute, body, creation);
   }
 

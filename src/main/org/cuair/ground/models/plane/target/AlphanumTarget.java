@@ -236,15 +236,7 @@ public class AlphanumTarget extends Target {
   public JsonNode toJson() {
     ObjectNode rootNode = new ObjectMapper().createObjectNode();
 
-//    if (offaxis) {
-//      rootNode.put("type", "off_axis");
-//    } else {
-//      rootNode.put("type", "STANDARD");
-//    }
-
     rootNode.put("type", "STANDARD");
-
-
 
     if (this.getGeotag() != null && !this.isOffaxis()) {
       if (this.getGeotag().getGpsLocation() != null
@@ -279,14 +271,6 @@ public class AlphanumTarget extends Target {
 
     return rootNode;
   }
-
-  public JsonNode toInteropJson() {
-
-    ObjectNode rootNode = (ObjectNode) toJson();
-    //    TODO: not sure if this should go here or somewhere else (ie) the interop section
-    rootNode.put("mission", Flags.MISSION_NUMBER);
-    return rootNode;
-    }
 
 
 }
