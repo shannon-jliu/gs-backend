@@ -2,10 +2,18 @@ logs/
 .idea/
 *.iml
 .gradle
+/bin/
+.settings/
+.project
+.classpath
 /build/
 /pgdata/
 /images/*
 out/
+*_segments/
+
+# Ignore npm package versions
+package-lock.json
 
 # Ignore auto-generated sql files
 *.sql
