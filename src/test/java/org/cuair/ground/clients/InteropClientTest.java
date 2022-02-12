@@ -36,6 +36,11 @@ public class InteropClientTest {
     }
 
     @Test
+    public void getSentTargets() throws ExecutionException, InterruptedException {
+        System.out.println(iopClient.getSentTargets().get().getBody());
+    }
+
+    @Test
     public void sendTargets() throws InvalidGpsLocationException, ExecutionException, InterruptedException {
         ODLCUser odlcUser = new ODLCUser("testUser2", "testAddr2", ODLCUser.UserType.MDLCOPERATOR);
 
@@ -53,19 +58,26 @@ public class InteropClientTest {
                 Color.BLACK,
                 false,
                 geotag,
-                12L,
+                null,
                 1L
         );
 
         System.out.println(original.toInteropJson());
 //        NOTE: if the database already has NO information comment this out for the test
 //        This assumes that the database begins EMPTY
-//        ListenableFuture k = iopClient.createTarget(original);
+        iopClient.createTarget(original);
+        ListenableFuture<ResponseEntity<String>> afterTarget = iopClient.getSentTarget(original.getJudgeTargetId());
+        System.out.println("response: " + afterTarget.get().getBody());
+        System.out.println("target id: " + original.getJudgeTargetId());
+
+
+        iopClient.createTarget(original);
 //        System.out.println("ERROR: " + k);
-        TimeUnit.SECONDS.sleep(4);
+//        TimeUnit.SECONDS.sleep(4);
 
 
-        ListenableFuture<ResponseEntity<String>> afterTarget = iopClient.getSentTargets();
+        afterTarget = iopClient.getSentTarget(original.getJudgeTargetId());
+
         System.out.println("response: " + afterTarget.get().getBody());
         System.out.println("target id: " + original.getJudgeTargetId());
 
@@ -90,7 +102,7 @@ public class InteropClientTest {
                 Color.BLACK,
                 false,
                 geotag,
-                18L,
+                null,
                 1L
         );
 
