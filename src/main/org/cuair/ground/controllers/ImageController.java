@@ -332,7 +332,7 @@ public class ImageController {
     Double DEFAULT_PLANE_YAW = 0.0;
     Double DEFAULT_GIMBAL_PITCH = 0.0;
     Double DEFAULT_GIMBAL_ROLL = 0.0;
-    Double DEFAULT_IMAGE_FOV = 60.0;
+    double[] DEFAULT_IMAGE_FOV = new double[] {60.0, 60.0};
 
     if (i.getImgMode() == null) {
       i.setImgMode(DEFAULT_IMAGE_MODE);
@@ -382,7 +382,7 @@ public class ImageController {
         t.setPlaneYaw(DEFAULT_PLANE_YAW);
       }
     }
-    if ((Double) i.getFov() == null) {
+    if (i.getFov() == null) {
       i.setFov(DEFAULT_IMAGE_FOV);
     }
 
