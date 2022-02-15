@@ -143,6 +143,8 @@ public class ROI extends ClientCreatable {
       return null;
     }
 
+    double[] fov = i.getFov();
+
     Double latitude = assignmentGps.getLatitude();
     Double longitude = assignmentGps.getLongitude();
     Double altitude = telemetry.getAltitude();
@@ -153,6 +155,6 @@ public class ROI extends ClientCreatable {
     }
 
     return Geotagging
-        .getPixelCoordinates(latitude, longitude, altitude, this.pixelx, this.pixely, planeYaw);
+        .getPixelCoordinates(latitude, longitude, altitude, fov, this.pixelx, this.pixely, planeYaw);
   }
 }

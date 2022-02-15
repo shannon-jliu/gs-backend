@@ -39,6 +39,7 @@ class Geotag(
         val assignment = sighting.assignment ?: return
         val image = assignment.image ?: return
         val telemetry = image.telemetry
+        val fov = image.fov
         val gps = telemetry.getGps()
         val altitude = telemetry.getAltitude()
         val pixelx = sighting.getpixelx().toDouble()
@@ -47,7 +48,7 @@ class Geotag(
         val centerLongitude = gps.getLongitude()
         val centerLatitude = gps.getLatitude()
         gpsLocation = Geotagging
-                .getPixelCoordinates(centerLatitude, centerLongitude, altitude, pixelx, pixely, planeYaw)
+                .getPixelCoordinates(centerLatitude, centerLongitude, altitude, fov, pixelx, pixely, planeYaw)
         clockwiseRadiansFromNorth = Geotagging.calculateClockwiseRadiansFromNorth(planeYaw, sighting.radiansFromTop)
     }
 

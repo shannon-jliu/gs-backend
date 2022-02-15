@@ -50,6 +50,7 @@ public class Geotagging {
    * @param latitude        The latitude of the plane
    * @param longitude       The longitude of the plane
    * @param altitude        The altitude of the plane
+   * @param fov             The (horizontal, vertical) fov of the camera
    * @param pixelx          The x-coordinate of the pixel center of the tag on the frontend with respect to the image
    * @param pixely          The y-coordinate of the pixel center of the tag on the frontend with respect to the image
    * @param planeYawRadians The yaw of the plane in radians
@@ -58,21 +59,26 @@ public class Geotagging {
       double latitude,
       double longitude,
       double altitude,
+      double[] fov,
       double pixelx,
       double pixely,
       double planeYawRadians) {
+
+    double fovHoriz = fov[0];
+    double fovVert = fov[1];
+
     // total horizontal distance imaged in meters
     double hdi =
         2
             * altitude
             * Math.tan(
-            FOV_HORIZONTAL_RADIANS
+            fovHoriz
                 / 2); // telemetryData.getAerialPosition().getAltitudeGroundFt()
     double vdi =
         2
             * altitude
             * Math.tan(
-            FOV_VERTICAL_RADIANS
+            fovVert
                 / 2); // telemetryData.getAerialPosition().getAltitudeGroundFt()
 
     // distance covered per pixel in meters/pixel

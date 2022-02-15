@@ -53,6 +53,7 @@ class Image(
      */
     @JsonIgnore fun getLocations(): MutableMap<String, Any?>? {
       val imageTelemetry = this.telemetry ?: return null
+      val imageFov = this.fov ?: return null
       val imageGPS = imageTelemetry.getGps() ?: return null
       val centerLatitude = imageGPS.getLatitude()
       val centerLongitude = imageGPS.getLongitude()
@@ -60,15 +61,16 @@ class Image(
       var planeYaw = imageTelemetry.getPlaneYaw() * Math.PI / 180
       val altitude = imageTelemetry.getAltitude() ?: return null
 
-      val topLeft = Geotagging.getPixelCoordinates(centerLatitude, centerLongitude, altitude, 0.0, 0.0, planeYaw)
+      val topLeft = Geotagging.getPixelCoordinates(centerLatitude, centerLongitude, altitude, imageFov, 0.0, 0.0, planeYaw)
       val topRight = Geotagging.getPixelCoordinates(
-          centerLatitude, centerLongitude, altitude, Geotagging.IMAGE_WIDTH, 0.0, planeYaw)
+          centerLatitude, centerLongitude, altitude, imageFov, Geotagging.IMAGE_WIDTH, 0.0, planeYaw)
       val bottomLeft = Geotagging.getPixelCoordinates(
-          centerLatitude, centerLongitude, altitude, 0.0, Geotagging.IMAGE_HEIGHT, planeYaw)
+          centerLatitude, centerLongitude, altitude, imageFov, 0.0, Geotagging.IMAGE_HEIGHT, planeYaw)
       val bottomRight = Geotagging.getPixelCoordinates(
           centerLatitude,
           centerLongitude,
           altitude,
+          imageFov,
           Geotagging.IMAGE_WIDTH,
           Geotagging.IMAGE_HEIGHT,
           planeYaw)
