@@ -25,15 +25,15 @@ class Image(
         @JsonIgnore var hasMdlcAssignment: Boolean = false,
         /** True if has at least one associated ADLC assignment, otherwise false. */
         @JsonIgnore var hasAdlcAssignment: Boolean = false,
-        /** The horizontal field of fiew of this image in degrees. */
-        var fov: Double
+        /** The field of view of this image in degrees (horizontal, vertical). */
+        var fov: DoubleArray
 ) : TimestampModel() {
 
     /** Secondary constructor that sets imgMode to FIXED by default */
     constructor(
             imageUrl: String,
             telemetry: Telemetry,
-            fov: Double
+            fov: DoubleArray
     ) : this(imageUrl, telemetry, ImgMode.FIXED, false, false, fov)
 
     /** The filesystem path this image lives on relative to the server directory */
@@ -96,7 +96,7 @@ class Image(
         if (this.imageUrl != other.imageUrl) return false
         if (this.imgMode != other.imgMode) return false
         if (!Objects.equals(this.telemetry, other.telemetry)) return false
-        if (this.fov != other.fov) return false
+        if (!this.fov.contentEquals(other.fov)) return false
         return true
     }
 }
