@@ -204,9 +204,9 @@ public class ImageController {
       return badRequest().body("Json part must include timestamp field");
     }
 
-    if (json.get("fov") == null) {
+    /*if (json.get("fov") == null) {
       return badRequest().body("Json part must include fov field");
-    }
+    }*/
 
     if (json.get("imgMode") == null) {
       return badRequest().body("Json part must include imgMode");
@@ -309,6 +309,8 @@ public class ImageController {
     }
 
     i.setImageUrl("/api/v1/image/file/" + imageFileName);
+
+    i.setFov(new double[] {60.0, 60.0});
 
     imageDao.create(i);
 
