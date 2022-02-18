@@ -12,6 +12,8 @@ import org.cuair.ground.models.geotag.GpsLocation;
 import org.cuair.ground.models.geotag.Telemetry;
 import org.cuair.ground.util.Geotagging;
 
+/** Represents an image and its corresponding metadata as sent down from the plane */
+
 @Entity
 public class Image extends TimestampModel {
 
