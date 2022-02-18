@@ -1,7 +1,7 @@
 package org.cuair.ground.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.HashMap;
 import java.util.Map;
 import javax.persistence.CascadeType;
@@ -29,9 +29,11 @@ public class Image extends TimestampModel {
   private ImgMode imgMode;
 
   /** True if has at least one associated MDLC assignment, otherwise false. */
+  @JsonIgnore
   private boolean hasMdlcAssignment = false;
 
   /** True if has at least one associated ADLC assignment, otherwise false. */
+  @JsonIgnore
   private boolean hasAdlcAssignment = false;
 
   /** The field of view of this image. */
@@ -56,7 +58,7 @@ public class Image extends TimestampModel {
     this.imgMode = imgMode;
   }
 
-  // Constructor corresponding to original Image class
+  // Constructor corresponding to original Image class (used in tests)
   public Image (String imageUrl, Telemetry telemetry, ImgMode imgMode, boolean hasMdlcAssignment, boolean hasAdlcAssignment, double fov) {
     this.imageUrl = imageUrl;
     this.telemetry = telemetry;
@@ -69,6 +71,7 @@ public class Image extends TimestampModel {
   /**
    * Internal method for finding geotags corresponding to four corners of image
    */
+  @JsonIgnore
   public Map<String, Object> getLocations() {
     GpsLocation imageGPS = telemetry.getGps();
     double centerLat = imageGPS.getLatitude();
