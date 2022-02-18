@@ -2,6 +2,7 @@ package org.cuair.ground.models.geotag;
 
 import javax.persistence.Entity;
 import org.cuair.ground.models.CUAirModel;
+import org.cuair.ground.util.Flags;
 
 @Entity
 public class FOV extends CUAirModel {
@@ -11,6 +12,16 @@ public class FOV extends CUAirModel {
   public FOV(double x, double y) {
     this.x = x;
     this.y = y;
+  }
+
+  public static FOV fromFocalLength(double focalLength) {
+    double CAM_SENSOR_WIDTH = Flags.CAM_SENSOR_WIDTH;
+    double CAM_SENSOR_HEIGHT = Flags.CAM_SENSOR_HEIGHT;
+
+    double fovHoriz = 2 * Math.atan(CAM_SENSOR_WIDTH / (2 * focalLength));
+    double fovVert = 2 * Math.atan(CAM_SENSOR_HEIGHT / (2 * focalLength));
+
+    return new FOV(fovHoriz, fovVert);
   }
 
   public double getX() {
