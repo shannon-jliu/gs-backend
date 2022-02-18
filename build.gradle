@@ -88,6 +88,9 @@ dependencies {
 
     // PowerMock
     implementation "org.powermock:powermock-reflect:2.0.6"
+
+    // Drew Noakes Metadata Extractor
+    implementation 'com.drewnoakes:metadata-extractor:2.16.0'
 }
 
 ebean {

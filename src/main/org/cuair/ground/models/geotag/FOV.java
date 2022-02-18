@@ -4,6 +4,8 @@ import javax.persistence.Entity;
 import org.cuair.ground.models.CUAirModel;
 import org.cuair.ground.util.Flags;
 
+/** Represents the field of view (FOV) of the camera during image capture in radians.  */
+
 @Entity
 public class FOV extends CUAirModel {
   private double x;
@@ -14,6 +16,7 @@ public class FOV extends CUAirModel {
     this.y = y;
   }
 
+  // Expects focalLength in mm, returns an FOV in radians
   public static FOV fromFocalLength(double focalLength) {
     double CAM_SENSOR_WIDTH = Flags.CAM_SENSOR_WIDTH;
     double CAM_SENSOR_HEIGHT = Flags.CAM_SENSOR_HEIGHT;

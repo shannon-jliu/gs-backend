@@ -3,6 +3,11 @@ package org.cuair.ground.controllers;
 import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.ok;
 
+
+import com.drew.imaging.ImageMetadataReader;
+import com.drew.imaging.ImageProcessingException;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.exif.ExifSubIFDDirectory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -14,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.FileExistsException;
@@ -41,6 +45,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
 
 /** Contains all the callbacks for all the public api endpoints for the Image */
 @CrossOrigin
@@ -296,6 +301,14 @@ public class ImageController {
     imageFileName += "." + imageExtension;
     i.setLocalImageUrl(planeImageDir + imageFileName);
 
+    // Read focal length in EXIF from imageFile to set FOV
+    try {
+      i.setFov(FOV.fromFocalLength(extractFocalLength(imageFile)));
+    } catch (IOException | ImageProcessingException e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body("Error when extracting focal length from image file: \n" + e);
+    }
+
     // store the image locally
     try {
       FileUtils.moveFile(imageFile, FileUtils.getFile(planeImageDir + imageFileName));
@@ -308,11 +321,28 @@ public class ImageController {
 
     i.setImageUrl("/api/v1/image/file/" + imageFileName);
 
-    i.setFov(new FOV(60.0, 60.0));
-
     imageDao.create(i);
 
     return ok(i);
+  }
+
+  /**
+   * Extracts the focal length of the image, which is included in the EXIF of the jpeg file
+   * Uses metadata-extraction library: https://drewnoakes.com/code/exif/
+   * https://github.com/drewnoakes/metadata-extractor/blob/master/Samples/com/drew/metadata/SampleUsage.java
+   */
+  private double extractFocalLength(File imageFile) throws ImageProcessingException, IOException {
+    Metadata metadata = ImageMetadataReader.readMetadata(imageFile);
+
+    // Focal length lives in ExifSubIFDDirectory
+    ExifSubIFDDirectory directory = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
+
+    // Read focal length
+    double focalLength = directory.getDoubleObject(ExifSubIFDDirectory.TAG_FOCAL_LENGTH);
+
+    // Note: you can also read "exposure time"
+
+    return focalLength;
   }
 
   /**
