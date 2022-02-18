@@ -246,7 +246,7 @@ public class ImageController {
       return badRequest().body("Json part must include planeYaw within telemetry");
     }
 
-    if (json.size() > 4) {
+    if (json.size() > 3) {
       return badRequest().body("Json part contains invalid field");
     }
 
