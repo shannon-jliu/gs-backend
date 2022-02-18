@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.HashMap;
 import java.util.Map;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 import org.cuair.ground.models.geotag.FOV;
@@ -21,6 +22,7 @@ public class Image extends TimestampModel {
   private String localImageUrl;
 
   /** Closest Telemetry for when this Image was taken  */
+  @OneToOne(cascade = CascadeType.ALL)
   private Telemetry telemetry;
 
   /** The type of this image. Either FIXED, TRACKING, or OFFAXIS */
@@ -33,6 +35,7 @@ public class Image extends TimestampModel {
   private boolean hasAdlcAssignment = false;
 
   /** The field of view of this image. */
+  @OneToOne(cascade = CascadeType.ALL)
   private FOV fov;
 
   /** The possible image modes: fixed, tracking, and off-axis */
@@ -41,12 +44,11 @@ public class Image extends TimestampModel {
     TRACKING("tracking"),
     OFFAXIS("off-axis");
 
-    // either add @JsonValue here (if you don't need getter)
     @JsonValue String value;
-
     ImgMode(String value) { this.value = value; }
   }
 
+  // Constructor
   public Image (String imageUrl, Telemetry telemetry, FOV fov, ImgMode imgMode) {
     this.imageUrl = imageUrl;
     this.telemetry = telemetry;
@@ -54,7 +56,17 @@ public class Image extends TimestampModel {
     this.imgMode = imgMode;
   }
 
-                                    /**
+  // Constructor corresponding to original Image class
+  public Image (String imageUrl, Telemetry telemetry, ImgMode imgMode, boolean hasMdlcAssignment, boolean hasAdlcAssignment, double fov) {
+    this.imageUrl = imageUrl;
+    this.telemetry = telemetry;
+    this.fov = new FOV(fov, fov);
+    this.imgMode = imgMode;
+    this.hasMdlcAssignment = hasMdlcAssignment;
+    this.hasAdlcAssignment = hasAdlcAssignment;
+  }
+
+  /**
    * Internal method for finding geotags corresponding to four corners of image
    */
   public Map<String, Object> getLocations() {
@@ -101,6 +113,14 @@ public class Image extends TimestampModel {
 
   public FOV getFov() {
     return fov;
+  }
+
+  public boolean getHasMdlcAssignment() {
+    return hasMdlcAssignment;
+  }
+
+  public boolean getHasAdlcAssignment() {
+    return hasAdlcAssignment;
   }
 
   public void setLocalImageUrl(String url) {

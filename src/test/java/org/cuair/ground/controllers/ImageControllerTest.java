@@ -73,7 +73,7 @@ public class ImageControllerTest {
   private double pitch;
   private double roll;
   private Telemetry expectedTelemetry;
-  private double[] fov;
+  private double fov;
   private Image expectedImg;
   private JSONObject gpsObj;
   private JSONObject gimOrtObj;
@@ -120,7 +120,7 @@ public class ImageControllerTest {
         planeYaw,
         new GimbalOrientation(pitch, roll)
     );
-    fov = new double[] {60.0, 60.0};
+    fov = 60.0;
     expectedImg =
         new Image("/api/v1/image/file/" + timestamp + ".jpeg", expectedTelemetry, ImgMode.FIXED,
             false, false, fov);
@@ -728,7 +728,7 @@ public class ImageControllerTest {
         planeYaw,
         new GimbalOrientation()
     );
-    double[] fov = new double[] {60.0, 60.0};
+    double fov = 60.0;
     Image expectedImg =
         new Image("/api/v1/image/dummy", expectedTelemetry, ImgMode.FIXED, false, false, fov);
     String bodyString = new ObjectMapper().writeValueAsString(expectedImg);
@@ -770,7 +770,7 @@ public class ImageControllerTest {
         planeYaw,
         new GimbalOrientation()
     );
-    double[] fov = new double[] {60.0, 60.0};
+    double fov = 60.0;
     Image expectedImg =
         new Image("/api/v1/image/dummy", expectedTelemetry, ImgMode.FIXED, false, false, fov);
 
