@@ -15,9 +15,6 @@ public class Geotagging {
   /** Width of height and image in pixels */
   public static double IMAGE_WIDTH = Flags.IMAGE_WIDTH;
   public static double IMAGE_HEIGHT = Flags.IMAGE_HEIGHT;
-  /** Field of view of camera horizontally and vertically */
-  private static double FOV_HORIZONTAL_RADIANS = Flags.FOV_HORIZONTAL_RADIANS;
-  private static double FOV_VERTICAL_RADIANS = Flags.FOV_VERTICAL_RADIANS;
   /** An approximation of the radius of the Earth in meters */
   private static double radiusEarth = 6371000.0;
 
