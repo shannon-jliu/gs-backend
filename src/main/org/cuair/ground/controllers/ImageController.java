@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.FileExistsException;
@@ -22,6 +23,7 @@ import org.apache.commons.io.IOUtils;
 import org.cuair.ground.daos.DAOFactory;
 import org.cuair.ground.daos.ImageDatabaseAccessor;
 import org.cuair.ground.models.Image;
+import org.cuair.ground.models.geotag.FOV;
 import org.cuair.ground.models.geotag.GimbalOrientation;
 import org.cuair.ground.models.geotag.GpsLocation;
 import org.cuair.ground.models.geotag.Telemetry;
@@ -113,7 +115,7 @@ public class ImageController {
     if (image == null) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Image with given id doesn't exist");
     }
-    Map<String, GpsLocation> locations = image.getLocations();
+    Map<String, Object> locations = image.getLocations();
     return (locations != null) ? ok(locations) : ResponseEntity.status(HttpStatus.NOT_FOUND)
         .body("The geotag information doesn't exist yet");
   }
@@ -310,7 +312,7 @@ public class ImageController {
 
     i.setImageUrl("/api/v1/image/file/" + imageFileName);
 
-    i.setFov(new double[] {60.0, 60.0});
+    i.setFov(new FOV(60.0, 60.0));
 
     imageDao.create(i);
 
@@ -328,13 +330,13 @@ public class ImageController {
    */
   private Image defaultValues(Image i) throws Exception {
     Image.ImgMode DEFAULT_IMAGE_MODE = Image.ImgMode.FIXED;
-    Double DEFAULT_LATITUDE = 42.4440;
-    Double DEFAULT_LONGITUDE = 76.5019;
-    Double DEFAULT_ALTITUDE = 100.0;
-    Double DEFAULT_PLANE_YAW = 0.0;
-    Double DEFAULT_GIMBAL_PITCH = 0.0;
-    Double DEFAULT_GIMBAL_ROLL = 0.0;
-    double[] DEFAULT_IMAGE_FOV = new double[] {60.0, 60.0};
+    double DEFAULT_LATITUDE = 42.4440;
+    double DEFAULT_LONGITUDE = 76.5019;
+    double DEFAULT_ALTITUDE = 100.0;
+    double DEFAULT_PLANE_YAW = 0.0;
+    double DEFAULT_GIMBAL_PITCH = 0.0;
+    double DEFAULT_GIMBAL_ROLL = 0.0;
+    FOV DEFAULT_IMAGE_FOV = new FOV(60.0, 60.0);
 
     if (i.getImgMode() == null) {
       i.setImgMode(DEFAULT_IMAGE_MODE);

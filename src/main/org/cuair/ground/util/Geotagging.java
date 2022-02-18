@@ -3,6 +3,7 @@ package org.cuair.ground.util;
 import java.util.Arrays;
 import java.util.Objects;
 import org.cuair.ground.models.exceptions.InvalidGpsLocationException;
+import org.cuair.ground.models.geotag.FOV;
 import org.cuair.ground.models.geotag.Geotag;
 import org.cuair.ground.models.geotag.GpsLocation;
 import org.cuair.ground.models.geotag.Radian;
@@ -59,13 +60,13 @@ public class Geotagging {
       double latitude,
       double longitude,
       double altitude,
-      double[] fov,
+      FOV fov,
       double pixelx,
       double pixely,
       double planeYawRadians) {
 
-    double fovHoriz = fov[0];
-    double fovVert = fov[1];
+    double fovHoriz = fov.getX();
+    double fovVert = fov.getY();
 
     // total horizontal distance imaged in meters
     double hdi =

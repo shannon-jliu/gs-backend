@@ -1,15 +1,24 @@
 package org.cuair.ground.models;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.HashMap;
 import java.util.Map;
+import javax.persistence.Entity;
+import javax.persistence.OneToOne;
+import org.cuair.ground.models.geotag.FOV;
 import org.cuair.ground.models.geotag.GpsLocation;
 import org.cuair.ground.models.geotag.Telemetry;
 import org.cuair.ground.util.Geotagging;
 
-public class Image {
+@Entity
+public class Image extends TimestampModel {
 
   /** The URL where clients can retrieve the image file  */
   private String imageUrl;
+
+  /** The local URL where image file lives on the ground server */
+  private String localImageUrl;
 
   /** Closest Telemetry for when this Image was taken  */
   private Telemetry telemetry;
@@ -23,27 +32,32 @@ public class Image {
   /** True if has at least one associated ADLC assignment, otherwise false. */
   private boolean hasAdlcAssignment = false;
 
-  /** The field of view of this image in degrees (horizontal, vertical). */
-  private double[] fov;
+  /** The field of view of this image. */
+  private FOV fov;
 
   /** The possible image modes: fixed, tracking, and off-axis */
-  private enum ImgMode {
-    FIXED,
-    TRACKING,
-    OFFAXIS
+  public enum ImgMode {
+    FIXED("fixed"),
+    TRACKING("tracking"),
+    OFFAXIS("off-axis");
+
+    // either add @JsonValue here (if you don't need getter)
+    @JsonValue String value;
+
+    ImgMode(String value) { this.value = value; }
   }
 
-  public Image (String imageUrl, Telemetry telemetry, double[] fov, ImgMode imgMode) {
+  public Image (String imageUrl, Telemetry telemetry, FOV fov, ImgMode imgMode) {
     this.imageUrl = imageUrl;
     this.telemetry = telemetry;
     this.fov = fov;
     this.imgMode = imgMode;
   }
 
-  /**
+                                    /**
    * Internal method for finding geotags corresponding to four corners of image
    */
-  public Map<String, GpsLocation> getLocations() {
+  public Map<String, Object> getLocations() {
     GpsLocation imageGPS = telemetry.getGps();
     double centerLat = imageGPS.getLatitude();
     double centerLong = imageGPS.getLongitude();
@@ -60,7 +74,7 @@ public class Image {
     GpsLocation bottomRight = Geotagging
         .getPixelCoordinates(centerLat, centerLong, altitude, fov, Geotagging.IMAGE_WIDTH, Geotagging.IMAGE_HEIGHT, planeYaw);
 
-    Map<String, GpsLocation> locs = new HashMap<String, GpsLocation>();
+    Map<String, Object> locs = new HashMap<>();
     locs.put("topLeft", topLeft);
     locs.put("topRight", topRight);
     locs.put("bottomLeft", bottomLeft);
@@ -68,5 +82,54 @@ public class Image {
 
     return locs;
   }
+
+  public String getImageUrl() {
+    return imageUrl;
+  }
+
+  public String getLocalImageUrl() {
+    return localImageUrl;
+  }
+
+  public Telemetry getTelemetry() {
+    return telemetry;
+  }
+
+  public ImgMode getImgMode() {
+    return imgMode;
+  }
+
+  public FOV getFov() {
+    return fov;
+  }
+
+  public void setLocalImageUrl(String url) {
+    localImageUrl = url;
+  }
+
+  public void setHasMdlcAssignment(boolean has) {
+    hasMdlcAssignment = has;
+  }
+
+  public void setHasAdlcAssignment(boolean has) {
+    hasAdlcAssignment = has;
+  }
+
+  public void setImageUrl(String imageUrl) {
+    this.imageUrl = imageUrl;
+  }
+
+  public void setTelemetry(Telemetry telemetry) {
+    this.telemetry = telemetry;
+  }
+
+  public void setImgMode(ImgMode imgMode) {
+    this.imgMode = imgMode;
+  }
+
+  public void setFov(FOV fov) {
+    this.fov = fov;
+  }
+
 
 }

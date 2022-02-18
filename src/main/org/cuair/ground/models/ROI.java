@@ -3,6 +3,7 @@ package org.cuair.ground.models;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import org.cuair.ground.models.geotag.FOV;
 import org.cuair.ground.models.geotag.GpsLocation;
 import org.cuair.ground.models.geotag.Telemetry;
 import org.cuair.ground.util.Geotagging;
@@ -143,7 +144,7 @@ public class ROI extends ClientCreatable {
       return null;
     }
 
-    double[] fov = i.getFov();
+    FOV fov = i.getFov();
 
     Double latitude = assignmentGps.getLatitude();
     Double longitude = assignmentGps.getLongitude();
