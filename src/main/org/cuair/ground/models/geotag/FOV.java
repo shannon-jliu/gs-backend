@@ -8,7 +8,11 @@ import org.cuair.ground.util.Flags;
 
 @Entity
 public class FOV extends CUAirModel {
+
+  /** The horizontal (x) field of view. */
   private double x;
+
+  /** The vertical (y) field of view. */
   private double y;
 
   public FOV(double x, double y) {
