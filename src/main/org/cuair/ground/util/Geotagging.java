@@ -47,7 +47,7 @@ public class Geotagging {
    *
    * @param latitude        The latitude of the plane
    * @param longitude       The longitude of the plane
-   * @param altitude        The altitude of the plane
+   * @param altitude        The altitude of the plane in meters
    * @param fov             The (horizontal, vertical) fov of the camera
    * @param pixelx          The x-coordinate of the pixel center of the tag on the frontend with respect to the image
    * @param pixely          The y-coordinate of the pixel center of the tag on the frontend with respect to the image

@@ -13,8 +13,8 @@ public class Flags {
   /** Constants */
   public static double CAM_SENSOR_WIDTH = 23.2; // in mm
   public static double CAM_SENSOR_HEIGHT = 15.4; // in mm
-  public static double IMAGE_WIDTH = 4912.0;
-  public static double IMAGE_HEIGHT = 3684.0;
+  public static double IMAGE_WIDTH = 5456.0;
+  public static double IMAGE_HEIGHT = 3632.0;
 
   /** Interop */
   public static boolean CUAIR_INTEROP_REQUESTS = false;

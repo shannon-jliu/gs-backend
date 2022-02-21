@@ -79,7 +79,7 @@ public class Image extends TimestampModel {
     double centerLat = imageGPS.getLatitude();
     double centerLong = imageGPS.getLongitude();
 
-    double planeYaw = telemetry.getPlaneYaw();
+    double planeYaw = telemetry.getPlaneYaw() * Math.PI / 180;
     double altitude = telemetry.getAltitude();
 
     GpsLocation topLeft = Geotagging
