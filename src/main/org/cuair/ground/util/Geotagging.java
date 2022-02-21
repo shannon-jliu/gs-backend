@@ -71,13 +71,15 @@ public class Geotagging {
             * altitude
             * Math.tan(
             fovHoriz
-                / 2); // telemetryData.getAerialPosition().getAltitudeGroundFt()
+                / 2);
+
+    // total vertical distance imaged in meters
     double vdi =
         2
             * altitude
             * Math.tan(
             fovVert
-                / 2); // telemetryData.getAerialPosition().getAltitudeGroundFt()
+                / 2);
 
     // distance covered per pixel in meters/pixel
     double dpphoriz = hdi / IMAGE_WIDTH;
