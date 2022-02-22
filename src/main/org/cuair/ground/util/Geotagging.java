@@ -45,8 +45,8 @@ public class Geotagging {
   /**
    * Creates a Gpslocation representing the center of the image
    *
-   * @param latitude        The latitude of the plane
-   * @param longitude       The longitude of the plane
+   * @param latitude        The latitude of the plane in degrees
+   * @param longitude       The longitude of the plane in degrees
    * @param altitude        The altitude of the plane in meters
    * @param fov             The (horizontal, vertical) fov of the camera
    * @param pixelx          The x-coordinate of the pixel center of the tag on the frontend with respect to the image
@@ -73,6 +73,8 @@ public class Geotagging {
             fovHoriz
                 / 2);
 
+    logger.info("hdi: " + hdi);
+
     // total vertical distance imaged in meters
     double vdi =
         2
@@ -80,6 +82,8 @@ public class Geotagging {
             * Math.tan(
             fovVert
                 / 2);
+
+    logger.info("vdi: " + vdi);
 
     // distance covered per pixel in meters/pixel
     double dpphoriz = hdi / IMAGE_WIDTH;
@@ -89,19 +93,34 @@ public class Geotagging {
     double deltapixel_x = pixelx - (IMAGE_WIDTH / 2);
     double deltapixel_y = (IMAGE_HEIGHT / 2) - pixely;
 
+    logger.info("dpx: " + deltapixel_x);
+    logger.info("dpy: " + deltapixel_y);
+
     double dppH = deltapixel_x * dpphoriz;
     double dppV = deltapixel_y * dppvert;
 
-    // matrix rotation to account for the yaw - (clockwise)
+    // Account for the yaw, which is clockwise
+    // We need to consider the negative yaw because traditionally coordinate system rotation
+    // is defined with counter-clockwise positive theta
+    double planeYawCC = -planeYawRadians;
     double target_reference_x_meters =
-        dppH * Math.cos(planeYawRadians) + dppV * Math.sin(planeYawRadians);
+        dppH * Math.cos(planeYawCC) + dppV * Math.sin(planeYawCC);
     double target_reference_y_meters =
-        dppH * -1 * Math.sin(planeYawRadians) + dppV * Math.cos(planeYawRadians);
+        dppH * -1 * Math.sin(planeYawCC) + dppV * Math.cos(planeYawCC);
+
+    logger.info("planeYawCC: " + planeYawCC);
+    logger.info("target_ref_x: " + target_reference_x_meters);
+    logger.info("target_ref_y: " + target_reference_y_meters);
 
     // find the change from the plane's center in longitude and latitude
-    double deltaLong =
-        haversineXMetersToLongitude(target_reference_x_meters, latitude) * 180 / Math.PI;
-    double deltaLat = haversineYMetersToLatitude(target_reference_y_meters) * 180 / Math.PI;
+    double latRadians = Math.PI / 180 * latitude; // convert to latitude in radians for haversine
+    double deltaLong = target_reference_x_meters / (111111*Math.cos(Math.sqrt(2)/2));
+        // haversineXMetersToLongitude(target_reference_x_meters, latRadians) * 180 / Math.PI;
+    double deltaLat = target_reference_y_meters / 111111;
+        //haversineYMetersToLatitude(target_reference_y_meters) * 180 / Math.PI;
+
+    logger.info("deltaLong: " + deltaLong);
+    logger.info("deltaLat: " + deltaLat);
 
     // adding the distance from the center to the plane's center position
     double longitude_of_target_x = longitude + deltaLong;
