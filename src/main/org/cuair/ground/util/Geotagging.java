@@ -99,16 +99,12 @@ public class Geotagging {
     double dppH = deltapixel_x * dpphoriz;
     double dppV = deltapixel_y * dppvert;
 
-    // Account for the yaw, which is clockwise
-    // We need to consider the negative yaw because traditionally coordinate system rotation
-    // is defined with counter-clockwise positive theta
-    double planeYawCC = -planeYawRadians;
+    // Do rotation of coordinate system to rotate dppH and dppV to account for yaw
     double target_reference_x_meters =
-        dppH * Math.cos(planeYawCC) + dppV * Math.sin(planeYawCC);
+        dppH * Math.cos(planeYawRadians) + dppV * Math.sin(planeYawRadians);
     double target_reference_y_meters =
-        dppH * -1 * Math.sin(planeYawCC) + dppV * Math.cos(planeYawCC);
+        dppH * -1 * Math.sin(planeYawRadians) + dppV * Math.cos(planeYawRadians);
 
-    logger.info("planeYawCC: " + planeYawCC);
     logger.info("target_ref_x: " + target_reference_x_meters);
     logger.info("target_ref_y: " + target_reference_y_meters);
 
