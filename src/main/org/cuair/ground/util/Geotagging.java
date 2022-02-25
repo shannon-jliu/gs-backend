@@ -27,7 +27,7 @@ public class Geotagging {
    * @param direction       The direction travelled (in radians clockwise from north)
    * @return an array of two doubles, [latitude, longitude] (in degrees)
    */
-  private static double[] inverseHarversine(double initLat, double initLong, double distance, double direction) {
+  private static double[] inverseHaversine(double initLat, double initLong, double distance, double direction) {
     double r = radiusEarth;
 
     // Initialize empty gps array
@@ -49,7 +49,7 @@ public class Geotagging {
 
 
   /**
-   * Creates a Gpslocation representing the center of the image
+   * Creates a GpsLocation representing the center of the image
    *
    * @param latitude        The latitude of the plane in degrees
    * @param longitude       The longitude of the plane in degrees
@@ -71,7 +71,7 @@ public class Geotagging {
     double fovHoriz = fov.getX();
     double fovVert = fov.getY();
 
-    // total horizontal distance imaged in meters
+    // total horizontal (x) distance imaged in meters
     double hdi =
         2
             * altitude
@@ -81,7 +81,7 @@ public class Geotagging {
 
     logger.info("hdi: " + hdi);
 
-    // total vertical distance imaged in meters
+    // total vertical (y) distance imaged in meters
     double vdi =
         2
             * altitude
@@ -91,17 +91,18 @@ public class Geotagging {
 
     logger.info("vdi: " + vdi);
 
-    // distance covered per pixel in meters/pixel
+    // Distance covered per pixel in meters/pixel
     double dpphoriz = hdi / IMAGE_WIDTH;
     double dppvert = vdi / IMAGE_HEIGHT;
 
-    // finding distance from the center
+    // Find pixel offset from the center
     double deltapixel_x = pixelx - (IMAGE_WIDTH / 2);
     double deltapixel_y = (IMAGE_HEIGHT / 2) - pixely;
 
     logger.info("dpx: " + deltapixel_x);
     logger.info("dpy: " + deltapixel_y);
 
+    // Find horizontal and vertical physical distance from center with respect to image
     double dppH = deltapixel_x * dpphoriz;
     double dppV = deltapixel_y * dppvert;
 
@@ -112,7 +113,7 @@ public class Geotagging {
     // Compute new gps using inverse haversine
     double distance = Math.sqrt(Math.pow(target_dx, 2) + Math.pow(target_dy, 2));
     double direction = planeYawRadians + (Math.PI / 2.0 - Math.atan2(target_dy, target_dx));
-    double[] newGps = inverseHarversine(latitude, longitude, distance, direction);
+    double[] newGps = inverseHaversine(latitude, longitude, distance, direction);
 
     GpsLocation gps = null;
     try {
