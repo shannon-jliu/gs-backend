@@ -19,28 +19,34 @@ public class Geotagging {
   private static double radiusEarth = 6371000.0;
 
   /**
-   * Returns the change in longitude (in radians) equivalent to a given change in meters in the x (East/West) direction
-   * at a given latitude, assuming the change in latitude is 0
-   *
-   * @param metersX  The change in meters in the x (East/West) direction
-   * @param latitude The latitude in radians
+   * Uses the inverse haversine function to return new gps corresponding to a translation
+   * of given distance and direction from an initial gps reading.
+   * @param initLat         The initial latitude
+   * @param initLong        The initial longitude
+   * @param distance        The distance offset travelled (in meters)
+   * @param direction       The direction travelled (in radians clockwise from north)
+   * @return an array of two doubles, [latitude, longitude] (in degrees)
    */
-  private static double haversineXMetersToLongitude(double metersX, double latitude) {
-    double sinSquaredTerm = 2 * Math.pow(Math.sin(metersX / (2 * radiusEarth)), 2);
-    double cosSquaredTerm = Math.pow(Math.cos(latitude), 2);
-    return Math.acos(1 - (sinSquaredTerm / cosSquaredTerm));
+  private static double[] inverseHarversine(double initLat, double initLong, double distance, double direction) {
+    double r = radiusEarth;
+
+    // Initialize empty gps array
+    double[] gps = new double[2];
+
+    // New latitude
+    gps[0] = Math.asin(Math.sin(initLat) * Math.cos(distance / r)
+              + Math.cos(initLat) * Math.sin(distance / r) * Math.cos(direction));
+
+    // New longitude
+    gps[1] = initLong + Math.atan2(Math.sin(direction) * Math.sin(distance / r) * Math.cos(initLat),
+        Math.cos(distance / r) - Math.sin(initLat) * Math.sin(gps[0]));
+
+    // Convert into degrees
+    gps[0] = gps[0] * 180 / Math.PI;
+    gps[1] = gps[1] * 180 / Math.PI;
+    return gps;
   }
 
-  /**
-   * Returns the change in latitude (in radians) equivalent to a given change in meters in the y (North/South) direction,
-   * assuming the change in longitude is 0
-   *
-   * @param metersY The change in meters in the y (North/South) direction
-   */
-  private static double haversineYMetersToLatitude(double metersY) {
-    double sinSquaredTerm = 2 * Math.pow(Math.sin(metersY / (2 * radiusEarth)), 2);
-    return Math.acos(1 - sinSquaredTerm);
-  }
 
   /**
    * Creates a Gpslocation representing the center of the image
@@ -100,31 +106,17 @@ public class Geotagging {
     double dppV = deltapixel_y * dppvert;
 
     // Do rotation of coordinate system to rotate dppH and dppV to account for yaw
-    double target_reference_x_meters =
-        dppH * Math.cos(planeYawRadians) + dppV * Math.sin(planeYawRadians);
-    double target_reference_y_meters =
-        dppH * -1 * Math.sin(planeYawRadians) + dppV * Math.cos(planeYawRadians);
+    double target_dx = dppH * Math.cos(planeYawRadians) + dppV * Math.sin(planeYawRadians);
+    double target_dy = dppH * -1 * Math.sin(planeYawRadians) + dppV * Math.cos(planeYawRadians);
 
-    logger.info("target_ref_x: " + target_reference_x_meters);
-    logger.info("target_ref_y: " + target_reference_y_meters);
-
-    // find the change from the plane's center in longitude and latitude
-    double latRadians = Math.PI / 180 * latitude; // convert to latitude in radians for haversine
-    double deltaLong = target_reference_x_meters / (111111*Math.cos(Math.sqrt(2)/2));
-        // haversineXMetersToLongitude(target_reference_x_meters, latRadians) * 180 / Math.PI;
-    double deltaLat = target_reference_y_meters / 111111;
-        //haversineYMetersToLatitude(target_reference_y_meters) * 180 / Math.PI;
-
-    logger.info("deltaLong: " + deltaLong);
-    logger.info("deltaLat: " + deltaLat);
-
-    // adding the distance from the center to the plane's center position
-    double longitude_of_target_x = longitude + deltaLong;
-    double latitude_of_target_y = latitude + deltaLat;
+    // Compute new gps using inverse haversine
+    double distance = Math.sqrt(Math.pow(target_dx, 2) + Math.pow(target_dy, 2));
+    double direction = planeYawRadians + (Math.PI / 2.0 - Math.atan2(target_dy, target_dx));
+    double[] newGps = inverseHarversine(latitude, longitude, distance, direction);
 
     GpsLocation gps = null;
     try {
-      gps = new GpsLocation(latitude_of_target_y, longitude_of_target_x);
+      gps = new GpsLocation(newGps[0], newGps[1]);
     } catch (InvalidGpsLocationException e) {
       logger.error(e.getMessage());
     }
