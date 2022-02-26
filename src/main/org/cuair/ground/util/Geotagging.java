@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory;
 public class Geotagging {
   private static final Logger logger = LoggerFactory.getLogger(GpsLocation.class);
   /** Width of height and image in pixels */
-  public static double IMAGE_WIDTH = Flags.IMAGE_WIDTH;
-  public static double IMAGE_HEIGHT = Flags.IMAGE_HEIGHT;
+  public static double IMAGE_WIDTH = Flags.FRONTEND_IMAGE_WIDTH;
+  public static double IMAGE_HEIGHT = Flags.FRONTEND_IMAGE_HEIGHT;
   /** An approximation of the radius of the Earth in meters */
   private static double radiusEarth = 6371000.0;
 
@@ -111,9 +111,14 @@ public class Geotagging {
     double target_dy = dppH * -1 * Math.sin(planeYawRadians) + dppV * Math.cos(planeYawRadians);
 
     // Compute new gps using inverse haversine
+    double latRadians = Math.PI / 180 * latitude;
+    double longRadians = Math.PI / 180 * longitude;
     double distance = Math.sqrt(Math.pow(target_dx, 2) + Math.pow(target_dy, 2));
     double direction = planeYawRadians + (Math.PI / 2.0 - Math.atan2(target_dy, target_dx));
-    double[] newGps = inverseHaversine(latitude, longitude, distance, direction);
+    double[] newGps = inverseHaversine(latRadians, longRadians, distance, direction);
+
+    System.out.println(newGps[0]);
+    System.out.println(newGps[1]);
 
     GpsLocation gps = null;
     try {
