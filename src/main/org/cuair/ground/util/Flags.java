@@ -19,6 +19,11 @@ public class Flags {
   /** Interop */
   public static boolean CUAIR_INTEROP_REQUESTS = false;
   public static String DEFAULT_EMERGENT_TARGET_DESC = "A lost hiker with a water bottle.";
+  public static String INTEROP_IP = "127.0.0.1";
+  public static String INTEROP_PORT = "8000";
+  public static String INTEROP_USERNAME = "testuser";
+  public static String INTEROP_PASSWORD = "testpass";
+  public static int MISSION_NUMBER = 1;
 
   /** Default username if no username specified as part of request */
   public static String DEFAULT_USERNAME = "<NO_USER>";
