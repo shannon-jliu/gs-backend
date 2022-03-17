@@ -79,6 +79,7 @@ public class ImageControllerTest {
   private JSONObject gimOrtObj;
   private JSONObject telemObj;
   private JSONObject jsonObj;
+  private MockMultipartFile jsonFile;
 
   /** Before each test, initialize models and empty tables */
   @Before
@@ -146,6 +147,10 @@ public class ImageControllerTest {
     jsonObj.put("imgMode", imgMode);
     jsonObj.put("fov", fov);
     jsonObj.put("telemetry", telemObj);
+
+    // json file
+    jsonFile = new MockMultipartFile("json", null,
+        "application/json", jsonObj.toString().getBytes());
   }
 
   /** After each test, clean the database */
@@ -370,7 +375,7 @@ public class ImageControllerTest {
   public void testCreate() throws Exception {
     ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
         .file(firstFile)
-        .param("json", jsonObj.toString()));
+        .file(jsonFile));
     MvcResult result = resultAction.andReturn();
     MockHttpServletResponse response = result.getResponse();
     Image responseImage =
@@ -388,10 +393,10 @@ public class ImageControllerTest {
   public void testCreateWithInvalidJson() throws Exception {
     ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
         .file(firstFile)
-        .param("json", "\"imgMode\":\"" + imgMode + "\"}"));
+        .file(new MockMultipartFile("json", null,
+            "application/json", "[]".getBytes())));
     MvcResult result = resultAction.andReturn();
     MockHttpServletResponse response = result.getResponse();
-
     assertEquals("text/plain;charset=UTF-8", response.getContentType());
     assertEquals(400, response.getStatus());
     assertTrue(response.getContentAsString().contains("Json part invalid"));
@@ -406,10 +411,12 @@ public class ImageControllerTest {
 
     // Edit json fields
     jsonObj.put("extraField", extraField);
+    jsonFile = new MockMultipartFile("json", null,
+        "application/json",jsonObj.toString().getBytes());
 
     ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
         .file(firstFile)
-        .param("json", jsonObj.toString()));
+        .file(jsonFile));
     MvcResult result = resultAction.andReturn();
     MockHttpServletResponse response = result.getResponse();
 
@@ -427,10 +434,12 @@ public class ImageControllerTest {
 
     // Edit json fields
     jsonObj.put("id", id);
+    jsonFile = new MockMultipartFile("json", null,
+        "application/json",jsonObj.toString().getBytes());
 
     ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
         .file(firstFile)
-        .param("json", jsonObj.toString()));
+        .file(jsonFile));
     MvcResult result = resultAction.andReturn();
     MockHttpServletResponse response = result.getResponse();
 
@@ -447,9 +456,12 @@ public class ImageControllerTest {
     // Edit json fields
     jsonObj.remove("timestamp");
 
+    jsonFile = new MockMultipartFile("json", null,
+        "application/json",jsonObj.toString().getBytes());
+
     ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
         .file(firstFile)
-        .param("json", jsonObj.toString()));
+        .file(jsonFile));
     MvcResult result = resultAction.andReturn();
     MockHttpServletResponse response = result.getResponse();
 
@@ -465,9 +477,12 @@ public class ImageControllerTest {
     // Edit json fields
     jsonObj.remove("fov");
 
+    jsonFile = new MockMultipartFile("json", null,
+        "application/json",jsonObj.toString().getBytes());
+
     ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
         .file(firstFile)
-        .param("json", jsonObj.toString()));
+        .file(jsonFile));
     MvcResult result = resultAction.andReturn();
     MockHttpServletResponse response = result.getResponse();
 
@@ -483,9 +498,12 @@ public class ImageControllerTest {
     // Edit json fields
     jsonObj.remove("imgMode");
 
+    jsonFile = new MockMultipartFile("json", null,
+        "application/json",jsonObj.toString().getBytes());
+
     ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
         .file(firstFile)
-        .param("json", jsonObj.toString()));
+        .file(jsonFile));
     MvcResult result = resultAction.andReturn();
     MockHttpServletResponse response = result.getResponse();
 
@@ -500,10 +518,12 @@ public class ImageControllerTest {
   public void testCreateWithNoTelemetry() throws Exception {
     // Edit json fields
     jsonObj.remove("telemetry");
+    jsonFile = new MockMultipartFile("json", null,
+        "application/json",jsonObj.toString().getBytes());
 
     ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
         .file(firstFile)
-        .param("json", jsonObj.toString()));
+        .file(jsonFile));
     MvcResult result = resultAction.andReturn();
     MockHttpServletResponse response = result.getResponse();
 
@@ -518,10 +538,12 @@ public class ImageControllerTest {
   public void testCreateWithNoGps() throws Exception {
     // Edit json fields
     telemObj.remove("gps");
+    jsonFile = new MockMultipartFile("json", null,
+        "application/json",jsonObj.toString().getBytes());
 
     ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
         .file(firstFile)
-        .param("json", jsonObj.toString()));
+        .file(jsonFile));
     MvcResult result = resultAction.andReturn();
     MockHttpServletResponse response = result.getResponse();
 
@@ -537,10 +559,12 @@ public class ImageControllerTest {
   public void testCreateWithNoLatitude() throws Exception {
     // Edit json fields
     gpsObj.remove("latitude");
+    jsonFile = new MockMultipartFile("json", null,
+        "application/json",jsonObj.toString().getBytes());
 
     ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
         .file(firstFile)
-        .param("json", jsonObj.toString()));
+        .file(jsonFile));
     MvcResult result = resultAction.andReturn();
     MockHttpServletResponse response = result.getResponse();
 
@@ -556,10 +580,12 @@ public class ImageControllerTest {
   public void testCreateWithNoLongitude() throws Exception {
     // Edit json fields
     gpsObj.remove("longitude");
+    jsonFile = new MockMultipartFile("json", null,
+        "application/json",jsonObj.toString().getBytes());
 
     ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
         .file(firstFile)
-        .param("json", jsonObj.toString()));
+        .file(jsonFile));
     MvcResult result = resultAction.andReturn();
     MockHttpServletResponse response = result.getResponse();
 
@@ -575,10 +601,12 @@ public class ImageControllerTest {
   public void testCreateWithNoGimOrt() throws Exception {
     // Edit json fields
     telemObj.remove("gimOrt");
+    jsonFile = new MockMultipartFile("json", null,
+        "application/json",jsonObj.toString().getBytes());
 
     ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
         .file(firstFile)
-        .param("json", jsonObj.toString()));
+        .file(jsonFile));
     MvcResult result = resultAction.andReturn();
     MockHttpServletResponse response = result.getResponse();
 
@@ -594,10 +622,12 @@ public class ImageControllerTest {
   public void testCreateWithNoPitch() throws Exception {
     // Edit json fields
     gimOrtObj.remove("pitch");
+    jsonFile = new MockMultipartFile("json", null,
+        "application/json",jsonObj.toString().getBytes());
 
     ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
         .file(firstFile)
-        .param("json", jsonObj.toString()));
+        .file(jsonFile));
     MvcResult result = resultAction.andReturn();
     MockHttpServletResponse response = result.getResponse();
 
@@ -613,10 +643,12 @@ public class ImageControllerTest {
   public void testCreateWithNoRoll() throws Exception {
     // Edit json fields
     gimOrtObj.remove("roll");
+    jsonFile = new MockMultipartFile("json", null,
+        "application/json",jsonObj.toString().getBytes());
 
     ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
         .file(firstFile)
-        .param("json", jsonObj.toString()));
+        .file(jsonFile));
     MvcResult result = resultAction.andReturn();
     MockHttpServletResponse response = result.getResponse();
 
@@ -631,10 +663,12 @@ public class ImageControllerTest {
   public void testCreateWithNoAltitude() throws Exception {
     // Edit json fields
     telemObj.remove("altitude");
+    jsonFile = new MockMultipartFile("json", null,
+        "application/json",jsonObj.toString().getBytes());
 
     ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
         .file(firstFile)
-        .param("json", jsonObj.toString()));
+        .file(jsonFile));
     MvcResult result = resultAction.andReturn();
     MockHttpServletResponse response = result.getResponse();
 
@@ -650,10 +684,12 @@ public class ImageControllerTest {
   public void testCreateWithNoPlaneYaw() throws Exception {
     // Edit json fields
     telemObj.remove("planeYaw");
+    jsonFile = new MockMultipartFile("json", null,
+        "application/json",jsonObj.toString().getBytes());
 
     ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
         .file(firstFile)
-        .param("json", jsonObj.toString()));
+        .file(jsonFile));
     MvcResult result = resultAction.andReturn();
     MockHttpServletResponse response = result.getResponse();
 
@@ -671,7 +707,7 @@ public class ImageControllerTest {
   @Test
   public void testCreateWhenNoImageSent() throws Exception {
     ResultActions resultAction = mvc.perform(MockMvcRequestBuilders.multipart("/image")
-        .param("json", jsonObj.toString()));
+        .file(jsonFile));
     MvcResult result = resultAction.andReturn();
     MockHttpServletResponse response = result.getResponse();
 
@@ -700,7 +736,7 @@ public class ImageControllerTest {
 
     assertNull(response.getContentType());
     assertEquals(400, response.getStatus());
-    assertEquals("Required String parameter 'json' is not present", response.getErrorMessage());
+    assertEquals("Required request part 'json' is not present", response.getErrorMessage());
     assertEquals(0, imageDao.getAllIds().size());
   }
 

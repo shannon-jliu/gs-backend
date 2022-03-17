@@ -1,25 +1,21 @@
 package org.cuair.ground.clients;
 
-import org.cuair.ground.models.*;
+import static org.junit.Assert.assertTrue;
+
+
+import java.util.concurrent.ExecutionException;
+import org.cuair.ground.models.Color;
+import org.cuair.ground.models.ODLCUser;
+import org.cuair.ground.models.Shape;
 import org.cuair.ground.models.exceptions.InvalidGpsLocationException;
 import org.cuair.ground.models.geotag.Geotag;
 import org.cuair.ground.models.geotag.GpsLocation;
 import org.cuair.ground.models.plane.target.AlphanumTarget;
-import org.cuair.ground.util.RequestUtil;
-import org.cuair.ground.models.plane.target.EmergentTargetSighting;
-import org.cuair.ground.util.Flags;
-import org.cuair.ground.util.RequestUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.concurrent.ListenableFuture;
-import java.util.concurrent.TimeUnit;
-
-import java.lang.annotation.Target;
-import java.util.concurrent.ExecutionException;
-
-import static org.junit.Assert.*;
 
 public class InteropClientTest {
 
@@ -54,7 +50,7 @@ public class InteropClientTest {
                 odlcUser,
                 Shape.SQUARE,
                 Color.BLUE,
-                'A',
+                "A",
                 Color.BLACK,
                 false,
                 geotag,
@@ -98,7 +94,7 @@ public class InteropClientTest {
                 odlcUser,
                 Shape.SQUARE,
                 Color.BLUE,
-                'A',
+                "A",
                 Color.BLACK,
                 false,
                 geotag,
@@ -157,7 +153,7 @@ public class InteropClientTest {
                 odlcUser,
                 Shape.SQUARE,
                 Color.BLUE,
-                'A',
+                "A",
                 Color.BLACK,
                 false,
                 geotag,
@@ -166,7 +162,7 @@ public class InteropClientTest {
         );
         assertTrue(testTargetCreate(original));
         testTargetCreate(original);
-        original.setAlpha('A');
+        original.setAlpha("A");
         testTargetUpdate(original);
         //assertTrue(testTargetUpdate(original));
     }
