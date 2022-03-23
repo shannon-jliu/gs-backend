@@ -79,8 +79,6 @@ public class Geotagging {
             fovHoriz
                 / 2);
 
-    logger.info("hdi: " + hdi);
-
     // total vertical (y) distance imaged in meters
     double vdi =
         2
@@ -89,8 +87,6 @@ public class Geotagging {
             fovVert
                 / 2);
 
-    logger.info("vdi: " + vdi);
-
     // Distance covered per pixel in meters/pixel
     double dpphoriz = hdi / IMAGE_WIDTH;
     double dppvert = vdi / IMAGE_HEIGHT;
@@ -98,9 +94,6 @@ public class Geotagging {
     // Find pixel offset from the center
     double deltapixel_x = pixelx - (IMAGE_WIDTH / 2);
     double deltapixel_y = (IMAGE_HEIGHT / 2) - pixely;
-
-    logger.info("dpx: " + deltapixel_x);
-    logger.info("dpy: " + deltapixel_y);
 
     // Find horizontal and vertical physical distance from center with respect to image
     double dppH = deltapixel_x * dpphoriz;
@@ -116,9 +109,6 @@ public class Geotagging {
     double distance = Math.sqrt(Math.pow(target_dx, 2) + Math.pow(target_dy, 2));
     double direction = planeYawRadians + (Math.PI / 2.0 - Math.atan2(target_dy, target_dx));
     double[] newGps = inverseHaversine(latRadians, longRadians, distance, direction);
-
-    System.out.println(newGps[0]);
-    System.out.println(newGps[1]);
 
     GpsLocation gps = null;
     try {
