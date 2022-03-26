@@ -11,10 +11,10 @@ public class Flags {
   public static String TEST_IMAGE_DIR = "src/test/java/org/cuair/ground/controllers/test_images/";
 
   /** Constants */
-  public static double FOV_HORIZONTAL_RADIANS = 0.7328394987;
-  public static double FOV_VERTICAL_RADIANS = 0.560476881;
-  public static double IMAGE_WIDTH = 4912.0;
-  public static double IMAGE_HEIGHT = 3684.0;
+  public static double CAM_SENSOR_WIDTH = 23.2; // in mm
+  public static double CAM_SENSOR_HEIGHT = 15.4; // in mm
+  public static double FRONTEND_IMAGE_WIDTH = 1900; // 5456.0
+  public static double FRONTEND_IMAGE_HEIGHT = 1263; // 3632.0
 
   /** Interop */
   public static boolean CUAIR_INTEROP_REQUESTS = false;

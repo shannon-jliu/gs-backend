@@ -3,6 +3,7 @@ package org.cuair.ground.util;
 import java.util.Arrays;
 import java.util.Objects;
 import org.cuair.ground.models.exceptions.InvalidGpsLocationException;
+import org.cuair.ground.models.geotag.FOV;
 import org.cuair.ground.models.geotag.Geotag;
 import org.cuair.ground.models.geotag.GpsLocation;
 import org.cuair.ground.models.geotag.Radian;
@@ -12,44 +13,48 @@ import org.slf4j.LoggerFactory;
 public class Geotagging {
   private static final Logger logger = LoggerFactory.getLogger(GpsLocation.class);
   /** Width of height and image in pixels */
-  public static double IMAGE_WIDTH = Flags.IMAGE_WIDTH;
-  public static double IMAGE_HEIGHT = Flags.IMAGE_HEIGHT;
-  /** Field of view of camera horizontally and vertically */
-  private static double FOV_HORIZONTAL_RADIANS = Flags.FOV_HORIZONTAL_RADIANS;
-  private static double FOV_VERTICAL_RADIANS = Flags.FOV_VERTICAL_RADIANS;
+  public static double IMAGE_WIDTH = Flags.FRONTEND_IMAGE_WIDTH;
+  public static double IMAGE_HEIGHT = Flags.FRONTEND_IMAGE_HEIGHT;
   /** An approximation of the radius of the Earth in meters */
   private static double radiusEarth = 6371000.0;
 
   /**
-   * Returns the change in longitude (in radians) equivalent to a given change in meters in the x (East/West) direction
-   * at a given latitude, assuming the change in latitude is 0
-   *
-   * @param metersX  The change in meters in the x (East/West) direction
-   * @param latitude The latitude in radians
+   * Uses the inverse haversine function to return new gps corresponding to a translation
+   * of given distance and direction from an initial gps reading.
+   * @param initLat         The initial latitude
+   * @param initLong        The initial longitude
+   * @param distance        The distance offset travelled (in meters)
+   * @param direction       The direction travelled (in radians clockwise from north)
+   * @return an array of two doubles, [latitude, longitude] (in degrees)
    */
-  private static double haversineXMetersToLongitude(double metersX, double latitude) {
-    double sinSquaredTerm = 2 * Math.pow(Math.sin(metersX / (2 * radiusEarth)), 2);
-    double cosSquaredTerm = Math.pow(Math.cos(latitude), 2);
-    return Math.acos(1 - (sinSquaredTerm / cosSquaredTerm));
+  private static double[] inverseHaversine(double initLat, double initLong, double distance, double direction) {
+    double r = radiusEarth;
+
+    // Initialize empty gps array
+    double[] gps = new double[2];
+
+    // New latitude
+    gps[0] = Math.asin(Math.sin(initLat) * Math.cos(distance / r)
+              + Math.cos(initLat) * Math.sin(distance / r) * Math.cos(direction));
+
+    // New longitude
+    gps[1] = initLong + Math.atan2(Math.sin(direction) * Math.sin(distance / r) * Math.cos(initLat),
+        Math.cos(distance / r) - Math.sin(initLat) * Math.sin(gps[0]));
+
+    // Convert into degrees
+    gps[0] = gps[0] * 180 / Math.PI;
+    gps[1] = gps[1] * 180 / Math.PI;
+    return gps;
   }
 
-  /**
-   * Returns the change in latitude (in radians) equivalent to a given change in meters in the y (North/South) direction,
-   * assuming the change in longitude is 0
-   *
-   * @param metersY The change in meters in the y (North/South) direction
-   */
-  private static double haversineYMetersToLatitude(double metersY) {
-    double sinSquaredTerm = 2 * Math.pow(Math.sin(metersY / (2 * radiusEarth)), 2);
-    return Math.acos(1 - sinSquaredTerm);
-  }
 
   /**
-   * Creates a Gpslocation representing the center of the image
+   * Creates a GpsLocation representing the center of the image
    *
-   * @param latitude        The latitude of the plane
-   * @param longitude       The longitude of the plane
-   * @param altitude        The altitude of the plane
+   * @param latitude        The latitude of the plane in degrees
+   * @param longitude       The longitude of the plane in degrees
+   * @param altitude        The altitude of the plane in meters
+   * @param fov             The (horizontal, vertical) fov of the camera
    * @param pixelx          The x-coordinate of the pixel center of the tag on the frontend with respect to the image
    * @param pixely          The y-coordinate of the pixel center of the tag on the frontend with respect to the image
    * @param planeYawRadians The yaw of the plane in radians
@@ -58,52 +63,56 @@ public class Geotagging {
       double latitude,
       double longitude,
       double altitude,
+      FOV fov,
       double pixelx,
       double pixely,
       double planeYawRadians) {
-    // total horizontal distance imaged in meters
+
+    double fovHoriz = fov.getX();
+    double fovVert = fov.getY();
+
+    // total horizontal (x) distance imaged in meters
     double hdi =
         2
             * altitude
             * Math.tan(
-            FOV_HORIZONTAL_RADIANS
-                / 2); // telemetryData.getAerialPosition().getAltitudeGroundFt()
+            fovHoriz
+                / 2);
+
+    // total vertical (y) distance imaged in meters
     double vdi =
         2
             * altitude
             * Math.tan(
-            FOV_VERTICAL_RADIANS
-                / 2); // telemetryData.getAerialPosition().getAltitudeGroundFt()
+            fovVert
+                / 2);
 
-    // distance covered per pixel in meters/pixel
+    // Distance covered per pixel in meters/pixel
     double dpphoriz = hdi / IMAGE_WIDTH;
     double dppvert = vdi / IMAGE_HEIGHT;
 
-    // finding distance from the center
+    // Find pixel offset from the center
     double deltapixel_x = pixelx - (IMAGE_WIDTH / 2);
     double deltapixel_y = (IMAGE_HEIGHT / 2) - pixely;
 
+    // Find horizontal and vertical physical distance from center with respect to image
     double dppH = deltapixel_x * dpphoriz;
     double dppV = deltapixel_y * dppvert;
 
-    // matrix rotation to account for the yaw - (clockwise)
-    double target_reference_x_meters =
-        dppH * Math.cos(planeYawRadians) + dppV * Math.sin(planeYawRadians);
-    double target_reference_y_meters =
-        dppH * -1 * Math.sin(planeYawRadians) + dppV * Math.cos(planeYawRadians);
+    // Do rotation of coordinate system to rotate dppH and dppV to account for yaw
+    double target_dx = dppH * Math.cos(planeYawRadians) + dppV * Math.sin(planeYawRadians);
+    double target_dy = dppH * -1 * Math.sin(planeYawRadians) + dppV * Math.cos(planeYawRadians);
 
-    // find the change from the plane's center in longitude and latitude
-    double deltaLong =
-        haversineXMetersToLongitude(target_reference_x_meters, latitude) * 180 / Math.PI;
-    double deltaLat = haversineYMetersToLatitude(target_reference_y_meters) * 180 / Math.PI;
-
-    // adding the distance from the center to the plane's center position
-    double longitude_of_target_x = longitude + deltaLong;
-    double latitude_of_target_y = latitude + deltaLat;
+    // Compute new gps using inverse haversine
+    double latRadians = Math.PI / 180 * latitude;
+    double longRadians = Math.PI / 180 * longitude;
+    double distance = Math.sqrt(Math.pow(target_dx, 2) + Math.pow(target_dy, 2));
+    double direction = planeYawRadians + (Math.PI / 2.0 - Math.atan2(target_dy, target_dx));
+    double[] newGps = inverseHaversine(latRadians, longRadians, distance, direction);
 
     GpsLocation gps = null;
     try {
-      gps = new GpsLocation(latitude_of_target_y, longitude_of_target_x);
+      gps = new GpsLocation(newGps[0], newGps[1]);
     } catch (InvalidGpsLocationException e) {
       logger.error(e.getMessage());
     }
