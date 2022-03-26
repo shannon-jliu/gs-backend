@@ -8,6 +8,7 @@ import java.util.Objects;
 import javax.persistence.Entity;
 import org.cuair.ground.models.ODLCUser;
 import org.cuair.ground.models.geotag.Geotag;
+import org.cuair.ground.util.Flags;
 
 /** Emergent Target that is associated with an Emergent Target Sighting. Has a description. */
 @Entity
@@ -122,4 +123,5 @@ public class EmergentTarget extends Target {
     rootNode.put("autonomous", this.getCreator().getUserType() == ODLCUser.UserType.ADLC);
     return rootNode;
   }
+
 }

@@ -91,6 +91,12 @@ dependencies {
 
     // Drew Noakes Metadata Extractor
     implementation 'com.drewnoakes:metadata-extractor:2.16.0'
+
+    //Gstreamer
+    implementation 'org.freedesktop.gstreamer:gst1-java-core:1.4.0'
+    implementation 'net.java.dev.jna:jna:5.6.0'
+    implementation 'net.java.dev.jna:jna-platform:5.6.0'
+
 }
 
 ebean {
@@ -100,3 +106,10 @@ ebean {
 test {
     useJUnitPlatform()
 }
+
+/*
+// Workaround to solve a possible issue where gradle build fails due to a DuplicatesStrategy error:
+// "no duplicate handling strategy has been set"
+tasks.withType(Jar).all {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}*/

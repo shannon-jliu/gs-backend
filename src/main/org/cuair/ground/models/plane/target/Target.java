@@ -1,14 +1,25 @@
 package org.cuair.ground.models.plane.target;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.JsonNode;
+
+import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.cuair.ground.models.ClientCreatable;
 import org.cuair.ground.models.ODLCUser;
 import org.cuair.ground.models.geotag.Geotag;
+import org.cuair.ground.util.Flags;
 
 /** Model to represent the target, which is an object on the field. */
 @MappedSuperclass
@@ -60,6 +71,16 @@ public abstract class Target extends ClientCreatable {
    * @return JsonNode
    */
   public abstract JsonNode toJson();
+
+  /**
+   * Creates a JSON object with a mission number
+   * @return JsonNode with required parameters to send to interop
+   */
+  public JsonNode toInteropJson() {
+    ObjectNode rootNode = (ObjectNode) toJson();
+    rootNode.put("mission", Flags.MISSION_NUMBER);
+    return rootNode;
+  }
 
   /**
    * Returns the class of targetSighting associated with this target

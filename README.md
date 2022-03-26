@@ -8,6 +8,7 @@
       - [Gradle](#gradle)
       - [Java 11/JDK 11](#java-11jdk-11)
       - [Postgres](#postgres)
+      - [GStreamer](#gstreamer)
   - [Setup](#setup)
   - [DISCLAIMER](#disclaimer)
   - [Setup (Docker)](#setup-docker)
@@ -27,6 +28,7 @@ The Imaging Ground Server, written with Spring Boot.
 - Python 3 for `pre-commit`
 - PostgresSQL
 - IntelliJ Ultimate
+- gstreamer (specifically gst-plugins-good)
 
 ## Installation
 #### Gradle
@@ -46,6 +48,10 @@ This assumes you already have some version of Java installed.
 #### Postgres
   - Linux: `sudo apt-get -y install postgresql`
   - MacOS: `brew install postgres`
+
+#### GStreamer
+  - Linux (Ubuntu/Debian): `sudo apt-get install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-plugins-good gstreamer1.0-libav gstreamer1.0-doc gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio`
+  - MacOS: follow instructions for downloading Gstreamer (https://gstreamer.freedesktop.org/documentation/installing/on-mac-osx.html)
 
 ## Setup
 1. To install `pre-commit`, run
