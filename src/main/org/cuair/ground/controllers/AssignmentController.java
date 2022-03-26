@@ -4,6 +4,7 @@ import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.ok;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.cuair.ground.daos.AssignmentDatabaseAccessor;
 import org.cuair.ground.daos.DAOFactory;
@@ -103,6 +104,18 @@ public class AssignmentController {
       user = odlcUserDao.getDefaltUser();
     }
     List<Assignment> a_list = assignmentDao.getAllForUser(user);
+    return ok(a_list);
+  }
+
+  @RequestMapping(value = "/allusers", method = RequestMethod.GET)
+  public ResponseEntity getAll() {
+    List<ODLCUser> taggers = odlcUserDao.getMDLCTaggers();
+    List<Assignment> a_list = new ArrayList<>();
+    for (ODLCUser t : taggers) {
+      for (Assignment a : assignmentDao.getAllForUser(t)) {
+        a_list.add(a);
+      }
+    }
     return ok(a_list);
   }
 
