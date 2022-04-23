@@ -17,15 +17,13 @@ import org.springframework.stereotype.Component;
 /* Lifecycle component, contains startup and shutdown logic for server. */
 @Component
 public class Lifecycle {
-  private static AlphanumTargetDatabaseAccessor<AlphanumTarget> alphaTargetDao =
-      (AlphanumTargetDatabaseAccessor<AlphanumTarget>)
-          DAOFactory.getDAO(
-              DAOFactory.ModelDAOType.ALPHANUM_TARGET_DATABASE_ACCESSOR, AlphanumTarget.class);
+  private static AlphanumTargetDatabaseAccessor<AlphanumTarget> alphaTargetDao = (AlphanumTargetDatabaseAccessor<AlphanumTarget>) DAOFactory
+      .getDAO(
+          DAOFactory.ModelDAOType.ALPHANUM_TARGET_DATABASE_ACCESSOR, AlphanumTarget.class);
 
-  private static ClientCreatableDatabaseAccessor<EmergentTarget> emergentTargetDao =
-      (ClientCreatableDatabaseAccessor<EmergentTarget>)
-          DAOFactory.getDAO(
-              DAOFactory.ModelDAOType.CLIENT_CREATABLE_DATABASE_ACCESSOR, EmergentTarget.class);
+  private static ClientCreatableDatabaseAccessor<EmergentTarget> emergentTargetDao = (ClientCreatableDatabaseAccessor<EmergentTarget>) DAOFactory
+      .getDAO(
+          DAOFactory.ModelDAOType.CLIENT_CREATABLE_DATABASE_ACCESSOR, EmergentTarget.class);
 
   private ODLCUserDatabaseAccessor odlcUserDao = (ODLCUserDatabaseAccessor) DAOFactory
       .getDAO(DAOFactory.ModellessDAOType.ODLCUSER_DATABASE_ACCESSOR);
@@ -45,17 +43,16 @@ public class Lifecycle {
       return;
     }
     if (offaxisTarget == null) {
-      offaxisTarget =
-          new AlphanumTarget(
-              new ODLCUser("interop", "localhost", ODLCUser.UserType.MDLCOPERATOR),
-              null,
-              null,
-              "A",
-              null,
-              true,
-              null,
-              null,
-              0L);
+      offaxisTarget = new AlphanumTarget(
+          new ODLCUser("interop", "localhost", ODLCUser.UserType.MDLCOPERATOR),
+          null,
+          null,
+          "A",
+          null,
+          true,
+          null,
+          null,
+          0L);
       alphaTargetDao.create(offaxisTarget);
     }
   }
@@ -74,13 +71,12 @@ public class Lifecycle {
       return;
     }
     if (emergentTarget == null) {
-      emergentTarget =
-          new EmergentTarget(
-              new ODLCUser("interop", "localhost", ODLCUser.UserType.ADLC),
-              null,
-              DEFAULT_EMERGENT_TARGET_DESC,
-              null,
-              0L);
+      emergentTarget = new EmergentTarget(
+          new ODLCUser("interop", "localhost", ODLCUser.UserType.ADLC),
+          null,
+          DEFAULT_EMERGENT_TARGET_DESC,
+          null,
+          0L);
       emergentTargetDao.create(emergentTarget);
     }
   }
@@ -90,8 +86,8 @@ public class Lifecycle {
    */
   @PostConstruct
   public void startUp() {
-    interopClient.getMissionData();
-    interopClient.getSentTargets();
+    // interopClient.getMissionData();
+    // interopClient.getSentTargets();
     initializeOffaxisTargetDatabase();
     initializeEmergentTargetDatabase();
     if (odlcUserDao.getADLCUser() == null) {
