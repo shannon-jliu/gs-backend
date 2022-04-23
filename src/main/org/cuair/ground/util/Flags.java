@@ -41,7 +41,7 @@ public class Flags {
   /** Plane servers */
   public static boolean PRINT_CLIENT_LOGS = true;
   public static String OBC_IP = "192.168.0.21";
-  public static String CAM_GIM_PORT = "5000";
+  public static String CAM_GIM_PORT = "8080";
   public static String SET_CAM_GIM_MODE_SETTINGS_ROUTE = "/api/mode";
   public static String SET_AIRDROP_SETTINGS_ROUTE = "/v1/airdrop/setting";
   public static String GET_CAM_GIM_MODE_SETTINGS_ROUTE = "/api/state";

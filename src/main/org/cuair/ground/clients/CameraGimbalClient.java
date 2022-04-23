@@ -25,7 +25,7 @@ public class CameraGimbalClient extends SettingsClient<CameraGimbalSettings> {
 
   private AsyncRestTemplate template = new AsyncRestTemplate();
 
-  private String planeServerAddress = "http://localhost:" + this.serverPort;
+  private String planeServerAddress;
 
   /**
    * Client to communicate with camera gimbal server
@@ -34,6 +34,7 @@ public class CameraGimbalClient extends SettingsClient<CameraGimbalSettings> {
     this.serverPort = Flags.CAM_GIM_PORT;
     this.setModeRoute = Flags.SET_CAM_GIM_MODE_SETTINGS_ROUTE;
     this.getModeRoute = Flags.GET_CAM_GIM_MODE_SETTINGS_ROUTE;
+    planeServerAddress = "http://localhost:" + this.serverPort + "/";
   }
 
   /**
@@ -41,7 +42,7 @@ public class CameraGimbalClient extends SettingsClient<CameraGimbalSettings> {
    *
    * @param rois the JSON representation of the ROIS
    */
-  public void sendMDLCGroundROIS(List<ROI> rois) {
+  public ListenableFuture<ResponseEntity<String>> sendMDLCGroundROIS(List<ROI> rois) {
     URI groundROIs = URI.create(planeServerAddress+"api/rois");
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -49,6 +50,7 @@ public class CameraGimbalClient extends SettingsClient<CameraGimbalSettings> {
     ListenableFuture<ResponseEntity<String>> groundROIfuture =
         template.exchange(groundROIs, HttpMethod.POST, requestEntity, String.class);
     RequestUtil.futureCallback(groundROIs, groundROIfuture);
+    return groundROIfuture;
   }
 
   /**
