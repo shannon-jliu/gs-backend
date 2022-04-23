@@ -42,7 +42,7 @@ public class CameraGimbalClient extends SettingsClient<CameraGimbalSettings> {
    * @param rois the JSON representation of the ROIS
    */
   public void sendMDLCGroundROIS(List<ROI> rois) {
-    URI groundROIs = URI.create(planeServerAddress+"pass/roi");
+    URI groundROIs = URI.create(planeServerAddress+"api/rois");
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
     HttpEntity<List<ROI>> requestEntity = new HttpEntity<List<ROI>>(rois, headers);
@@ -66,7 +66,7 @@ public class CameraGimbalClient extends SettingsClient<CameraGimbalSettings> {
    * Gets the ids of all captured ROIs on the plane system
    */
   public ResponseEntity<String> getCapturedROIs() throws Exception{
-    URI planeCapturedROIs = URI.create(planeServerAddress+"pass/captured-roi");
+    URI planeCapturedROIs = URI.create(planeServerAddress+"api/captured-rois");
     HttpEntity<String> requestEntity = new HttpEntity<String>(RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> roiFuture =
         template.exchange(planeCapturedROIs, HttpMethod.GET, requestEntity, String.class);
@@ -77,7 +77,7 @@ public class CameraGimbalClient extends SettingsClient<CameraGimbalSettings> {
    * Gets the capture plan for ROIs from the plane system
    */
   public ResponseEntity<String> getCapturePlan() throws Exception{
-    URI capturePlan = URI.create(planeServerAddress+"pass/capture");
+    URI capturePlan = URI.create(planeServerAddress+"api/capture-plan");
     HttpEntity<String> requestEntity = new HttpEntity<String>(RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> captureFuture =
         template.exchange(capturePlan, HttpMethod.GET, requestEntity, String.class);

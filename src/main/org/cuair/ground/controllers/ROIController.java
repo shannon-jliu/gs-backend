@@ -5,8 +5,10 @@ import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.ok;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.cuair.ground.clients.CameraGimbalClient;
 import org.cuair.ground.daos.AssignmentDatabaseAccessor;
 import org.cuair.ground.daos.ClientCreatableDatabaseAccessor;
 import org.cuair.ground.daos.DAOFactory;
@@ -129,6 +131,11 @@ public class ROIController {
     }
 
     ROIController.createAndUpdateAveragedRois(roi);
+
+    List<ROI> rois = new ArrayList<>();
+    rois.add(roi);
+    CameraGimbalClient client = new CameraGimbalClient();
+    client.sendMDLCGroundROIS(rois);
 
     return ok(roi);
   }
