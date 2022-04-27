@@ -19,7 +19,7 @@ public class Flags {
   public static double RAW_IMAGE_HEIGHT = 3632;
 
   /** Interop */
-  public static boolean CUAIR_INTEROP_REQUESTS = false;
+  public static boolean CUAIR_INTEROP_REQUESTS = true;
   public static String DEFAULT_EMERGENT_TARGET_DESC = "A lost hiker with a water bottle.";
   public static String INTEROP_IP = "127.0.0.1";
   public static String INTEROP_PORT = "8000";
