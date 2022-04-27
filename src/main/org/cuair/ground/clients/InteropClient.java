@@ -236,6 +236,25 @@ public class InteropClient {
     sendTarget(target, false);
   }
 
+  public void sendThumbnail(byte[] imageContent, Target target) {
+    // Build the thumbnail route
+    URI thumbnailRoute = URI.create(InteropAddress + "/api/odlcs/" + target.getJudgeTargetId() + "/image");
+
+    // Create Http Headers with session cookies to stay authenticated
+    HttpHeaders headers = RequestUtil.getDefaultCookieHeaders(sessionCookies);
+
+    // Build the request entity with the map content
+    HttpEntity<byte[]> requestEntity = new HttpEntity<>(imageContent, headers);
+
+    // Create listenable future to listen for response
+    ListenableFuture<ResponseEntity<String>> responseFuture = template.exchange(thumbnailRoute,
+        HttpMethod.PUT,
+        requestEntity,
+        String.class);
+
+    RequestUtil.futureCallback(thumbnailRoute, responseFuture);
+  }
+
   /**
    * Get sent targets from interop
    *
