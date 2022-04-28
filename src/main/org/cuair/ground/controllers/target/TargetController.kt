@@ -7,6 +7,8 @@ import org.cuair.ground.daos.ClientCreatableDatabaseAccessor
 import org.cuair.ground.daos.TargetSightingsDatabaseAccessor
 import org.cuair.ground.models.plane.target.Target
 import org.cuair.ground.models.plane.target.TargetSighting
+import org.cuair.ground.util.Flags
+import org.cuair.ground.clients.InteropClient
 
 import org.springframework.http.ResponseEntity.ok
 import org.springframework.http.ResponseEntity.noContent
@@ -22,6 +24,7 @@ import kotlin.concurrent.thread
 
 /** Controller to handle creation/retrieval of Emergent Target model objects  */
 abstract class TargetController<T : Target> {
+    var interopClient: InteropClient = InteropClient()
 
     /** Gets the database accessor object for this target  */
     abstract fun getTargetDao(): ClientCreatableDatabaseAccessor<T>
@@ -55,17 +58,18 @@ abstract class TargetController<T : Target> {
         if (t.id != null) return badRequest().body("Don't pass ids for creates")
         if (t.creator == null) return badRequest().body("Create request should have creator")
         getTargetDao().create(t)
-        // TODO: Add interop code
-        // if (CUAIR_INTEROP_REQUESTS) {
-        //     interopClient.createTarget(getTargetDao().get(t.id))
-        //     thread {
-        //         Thread.sleep(TARGETLOGGER_DELAY)
-        //         while (getTargetDao().get(t.id).judgeTargetId == null) {
-        //             logger.warn("${t.typeString} Target ${t.id} not sent to judges!")
-        //             Thread.sleep(TARGETLOGGER_DELAY)
-        //         }
-        //     }
-        // }
+
+        // Interop Client code
+        if (Flags.CUAIR_INTEROP_REQUESTS) {
+            interopClient.createTarget(getTargetDao().get(t.id))
+            /*thread {
+                // Thread.sleep(TARGETLOGGER_DELAY)
+                while (getTargetDao().get(t.id).judgeTargetId == null) {
+                    logger.warn("${t.typeString} Target ${t.id} not sent to judges!")
+                    // Thread.sleep(TARGETLOGGER_DELAY)
+                }
+            }*/
+        }
         return ok(t)
     }
 
@@ -93,13 +97,13 @@ abstract class TargetController<T : Target> {
         t.updateFromTarget(other)
         getTargetDao().update(t)
 
-        // TODO: Add client code
-        // if (CUAIR_INTEROP_REQUESTS) {
-        //     if (isTSIdUpdated) {
-        //         interopClient.updateTargetImage(targetSightingDao.get(t.thumbnail_tsid))
-        //     }
-        //     interopClient.updateTarget(getTargetDao().get(t.id))
-        // }
+        // Interop Client code
+        if (Flags.CUAIR_INTEROP_REQUESTS) {
+             if (isTSIdUpdated) {
+                 interopClient.sendThumbnail(targetSightingDao.get(t.getthumbnailTsid()).thumbnailImage(), t)
+             }
+             interopClient.updateTarget(getTargetDao().get(t.id))
+        }
         return ok(t)
     }
 

@@ -418,34 +418,6 @@ public class AlphanumTargetSighting extends TargetSighting {
   }
 
   /**
-   * Returns the raw content of the thumbnail corresponding to this target sighting, for
-   * submission to interop.
-   */
-  public byte[] thumbnailImage() throws IOException {
-    Image image = this.getAssignment().getImage();
-    assert image != null;
-    String imgPathLocal = image.getLocalImageUrl();
-    InputStream in = getClass().getResourceAsStream(imgPathLocal);
-    assert in != null;
-    BufferedImage initialImage = ImageIO.read(in);
-
-    // Produce cropped thumbnail - need to scale up as values are from compressed frontend image
-    double scaleUpW = Flags.RAW_IMAGE_WIDTH / Flags.FRONTEND_IMAGE_WIDTH;
-    double scaleUpH = Flags.RAW_IMAGE_HEIGHT / Flags.FRONTEND_IMAGE_HEIGHT;
-    BufferedImage croppedThumb = initialImage.getSubimage(
-        (int) (scaleUpW * (pixelx - width/2)),
-        (int) (scaleUpH * (pixely - height/2)),
-        (int) (scaleUpW * width),
-        (int) (scaleUpH * height));
-
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    ImageIO.write(croppedThumb, "jpg", baos);
-
-    return baos.toByteArray();
-
-  }
-
-  /**
    * Determines if the given object is logically equal to this AlphanumTargetSighting
    *
    * @param o The object to compare
