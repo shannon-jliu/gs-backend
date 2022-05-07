@@ -48,4 +48,19 @@ public class SettingsClient<T> {
         template.exchange(settingsURI, HttpMethod.GET, requestEntity, String.class);
     return settingsFuture.get();
   }
+
+  /**
+   * Gets the camera settings from the plane server.
+   * Note: currently returns 400 due to error in logic---type error? convert json to java string?
+   */
+  public ResponseEntity<String> getCamStatus() throws Exception {
+    // URI statusURI = URI.create(Flags.PLANE_SYSTEM_IP + Flags.CAM_PORT + Flags.GET_CAM_STATUS_ROUTE);
+    URI statusURI = URI.create("169.254.118.78:8080/api/camera");
+    HttpEntity<String> requestEntity = new HttpEntity<String>(RequestUtil.getDefaultHeaders());
+    ListenableFuture<ResponseEntity<String>> statusFuture =
+            template.exchange(statusURI, HttpMethod.GET, requestEntity, String.class);
+    return statusFuture.get();
+  }
+
 }
+

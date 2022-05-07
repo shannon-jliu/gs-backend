@@ -51,6 +51,9 @@ public class Flags {
   public static String SET_AIRDROP_SETTINGS_ROUTE = "/v1/airdrop/setting";
   public static String GET_CAM_GIM_MODE_SETTINGS_ROUTE = "/api/state";
   public static String GET_AIRDROP_SETTINGS_ROUTE = "/v1/airdrop/state";
+  public static String CAM_PORT = "8080";
+  public static String GET_CAM_STATUS_ROUTE = "/api/camera";
+  public static String PLANE_SYSTEM_IP = "169.254.118.78";
 
   /** Streaming */
   public static String STREAM_CLIP_DIR = "src/main/org/cuair/ground/";
