@@ -1,9 +1,13 @@
 package org.cuair.ground.clients;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+
 import org.cuair.ground.models.Image;
 import org.cuair.ground.models.ROI;
 import org.cuair.ground.models.plane.settings.CameraGimbalSettings;
@@ -37,6 +41,17 @@ public class CameraGimbalClient extends SettingsClient<CameraGimbalSettings> {
     planeServerAddress = "http://localhost:" + this.serverPort + "/";
   }
 
+
+  public ObjectNode roisToJson(List<ROI> rois){
+    ObjectNode on  = new ObjectMapper().createObjectNode();
+    ArrayNode arrayNode = on.putArray("rois");
+    for (ROI roi :rois) {
+      arrayNode.add(roi.toJson());
+    }
+    on.put("client_type", "mdlc");
+    return on;
+  }
+
   /**
    * Sends MDLC ROI's to the plane system
    *
@@ -46,7 +61,9 @@ public class CameraGimbalClient extends SettingsClient<CameraGimbalSettings> {
     URI groundROIs = URI.create(planeServerAddress+"api/rois");
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
-    HttpEntity<List<ROI>> requestEntity = new HttpEntity<List<ROI>>(rois, headers);
+    ObjectNode on = roisToJson(rois);
+
+    HttpEntity<String> requestEntity = new HttpEntity<>(on.toString(), headers);
     ListenableFuture<ResponseEntity<String>> groundROIfuture =
         template.exchange(groundROIs, HttpMethod.POST, requestEntity, String.class);
     RequestUtil.futureCallback(groundROIs, groundROIfuture);

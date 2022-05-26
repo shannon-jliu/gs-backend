@@ -3,9 +3,15 @@ package org.cuair.ground.models;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.cuair.ground.models.geotag.GpsLocation;
 import org.cuair.ground.models.geotag.Telemetry;
 import org.cuair.ground.util.Geotagging;
+
+import java.util.List;
 
 @Entity
 public class ROI extends ClientCreatable {
@@ -116,6 +122,20 @@ public class ROI extends ClientCreatable {
    */
   public void setAssignment(Assignment assignment) {
     this.assignment = assignment;
+  }
+
+
+  public JsonNode toJson(){
+    ObjectNode rootNode = new ObjectMapper().createObjectNode();
+    ObjectNode xyNode = new ObjectMapper().createObjectNode();
+    xyNode.put("x", gpsLocation.getLatitude());
+    xyNode.put("y", gpsLocation.getLongitude());
+    rootNode.put("location", xyNode);
+    // TODO: Sort by type of target, currently not in the ROI type rn rip :(
+    rootNode.put("kind", "normal");
+    // TODO: Make an id lmfao move to the cameraGimbalClient
+    rootNode.put("id", 1);
+    return rootNode;
   }
 
   /**
