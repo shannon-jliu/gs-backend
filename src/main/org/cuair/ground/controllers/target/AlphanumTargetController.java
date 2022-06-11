@@ -13,15 +13,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Controller to handle creation/retrieval of Alphanumeric Target model objects */
+/**
+ * Controller to handle creation/retrieval of Alphanumeric Target model objects
+ */
 @CrossOrigin
 @RestController
 @RequestMapping(value = "/alphanum_target")
 public class AlphanumTargetController extends TargetController<AlphanumTarget> {
 
   /** Database accessor object for alphanum targets */
-  private static final AlphanumTargetDatabaseAccessor<AlphanumTarget> targetDao =
-      (AlphanumTargetDatabaseAccessor<AlphanumTarget>) DAOFactory.getDAO(
+  private static final AlphanumTargetDatabaseAccessor<AlphanumTarget> targetDao = (AlphanumTargetDatabaseAccessor<AlphanumTarget>) DAOFactory
+      .getDAO(
           DAOFactory.ModelDAOType.ALPHANUM_TARGET_DATABASE_ACCESSOR, AlphanumTarget.class);
 
   /** Gets the database accessor object for this target */
@@ -43,7 +45,8 @@ public class AlphanumTargetController extends TargetController<AlphanumTarget> {
   /**
    * Create Target
    *
-   * @return the created alphanum target on success, 400 when the request includes an id or creator field
+   * @return the created alphanum target on success, 400 when the request includes
+   *         an id or creator field
    */
   @RequestMapping(method = RequestMethod.POST)
   public ResponseEntity create(@RequestBody AlphanumTarget t) {
@@ -54,8 +57,9 @@ public class AlphanumTargetController extends TargetController<AlphanumTarget> {
    * Update Target by id
    *
    * @param id Long id of the Target being updated
-   * @return the updated alphanum target on success, 204 when the alphanum target with the specified id does not exist,
-   * or 400 when the request includes an id or creator field
+   * @return the updated alphanum target on success, 204 when the alphanum target
+   *         with the specified id does not exist,
+   *         or 400 when the request includes an id or creator field
    */
   @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
   public ResponseEntity update(@PathVariable Long id, @RequestBody AlphanumTarget other) {
@@ -67,7 +71,8 @@ public class AlphanumTargetController extends TargetController<AlphanumTarget> {
   }
 
   /**
-   * Deletes a Target and unassigns all TargetSightings that were assigned to this Target You must
+   * Deletes a Target and unassigns all TargetSightings that were assigned to this
+   * Target You must
    * send an empty body to do a delete.
    *
    * @param id Long id of target to be deleted
@@ -77,5 +82,39 @@ public class AlphanumTargetController extends TargetController<AlphanumTarget> {
   @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
   public ResponseEntity delete(@PathVariable Long id) {
     return super.delete(id);
+  }
+
+  /**
+   * Defines endpoint for Intelligent Systems to submit an autonomous target.
+   *
+   * @param jsonString the json representing the target submission data
+   * @param rawThumb   the bytes representing the target thumbnail
+   *
+   * @return 200 on success, 400 when request parts don't exist,
+   *         or 500 if communication with interop fails or the file cannot be
+   *         parsed.
+   */
+  @RequestMapping(value = "/auto", method = RequestMethod.POST)
+  public ResponseEntity submitAuto(@RequestPart("json") String jsonString, @RequestPart("bytes") byte[] rawThumb) {
+    if (jsonString == null) {
+      return badRequest().body("Missing target json");
+    }
+    if (rawThumb == null) {
+      return badRequest().body("Missing target thumbnail");
+    }
+
+    // Check to see if the image is small enough -> otherwise interop will fail
+    if (rawThumb.length > Math.pow(10, 6))
+      return badRequest().body("Thumbnail file is larger than one megabyte.");
+
+    // Send to interop
+    if (Flags.CUAIR_INTEROP_REQUESTS) {
+      if (!interopClient.submitTargetAndThumb(jsonString, rawThumb)) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body("Interop submission failed.");
+      }
+    }
+
+    return ok(jsonString);
   }
 }

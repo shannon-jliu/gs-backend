@@ -292,4 +292,52 @@ public class InteropClient {
       return false;
     }
   }
+
+  /**
+   * ONE-TIME sends a target/thumbnail to interop on behalf of Intelligent
+   * Systems.
+   * 
+   * @param json         - the json for the target submission
+   * @param imageContent - raw binary content of thumbnail image
+   * @return true iff submission to interop succeeded
+   */
+  public boolean submitTargetAndThumb(String json, byte[] imageContent) {
+    // Build the map route
+    URI targetRoute = URI.create(InteropAddress + "/api/odlcs");
+
+    // Create Http Headers with session cookies to stay authenticated
+    HttpHeaders headers = RequestUtil.getDefaultCookieHeaders(sessionCookies);
+
+    // Build the request entities with the target content
+    HttpEntity<String> targetRequestEntity = new HttpEntity<>(json, headers);
+    HttpEntity<byte[]> thumbRequestEntity = new HttpEntity<>(imageContent, headers);
+
+    // Create listenable future to listen for response
+    ListenableFuture<ResponseEntity<String>> targetResponseFuture = template.exchange(targetRoute,
+        HttpMethod.POST,
+        targetRequestEntity,
+        String.class);
+
+    RequestUtil.futureCallback(targetRoute, targetResponseFuture);
+
+    // Checks for successful submission and then submits thumbnail
+    try {
+      JSONObject jsonResp = new JSONObject(response.get().getBody());
+      String id = jsonResp.get("id");
+      URI thumbRoute = URI.create(InteropAddress + "/api/odlcs/" + id);
+
+      ListenableFuture<ResponseEntity<String>> thumbResponseFuture = template.exchange(thumbRoute,
+          HttpMethod.POST,
+          thumbRequestEntity,
+          String.class);
+
+      RequestUtil.futureCallback(thumbRoute, thumbResponseFuture);
+
+      thumbResponseFuture.get();
+
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
+  }
 }
