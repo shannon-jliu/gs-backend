@@ -9,6 +9,7 @@ import org.cuair.ground.models.plane.target.Target
 import org.cuair.ground.models.plane.target.TargetSighting
 import org.cuair.ground.util.Flags
 import org.cuair.ground.clients.InteropClient
+import org.cuair.ground.models.geotag.Geotag
 
 import org.springframework.http.ResponseEntity.ok
 import org.springframework.http.ResponseEntity.noContent
@@ -57,11 +58,12 @@ abstract class TargetController<T : Target> {
     open fun create(t: T): ResponseEntity<Any> {
         if (t.id != null) return badRequest().body("Don't pass ids for creates")
         if (t.creator == null) return badRequest().body("Create request should have creator")
-        getTargetDao().create(t)
 
         // Interop Client code
         if (Flags.CUAIR_INTEROP_REQUESTS) {
-            interopClient.createTarget(getTargetDao().get(t.id))
+            interopClient.createTarget(t)
+            interopClient.printL(5555)
+            interopClient.printL(t.getJudgeTargetId())
             /*thread {
                 // Thread.sleep(TARGETLOGGER_DELAY)
                 while (getTargetDao().get(t.id).judgeTargetId == null) {
@@ -70,6 +72,10 @@ abstract class TargetController<T : Target> {
                 }
             }*/
         }
+
+        getTargetDao().create(t)
+        interopClient.printL(getTargetDao().get(t.id).getJudgeTargetId())
+
         return ok(t)
     }
 
@@ -92,17 +98,27 @@ abstract class TargetController<T : Target> {
             return badRequest().body("Don't pass creator for updates")
         }
 
+        // ensure other target has same judge target id
+        other.setJudgeTargetId_CREATION(t.getJudgeTargetId())
+        interopClient.printL(t.getJudgeTargetId())
+        interopClient.printL(other.getJudgeTargetId())
+
         val isTSIdUpdated = t.getthumbnailTsid() != other.getthumbnailTsid()
+        interopClient.printL(1234)
+        interopClient.printL(t.getthumbnailTsid())
+        interopClient.printL(other.getthumbnailTsid())
+        // interopClient.print(isTSIdUpdated)
 
         t.updateFromTarget(other)
+        Geotag.updateGeotag(t, targetSightingDao.get(t.getthumbnailTsid()))
         getTargetDao().update(t)
 
         // Interop Client code
         if (Flags.CUAIR_INTEROP_REQUESTS) {
-             if (isTSIdUpdated) {
-                 interopClient.sendThumbnail(targetSightingDao.get(t.getthumbnailTsid()).thumbnailImage(), t)
-             }
-             interopClient.updateTarget(getTargetDao().get(t.id))
+            interopClient.updateTarget(getTargetDao().get(t.id)) 
+            if (isTSIdUpdated) {
+                interopClient.sendThumbnail(targetSightingDao.get(t.getthumbnailTsid()).thumbnailImage(), t)
+            }
         }
         return ok(t)
     }

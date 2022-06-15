@@ -107,9 +107,9 @@ test {
     useJUnitPlatform()
 }
 
-/*
+
 // Workaround to solve a possible issue where gradle build fails due to a DuplicatesStrategy error:
 // "no duplicate handling strategy has been set"
 tasks.withType(Jar).all {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}*/
+}

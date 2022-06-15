@@ -217,13 +217,16 @@ public class InteropClient {
    */
   public ListenableFuture<ResponseEntity<String>> createTarget(Target target)
       throws ExecutionException, InterruptedException {
+    interopLogger.info(target.toInteropJson().toString());
     ListenableFuture<ResponseEntity<String>> response = sendTarget(target, true);
     // parse the response
     JSONObject jsonResp = new JSONObject(response.get().getBody());
+    interopLogger.info("Response to target submission:" + jsonResp.toString());
     Long l = (long) (int) jsonResp.get("id");
-    // TODO: I dont remember why I decided that this would be test only
+    interopLogger.info("id: " + l);
+
     // update the target to have the judge id so we can perform updates later
-    target.setJudgeTargetId_TESTS_ONLY(l);
+    target.setJudgeTargetId_CREATION(l);
     return response;
   }
 
@@ -232,11 +235,17 @@ public class InteropClient {
    *
    * @param target The target being updated
    */
-  public void updateTarget(Target target) {
-    sendTarget(target, false);
+  public void updateTarget(Target target)
+      throws ExecutionException, InterruptedException {
+    ListenableFuture<ResponseEntity<String>> response = sendTarget(target, false);
+    // parse the response
+    JSONObject jsonResp = new JSONObject(response.get().getBody());
+    interopLogger.info("Response to target update:" + jsonResp.toString());
   }
 
   public void sendThumbnail(byte[] imageContent, Target target) {
+    interopLogger.info("Attempting to submit thumbnail for target with id " + target.getJudgeTargetId());
+
     // Build the thumbnail route
     URI thumbnailRoute = URI.create(InteropAddress + "/api/odlcs/" + target.getJudgeTargetId() + "/image");
 
@@ -309,6 +318,14 @@ public class InteropClient {
       return true;
     } catch (Exception e) {
       return false;
+    }
+  }
+
+  public void printL(Long s) {
+    try {
+      interopLogger.info(s.toString());
+    } catch (Exception e) {
+      interopLogger.error("NULL");
     }
   }
 }

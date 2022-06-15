@@ -15,7 +15,13 @@ import org.cuair.ground.models.geotag.CardinalDirection;
 import org.cuair.ground.models.geotag.Geotag;
 import org.cuair.ground.util.Flags;
 
-/** Alphanum Target is target that is associated with Alphanumeric Target Sightings. */
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Alphanum Target is target that is associated with Alphanumeric Target
+ * Sightings.
+ */
 @Entity
 public class AlphanumTarget extends Target {
 
@@ -66,7 +72,8 @@ public class AlphanumTarget extends Target {
   }
 
   /**
-   * Given another target, it updates all fields of this instance if there are any differences
+   * Given another target, it updates all fields of this instance if there are any
+   * differences
    *
    * @param other Target containing updated fields
    */
@@ -94,9 +101,13 @@ public class AlphanumTarget extends Target {
     if (alphaTarget.isOffaxis() != null) {
       this.offaxis = alphaTarget.isOffaxis();
     }
-    if (alphaTarget.getGeotag() != null) {
-      this.geotag = alphaTarget.getGeotag();
-    }
+
+    /*
+     * if (alphaTarget.getGeotag() != null) {
+     * this.geotag = alphaTarget.getGeotag();
+     * }
+     */
+
   }
 
   /** Returns class associated with this target */
@@ -238,7 +249,9 @@ public class AlphanumTarget extends Target {
 
     rootNode.put("type", "STANDARD");
 
-    if (this.getGeotag() != null && !this.isOffaxis()) {
+    Logger logger = LoggerFactory.getLogger(AlphanumTarget.class);
+    logger.info("geotag is " + this.getGeotag());
+    if (this.getGeotag() != null /* && !this.isOffaxis() */) {
       if (this.getGeotag().getGpsLocation() != null
           && (Double) this.getGeotag().getGpsLocation().getLatitude() != null
           && !((Double) this.getGeotag().getGpsLocation().getLatitude()).isNaN()) {
@@ -256,21 +269,21 @@ public class AlphanumTarget extends Target {
                 .getAbbreviation());
       }
     }
-    if (this.shape != null) rootNode.put("shape", this.shape.getName().toUpperCase());
+    if (this.shape != null)
+      rootNode.put("shape", this.shape.getName().toUpperCase());
 
     rootNode.put("alphanumeric", this.alpha.toString().toUpperCase());
 
     if (this.shapeColor != null) {
-      rootNode.put("shape_color", this.shapeColor.name().toUpperCase());
+      rootNode.put("shapeColor", this.shapeColor.name().toUpperCase());
     }
 
     if (this.alphaColor != null) {
-      rootNode.put("alphanumeric_color", this.alphaColor.name().toUpperCase());
+      rootNode.put("alphanumericColor", this.alphaColor.name().toUpperCase());
     }
     rootNode.put("autonomous", this.getCreator().getUserType() == ODLCUser.UserType.ADLC);
 
     return rootNode;
   }
-
 
 }
