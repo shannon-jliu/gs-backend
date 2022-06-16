@@ -19,12 +19,14 @@ public class Geotagging {
   private static double radiusEarth = 6371000.0;
 
   /**
-   * Uses the inverse haversine function to return new gps corresponding to a translation
+   * Uses the inverse haversine function to return new gps corresponding to a
+   * translation
    * of given distance and direction from an initial gps reading.
-   * @param initLat         The initial latitude
-   * @param initLong        The initial longitude
-   * @param distance        The distance offset travelled (in meters)
-   * @param direction       The direction travelled (in radians clockwise from north)
+   * 
+   * @param initLat   The initial latitude
+   * @param initLong  The initial longitude
+   * @param distance  The distance offset travelled (in meters)
+   * @param direction The direction travelled (in radians clockwise from north)
    * @return an array of two doubles, [latitude, longitude] (in degrees)
    */
   private static double[] inverseHaversine(double initLat, double initLong, double distance, double direction) {
@@ -35,7 +37,7 @@ public class Geotagging {
 
     // New latitude
     gps[0] = Math.asin(Math.sin(initLat) * Math.cos(distance / r)
-              + Math.cos(initLat) * Math.sin(distance / r) * Math.cos(direction));
+        + Math.cos(initLat) * Math.sin(distance / r) * Math.cos(direction));
 
     // New longitude
     gps[1] = initLong + Math.atan2(Math.sin(direction) * Math.sin(distance / r) * Math.cos(initLat),
@@ -47,7 +49,6 @@ public class Geotagging {
     return gps;
   }
 
-
   /**
    * Creates a GpsLocation representing the center of the image
    *
@@ -55,8 +56,10 @@ public class Geotagging {
    * @param longitude       The longitude of the plane in degrees
    * @param altitude        The altitude of the plane in meters
    * @param fov             The (horizontal, vertical) fov of the camera
-   * @param pixelx          The x-coordinate of the pixel center of the tag on the frontend with respect to the image
-   * @param pixely          The y-coordinate of the pixel center of the tag on the frontend with respect to the image
+   * @param pixelx          The x-coordinate of the pixel center of the tag on the
+   *                        frontend with respect to the image
+   * @param pixely          The y-coordinate of the pixel center of the tag on the
+   *                        frontend with respect to the image
    * @param planeYawRadians The yaw of the plane in radians
    */
   public static GpsLocation getPixelCoordinates(
@@ -66,24 +69,24 @@ public class Geotagging {
       FOV fov,
       double pixelx,
       double pixely,
+      double planeRollRadians,
+      double planePitchRadians,
       double planeYawRadians) {
 
     double fovHoriz = fov.getX();
     double fovVert = fov.getY();
 
     // total horizontal (x) distance imaged in meters
-    double hdi =
-        2
-            * altitude
-            * Math.tan(
+    double hdi = 2
+        * altitude
+        * Math.tan(
             fovHoriz
                 / 2);
 
     // total vertical (y) distance imaged in meters
-    double vdi =
-        2
-            * altitude
-            * Math.tan(
+    double vdi = 2
+        * altitude
+        * Math.tan(
             fovVert
                 / 2);
 
@@ -95,14 +98,26 @@ public class Geotagging {
     double deltapixel_x = pixelx - (IMAGE_WIDTH / 2);
     double deltapixel_y = (IMAGE_HEIGHT / 2) - pixely;
 
-    // Find horizontal and vertical physical distance from center with respect to image
-    double dppH = deltapixel_x * dpphoriz;
-    double dppV = deltapixel_y * dppvert;
-
-    // Do rotation of coordinate system to rotate dppH and dppV to account for yaw
-    double target_dx = dppH * Math.cos(planeYawRadians) + dppV * Math.sin(planeYawRadians);
-    double target_dy = dppH * -1 * Math.sin(planeYawRadians) + dppV * Math.cos(planeYawRadians);
-
+    // Find x and y distance between plane and target
+    double target_dx = altitude * (Math.tan(-planeRollRadians + fovHoriz * deltapixel_x / IMAGE_WIDTH)
+        * Math.cos(planeYawRadians)
+        + Math.tan(planePitchRadians + fovVert * deltapixel_y / IMAGE_HEIGHT) * Math.sin(planeYawRadians));
+    double target_dy = altitude * (Math.tan(-planeRollRadians + fovHoriz * deltapixel_x / IMAGE_WIDTH)
+        * Math.sin(-planeYawRadians)
+        + Math.tan(planePitchRadians + fovVert * deltapixel_y / IMAGE_HEIGHT) * Math.cos(planeYawRadians));
+    /*
+     * // Find horizontal and vertical physical distance from center with respect to
+     * // image
+     * double dppH = deltapixel_x * dpphoriz;
+     * double dppV = deltapixel_y * dppvert;
+     * 
+     * // Do rotation of coordinate system to rotate dppH and dppV to account for
+     * yaw
+     * double target_dx = dppH * Math.cos(planeYawRadians) + dppV *
+     * Math.sin(planeYawRadians);
+     * double target_dy = dppH * -1 * Math.sin(planeYawRadians) + dppV *
+     * Math.cos(planeYawRadians);
+     */
     // Compute new gps using inverse haversine
     double latRadians = Math.PI / 180 * latitude;
     double longRadians = Math.PI / 180 * longitude;
@@ -122,7 +137,8 @@ public class Geotagging {
   /**
    * Calculate the orientation of this geotag as radians from north
    *
-   * @param planeYaw       The yaw of the plane in radians, going clockwise from 0 = north
+   * @param planeYaw       The yaw of the plane in radians, going clockwise from 0
+   *                       = north
    * @param radiansFromTop The radians from the top of the image
    * @return The orientation of this geotag
    */
@@ -137,19 +153,16 @@ public class Geotagging {
    * @return The medianed geotag object
    */
   public static Geotag median(Geotag... geotags) {
-    geotags =
-        Arrays.stream(geotags)
-            .filter(Objects::nonNull)
-            .filter(g -> g.getGpsLocation() != null)
-            .filter(g -> g.getClockwiseRadiansFromNorth() != null)
-            .toArray(Geotag[]::new);
+    geotags = Arrays.stream(geotags)
+        .filter(Objects::nonNull)
+        .filter(g -> g.getGpsLocation() != null)
+        .filter(g -> g.getClockwiseRadiansFromNorth() != null)
+        .toArray(Geotag[]::new);
     if (geotags.length == 0) {
       return null;
     }
-    GpsLocation[] locations =
-        Arrays.stream(geotags).map(Geotag::getGpsLocation).toArray(GpsLocation[]::new);
-    Double[] radians =
-        Arrays.stream(geotags).map(Geotag::getClockwiseRadiansFromNorth).toArray(Double[]::new);
+    GpsLocation[] locations = Arrays.stream(geotags).map(Geotag::getGpsLocation).toArray(GpsLocation[]::new);
+    Double[] radians = Arrays.stream(geotags).map(Geotag::getClockwiseRadiansFromNorth).toArray(Double[]::new);
     return new Geotag(GpsLocation.median(locations), Radian.median(radians));
   }
 }
