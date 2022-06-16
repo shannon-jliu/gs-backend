@@ -3,7 +3,6 @@ package org.cuair.ground.controllers;
 import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.ok;
 
-
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Metadata;
@@ -45,7 +44,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 
 /** Contains all the callbacks for all the public api endpoints for the Image */
 @CrossOrigin
@@ -66,7 +66,7 @@ public class ImageController {
    *
    * @param id Long id representing the id after which all images will be returned
    * @return a list of images with ids after the given id on success, 404 when
-   * the most recent image in the db does not exist
+   *         the most recent image in the db does not exist
    */
   @RequestMapping(value = "/all/{id}", method = RequestMethod.GET)
   public ResponseEntity getAllAfterId(@PathVariable Long id) {
@@ -84,10 +84,12 @@ public class ImageController {
   }
 
   /**
-   * Constructs an HTTP response with the most recent image that was captured by the plane.
+   * Constructs an HTTP response with the most recent image that was captured by
+   * the plane.
    *
-   * @return 200 with the most recent image that was captured by the plane on success, 404 when
-   * the most recent image in the db does not exist
+   * @return 200 with the most recent image that was captured by the plane on
+   *         success, 404 when
+   *         the most recent image in the db does not exist
    */
   @RequestMapping(value = "/recent", method = RequestMethod.GET)
   public ResponseEntity getRecent() {
@@ -108,11 +110,13 @@ public class ImageController {
   }
 
   /**
-   * Constructs a HTTP response with gps locations of the four corners of an image based on Geotag index 0 - top
+   * Constructs a HTTP response with gps locations of the four corners of an image
+   * based on Geotag index 0 - top
    * left; index 1 - top right; index 2 - bottom left; index 3 - bottom right;
    *
    * @param id Long id for Image for which the client wants geotag information
-   * @return 200 with the gps locations of the four corners of the image with id 'id' based on Geotag, 404 on error
+   * @return 200 with the gps locations of the four corners of the image with id
+   *         'id' based on Geotag, 404 on error
    */
   @RequestMapping(value = "/geotag/{id}", method = RequestMethod.GET)
   public ResponseEntity getGeotagCoordinates(@PathVariable Long id) {
@@ -121,16 +125,19 @@ public class ImageController {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Image with given id doesn't exist");
     }
     Map<String, Object> locations = image.getLocations();
-    return (locations != null) ? ok(locations) : ResponseEntity.status(HttpStatus.NOT_FOUND)
-        .body("The geotag information doesn't exist yet");
+    return (locations != null) ? ok(locations)
+        : ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body("The geotag information doesn't exist yet");
   }
 
   /**
    * Constructs an HTTP response with the given filename.
    *
    * @param file String filename for the requested image file
-   * @return 200 with the file with the given filename on success, 500 when error finding or reading
-   * the provided file, or 404 when the provided (image) file does not exist
+   * @return 200 with the file with the given filename on success, 500 when error
+   *         finding or reading
+   *         the provided file, or 404 when the provided (image) file does not
+   *         exist
    */
   @RequestMapping(value = "/file/{file}", method = RequestMethod.GET)
   public ResponseEntity getFile(@PathVariable String file) {
@@ -176,18 +183,22 @@ public class ImageController {
   }
 
   /**
-   * Creates an Image on our server given the request. Constructs an HTTP response with the
-   * json of the image that was created. Option to include custom file name in json.
+   * Creates an Image on our server given the request. Constructs an HTTP response
+   * with the
+   * json of the image that was created. Option to include custom file name in
+   * json.
    *
    * @param jsonString the json part of the multipart request as a String
    * @param file       the file of the multipart request
-   * @return 200 with the uploaded image on success, 400 when request parts are missing or
-   * if the requset json is invalid, or 500 on errors converting file to an image and saving
-   * the image in the db
+   * @return 200 with the uploaded image on success, 400 when request parts are
+   *         missing or
+   *         if the requset json is invalid, or 500 on errors converting file to
+   *         an image and saving
+   *         the image in the db
    */
   @RequestMapping(method = RequestMethod.POST)
   public ResponseEntity upload(@RequestPart("json") String jsonString,
-                               @RequestPart("files") MultipartFile file) {
+      @RequestPart("files") MultipartFile file) {
     if (file == null || file.isEmpty()) {
       return badRequest().body("Missing image file");
     }
@@ -327,7 +338,8 @@ public class ImageController {
   }
 
   /**
-   * Extracts the focal length of the image, which is included in the EXIF of the jpeg file
+   * Extracts the focal length of the image, which is included in the EXIF of the
+   * jpeg file
    * Uses metadata-extraction library: https://drewnoakes.com/code/exif/
    * https://github.com/drewnoakes/metadata-extractor/blob/master/Samples/com/drew/metadata/SampleUsage.java
    */
@@ -341,6 +353,12 @@ public class ImageController {
     double focalLength = directory.getDoubleObject(ExifSubIFDDirectory.TAG_FOCAL_LENGTH);
 
     // Note: you can also read "exposure time"
+
+    // Get rid of EXIF data; we don't want it once it's read because orientation
+    // screws with the image
+    // display on the frontend
+    BufferedImage image = ImageIO.read(imageFile);
+    ImageIO.write(image, "jpg", imageFile);
 
     return focalLength;
   }
@@ -370,8 +388,7 @@ public class ImageController {
           new GpsLocation(DEFAULT_LATITUDE, DEFAULT_LONGITUDE),
           DEFAULT_ALTITUDE,
           DEFAULT_PLANE_YAW,
-          new GimbalOrientation(DEFAULT_GIMBAL_PITCH, DEFAULT_GIMBAL_ROLL)
-      );
+          new GimbalOrientation(DEFAULT_GIMBAL_PITCH, DEFAULT_GIMBAL_ROLL));
       i.setTelemetry(t);
     } else {
       Telemetry t = i.getTelemetry();
@@ -418,8 +435,7 @@ public class ImageController {
           new GpsLocation(DEFAULT_LATITUDE, DEFAULT_LONGITUDE),
           DEFAULT_ALTITUDE,
           DEFAULT_PLANE_YAW,
-          new GimbalOrientation(DEFAULT_GIMBAL_PITCH, DEFAULT_GIMBAL_ROLL)
-      );
+          new GimbalOrientation(DEFAULT_GIMBAL_PITCH, DEFAULT_GIMBAL_ROLL));
       i.setTelemetry(t);
     } else {
       Telemetry t = i.getTelemetry();
@@ -462,12 +478,15 @@ public class ImageController {
   }
 
   /**
-   * Dummy creates an Image given the request body json. This means that it does not query for the
-   * telemetry data or gimbal state. Constructs a HTTP response with the json of the image that was
+   * Dummy creates an Image given the request body json. This means that it does
+   * not query for the
+   * telemetry data or gimbal state. Constructs a HTTP response with the json of
+   * the image that was
    * created
    *
-   * @return 200 with the uploaded image on success, 400 if id in in the request or 500 parsing request
-   * json, converting json to an Image instance, or adding default values
+   * @return 200 with the uploaded image on success, 400 if id in in the request
+   *         or 500 parsing request
+   *         json, converting json to an Image instance, or adding default values
    */
   @RequestMapping(value = "/dummy", method = RequestMethod.POST)
   public ResponseEntity dummyCreate(@RequestBody Image i) {
