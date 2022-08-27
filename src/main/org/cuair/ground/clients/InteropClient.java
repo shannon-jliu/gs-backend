@@ -48,6 +48,8 @@ public class InteropClient {
    * Attempts to login to interop.
    */
   private void attemptLogin() {
+    interopLogger.info("Attempting login to interop server.");
+
     // Create URI for interop server location to login
     URI loginLocation = URI.create(InteropAddress + "/api/login");
 

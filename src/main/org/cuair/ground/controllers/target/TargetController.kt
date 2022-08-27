@@ -64,13 +64,13 @@ abstract class TargetController<T : Target> {
             interopClient.createTarget(t)
             interopClient.printL(5555)
             interopClient.printL(t.getJudgeTargetId())
-            /*thread {
-                // Thread.sleep(TARGETLOGGER_DELAY)
-                while (getTargetDao().get(t.id).judgeTargetId == null) {
-                    logger.warn("${t.typeString} Target ${t.id} not sent to judges!")
-                    // Thread.sleep(TARGETLOGGER_DELAY)
+            thread {
+                Thread.sleep(2000)
+                while (getTargetDao().get(t.id).getJudgeTargetId() == null) {
+                    Thread.sleep(2000)
+                    interopClient.printL(getTargetDao().get(t.id).getJudgeTargetId())
                 }
-            }*/
+            }
         }
 
         getTargetDao().create(t)

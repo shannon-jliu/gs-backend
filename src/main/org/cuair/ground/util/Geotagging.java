@@ -122,7 +122,9 @@ public class Geotagging {
     double latRadians = Math.PI / 180 * latitude;
     double longRadians = Math.PI / 180 * longitude;
     double distance = Math.sqrt(Math.pow(target_dx, 2) + Math.pow(target_dy, 2));
-    double direction = planeYawRadians + (Math.PI / 2.0 - Math.atan2(target_dy, target_dx));
+    // double direction = planeYawRadians + (Math.PI / 2.0 - Math.atan2(target_dy,
+    // target_dx));
+    double direction = Math.PI / 2.0 - Math.atan2(target_dy, target_dx);
     double[] newGps = inverseHaversine(latRadians, longRadians, distance, direction);
 
     GpsLocation gps = null;
