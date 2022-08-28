@@ -322,12 +322,4 @@ public class InteropClient {
       return false;
     }
   }
-
-  public void printL(Long s) {
-    try {
-      interopLogger.info(s.toString());
-    } catch (Exception e) {
-      interopLogger.error("NULL");
-    }
-  }
 }

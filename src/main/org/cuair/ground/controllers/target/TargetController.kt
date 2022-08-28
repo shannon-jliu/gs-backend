@@ -62,19 +62,15 @@ abstract class TargetController<T : Target> {
         // Interop Client code
         if (Flags.CUAIR_INTEROP_REQUESTS) {
             interopClient.createTarget(t)
-            interopClient.printL(5555)
-            interopClient.printL(t.getJudgeTargetId())
             thread {
                 Thread.sleep(2000)
                 while (getTargetDao().get(t.id).getJudgeTargetId() == null) {
                     Thread.sleep(2000)
-                    interopClient.printL(getTargetDao().get(t.id).getJudgeTargetId())
                 }
             }
         }
 
         getTargetDao().create(t)
-        interopClient.printL(getTargetDao().get(t.id).getJudgeTargetId())
 
         return ok(t)
     }
@@ -100,14 +96,8 @@ abstract class TargetController<T : Target> {
 
         // ensure other target has same judge target id
         other.setJudgeTargetId_CREATION(t.getJudgeTargetId())
-        interopClient.printL(t.getJudgeTargetId())
-        interopClient.printL(other.getJudgeTargetId())
 
         val isTSIdUpdated = t.getthumbnailTsid() != other.getthumbnailTsid()
-        interopClient.printL(1234)
-        interopClient.printL(t.getthumbnailTsid())
-        interopClient.printL(other.getthumbnailTsid())
-        // interopClient.print(isTSIdUpdated)
 
         t.updateFromTarget(other)
         Geotag.updateGeotag(t, targetSightingDao.get(t.getthumbnailTsid()))
