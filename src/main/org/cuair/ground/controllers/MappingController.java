@@ -18,7 +18,13 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-/** Contains all the callbacks for all the public api endpoints for the mapping task. */
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Contains all the callbacks for all the public api endpoints for the mapping
+ * task.
+ */
 @CrossOrigin
 @RestController
 @RequestMapping(value = "/mapping")
@@ -34,8 +40,10 @@ public class MappingController {
    *
    * @param file the file of the multipart request
    *
-   * @return 200 with the uploaded mapping image on success, 400 when the map file doesn't exist or
-   * is too large, or 500 if communication with interop fails or the file cannot be parsed.
+   * @return 200 with the uploaded mapping image on success, 400 when the map file
+   *         doesn't exist or
+   *         is too large, or 500 if communication with interop fails or the file
+   *         cannot be parsed.
    */
   @RequestMapping(method = RequestMethod.POST)
   public ResponseEntity submitMapping(@RequestPart("file") MultipartFile file) {
@@ -69,22 +77,30 @@ public class MappingController {
   }
 
   /**
-   * Defines endpoint for Intelligent Systems to submit the raw byte content of a mapping image.
+   * Defines endpoint for Intelligent Systems to submit the raw byte content of a
+   * mapping image.
    *
    * @param rawContent a byte array corresponding to the map
    *
-   * @return 200 with the uploaded mapping image on success, 400 when the byte array doesn't exist,
-   * or 500 if communication with interop fails.
+   * @return 200 with the uploaded mapping image on success, 400 when the byte
+   *         array doesn't exist,
+   *         or 500 if communication with interop fails.
    */
-  @RequestMapping(value="/bytes", method = RequestMethod.POST)
+  @RequestMapping(value = "/bytes", method = RequestMethod.POST)
   public ResponseEntity submitMapping(@RequestPart("bytes") byte[] rawContent) {
+
+    Logger logger = LoggerFactory.getLogger(MappingController.class);
+    logger.info("raw content is " + rawContent);
+
     if (rawContent == null) {
       return badRequest().body("Missing mapping data");
     }
 
     // Check to see if the image is small enough -> otherwise interop will fail
-    if (rawContent.length > Math.pow(10, 6))
+    if (rawContent.length > Math.pow(10, 6)) {
+      logger.info("too big " + rawContent.length);
       return badRequest().body("Mapping image file is larger than one megabyte.");
+    }
 
     // Send to interop
     if (Flags.CUAIR_INTEROP_REQUESTS) {
@@ -99,7 +115,8 @@ public class MappingController {
   }
 
   /**
-   * Defines endpoint for Intelligent Systems to request mapping specification data provided by
+   * Defines endpoint for Intelligent Systems to request mapping specification
+   * data provided by
    * Interop.
    *
    * @return 200 with the json, or 500 if communication with interop fails.

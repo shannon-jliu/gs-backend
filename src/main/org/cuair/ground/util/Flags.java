@@ -13,17 +13,26 @@ public class Flags {
   /** Constants */
   public static double CAM_SENSOR_WIDTH = 23.2; // in mm
   public static double CAM_SENSOR_HEIGHT = 15.4; // in mm
-  public static double FRONTEND_IMAGE_WIDTH = 1900; // 5456.0
-  public static double FRONTEND_IMAGE_HEIGHT = 1263; // 3632.0
+  public static double RAW_IMAGE_WIDTH = 5456;
+  public static double RAW_IMAGE_HEIGHT = 3632;
+  public static double FRONTEND_IMAGE_WIDTH = RAW_IMAGE_WIDTH; // 1900
+  public static double FRONTEND_IMAGE_HEIGHT = RAW_IMAGE_HEIGHT; // 1263
 
   /** Interop */
   public static boolean CUAIR_INTEROP_REQUESTS = true;
   public static String DEFAULT_EMERGENT_TARGET_DESC = "A lost hiker with a water bottle.";
+  /*
+   * public static String INTEROP_IP = "10.10.130.10"; // "127.0.0.1";
+   * public static String INTEROP_PORT = "80"; // "8000";
+   * public static String INTEROP_USERNAME = "cornell-university"; // "testuser";
+   * public static String INTEROP_PASSWORD = "6134044186"; // "testpass";
+   */
   public static String INTEROP_IP = "127.0.0.1";
   public static String INTEROP_PORT = "8000";
   public static String INTEROP_USERNAME = "testuser";
   public static String INTEROP_PASSWORD = "testpass";
-  public static int MISSION_NUMBER = 1;
+
+  public static int MISSION_NUMBER = 2;
 
   /** Default username if no username specified as part of request */
   public static String DEFAULT_USERNAME = "<NO_USER>";

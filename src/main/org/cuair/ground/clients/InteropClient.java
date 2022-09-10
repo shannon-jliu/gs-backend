@@ -48,6 +48,8 @@ public class InteropClient {
    * Attempts to login to interop.
    */
   private void attemptLogin() {
+    interopLogger.info("Attempting login to interop server.");
+
     // Create URI for interop server location to login
     URI loginLocation = URI.create(InteropAddress + "/api/login");
 
@@ -217,13 +219,16 @@ public class InteropClient {
    */
   public ListenableFuture<ResponseEntity<String>> createTarget(Target target)
       throws ExecutionException, InterruptedException {
+    interopLogger.info(target.toInteropJson().toString());
     ListenableFuture<ResponseEntity<String>> response = sendTarget(target, true);
     // parse the response
     JSONObject jsonResp = new JSONObject(response.get().getBody());
+    interopLogger.info("Response to target submission:" + jsonResp.toString());
     Long l = (long) (int) jsonResp.get("id");
-    // TODO: I dont remember why I decided that this would be test only
+    interopLogger.info("id: " + l);
+
     // update the target to have the judge id so we can perform updates later
-    target.setJudgeTargetId_TESTS_ONLY(l);
+    target.setJudgeTargetId_CREATION(l);
     return response;
   }
 
@@ -232,8 +237,33 @@ public class InteropClient {
    *
    * @param target The target being updated
    */
-  public void updateTarget(Target target) {
-    sendTarget(target, false);
+  public void updateTarget(Target target)
+      throws ExecutionException, InterruptedException {
+    ListenableFuture<ResponseEntity<String>> response = sendTarget(target, false);
+    // parse the response
+    JSONObject jsonResp = new JSONObject(response.get().getBody());
+    interopLogger.info("Response to target update:" + jsonResp.toString());
+  }
+
+  public void sendThumbnail(byte[] imageContent, Target target) {
+    interopLogger.info("Attempting to submit thumbnail for target with id " + target.getJudgeTargetId());
+
+    // Build the thumbnail route
+    URI thumbnailRoute = URI.create(InteropAddress + "/api/odlcs/" + target.getJudgeTargetId() + "/image");
+
+    // Create Http Headers with session cookies to stay authenticated
+    HttpHeaders headers = RequestUtil.getDefaultCookieHeaders(sessionCookies);
+
+    // Build the request entity with the map content
+    HttpEntity<byte[]> requestEntity = new HttpEntity<>(imageContent, headers);
+
+    // Create listenable future to listen for response
+    ListenableFuture<ResponseEntity<String>> responseFuture = template.exchange(thumbnailRoute,
+        HttpMethod.PUT,
+        requestEntity,
+        String.class);
+
+    RequestUtil.futureCallback(thumbnailRoute, responseFuture);
   }
 
   /**

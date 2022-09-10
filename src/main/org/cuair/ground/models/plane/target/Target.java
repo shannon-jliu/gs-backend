@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import javax.persistence.Column;
 import javax.persistence.CascadeType;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
@@ -26,7 +27,8 @@ import org.cuair.ground.util.Flags;
 public abstract class Target extends ClientCreatable {
 
   /**
-   * Represents the Geotag of this target that records the gps location and the direction that the
+   * Represents the Geotag of this target that records the gps location and the
+   * direction that the
    * target is facing
    */
   @OneToOne(cascade = CascadeType.ALL)
@@ -37,6 +39,7 @@ public abstract class Target extends ClientCreatable {
   private Long judgeTargetId;
 
   /** Id of target sighting used for thumbnail */
+  // @Column(name = "thumbnailTSId")
   private Long thumbnailTsid;
 
   /**
@@ -55,7 +58,8 @@ public abstract class Target extends ClientCreatable {
   }
 
   /**
-   * Given another target, it updates all fields of this instance if there are any differences
+   * Given another target, it updates all fields of this instance if there are any
+   * differences
    *
    * @param other Target containing updated fields
    */
@@ -74,6 +78,7 @@ public abstract class Target extends ClientCreatable {
 
   /**
    * Creates a JSON object with a mission number
+   * 
    * @return JsonNode with required parameters to send to interop
    */
   public JsonNode toInteropJson() {
@@ -101,7 +106,8 @@ public abstract class Target extends ClientCreatable {
   /**
    * Sets the Geotag of this Target
    *
-   * @param geotag Geotag representing the new location and direction of the Target
+   * @param geotag Geotag representing the new location and direction of the
+   *               Target
    */
   public void setGeotag(Geotag geotag) {
     this.geotag = geotag;
@@ -117,12 +123,13 @@ public abstract class Target extends ClientCreatable {
   }
 
   /**
-   * Sets the id of the target on the competition server. The judge target id should never be changed after initial
+   * Sets the id of the target on the competition server. The judge target id
+   * should never be changed after initial
    * assignment which is done elsewhere, so this should only be used in tests
    *
    * @param judgeTargetId new judge target id
    */
-  public void setJudgeTargetId_TESTS_ONLY(Long judgeTargetId) {
+  public void setJudgeTargetId_CREATION(Long judgeTargetId) {
     this.judgeTargetId = judgeTargetId;
   }
 
@@ -162,11 +169,14 @@ public abstract class Target extends ClientCreatable {
   public boolean equals(Object o) {
     Target other = (Target) o;
 
-    if (!super.equals(other)) return false;
+    if (!super.equals(other))
+      return false;
 
-    if (!Objects.deepEquals(this.geotag, other.getGeotag())) return false;
+    if (!Objects.deepEquals(this.geotag, other.getGeotag()))
+      return false;
 
-    if (!Objects.deepEquals(this.judgeTargetId, other.getJudgeTargetId())) return false;
+    if (!Objects.deepEquals(this.judgeTargetId, other.getJudgeTargetId()))
+      return false;
 
     return Objects.deepEquals(this.thumbnailTsid, other.getthumbnailTsid());
   }
