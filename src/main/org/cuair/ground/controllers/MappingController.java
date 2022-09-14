@@ -6,7 +6,6 @@ import static org.springframework.http.ResponseEntity.ok;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import org.cuair.ground.clients.InteropClient;
 import org.cuair.ground.util.Flags;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
@@ -29,8 +28,6 @@ import org.slf4j.LoggerFactory;
 @RestController
 @RequestMapping(value = "/mapping")
 public class MappingController {
-
-  private static InteropClient interopClient = new InteropClient();
 
   // Holds the most recently submitted map
   private static byte[] submittedMap;
@@ -64,14 +61,6 @@ public class MappingController {
     if (rawContent.length > Math.pow(10, 6))
       return badRequest().body("Mapping image file is larger than one megabyte.");
 
-    // Send to interop
-    if (Flags.CUAIR_INTEROP_REQUESTS) {
-      if (!interopClient.sendMapping(rawContent)) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body("Interop submission failed.");
-      }
-    }
-
     submittedMap = rawContent;
     return ok(rawContent);
   }
@@ -102,53 +91,9 @@ public class MappingController {
       return badRequest().body("Mapping image file is larger than one megabyte.");
     }
 
-    // Send to interop
-    if (Flags.CUAIR_INTEROP_REQUESTS) {
-      if (!interopClient.sendMapping(rawContent)) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body("Interop submission failed.");
-      }
-    }
-
     submittedMap = rawContent;
     return ok(rawContent);
   }
 
-  /**
-   * Defines endpoint for Intelligent Systems to request mapping specification
-   * data provided by
-   * Interop.
-   *
-   * @return 200 with the json, or 500 if communication with interop fails.
-   */
-  @RequestMapping(value = "/spec", method = RequestMethod.GET)
-  public ResponseEntity getMappingSpec() {
-    // Attempt to request data from interop using interop client
-    JSONObject missionData;
-    try {
-      missionData = interopClient.getMissionData();
-    } catch (NullPointerException e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body("Could not get map specification data from interop.");
-    }
 
-    if (missionData == null) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body("Could not get map specification data from interop.");
-    }
-
-    // Extract mapping specific data from json object (center lat/long, height)
-    JSONObject mappingCenterPos = missionData.getJSONObject("mapCenterPos");
-    double mappingCenterLat = mappingCenterPos.getNumber("latitude").doubleValue();
-    double mappingCenterLong = mappingCenterPos.getNumber("longitude").doubleValue();
-    double mapHeight = missionData.getInt("mapHeight");
-
-    // Construct dictionary containing data to expose
-    Map<String, Double> mapSpec = new HashMap<String, Double>();
-    mapSpec.put("map_center_lat", mappingCenterLat);
-    mapSpec.put("map_center_long", mappingCenterLong);
-    mapSpec.put("map_height", mapHeight);
-
-    return ok(mapSpec);
-  }
 }
