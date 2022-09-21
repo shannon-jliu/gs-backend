@@ -44,8 +44,6 @@ public class EmergentTargetSighting extends TargetSighting {
         width,
         height,
         geotag,
-        radiansFromTop,
-        orientationConfidence,
         mdlcClassConf,
         assignment);
     this.target = target;

@@ -262,12 +262,6 @@ public class AlphanumTarget extends Target {
           && !((Double) this.getGeotag().getGpsLocation().getLongitude()).isNaN()) {
         rootNode.put("longitude", this.getGeotag().getGpsLocation().getLongitude());
       }
-      if (this.getGeotag().getClockwiseRadiansFromNorth() != null) {
-        rootNode.put(
-            "orientation",
-            CardinalDirection.getFromRadians(this.getGeotag().getClockwiseRadiansFromNorth())
-                .getAbbreviation());
-      }
     }
     if (this.shape != null)
       rootNode.put("shape", this.shape.getName().toUpperCase());

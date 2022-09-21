@@ -6,7 +6,6 @@ import org.cuair.ground.models.exceptions.InvalidGpsLocationException;
 import org.cuair.ground.models.geotag.FOV;
 import org.cuair.ground.models.geotag.Geotag;
 import org.cuair.ground.models.geotag.GpsLocation;
-import org.cuair.ground.models.geotag.Radian;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -136,17 +135,6 @@ public class Geotagging {
     return gps;
   }
 
-  /**
-   * Calculate the orientation of this geotag as radians from north
-   *
-   * @param planeYaw       The yaw of the plane in radians, going clockwise from 0
-   *                       = north
-   * @param radiansFromTop The radians from the top of the image
-   * @return The orientation of this geotag
-   */
-  public static Double calculateClockwiseRadiansFromNorth(double planeYaw, double radiansFromTop) {
-    return Radian.normalize(planeYaw + radiansFromTop);
-  }
 
   /**
    * Median a variable number of geotags
@@ -158,13 +146,11 @@ public class Geotagging {
     geotags = Arrays.stream(geotags)
         .filter(Objects::nonNull)
         .filter(g -> g.getGpsLocation() != null)
-        .filter(g -> g.getClockwiseRadiansFromNorth() != null)
         .toArray(Geotag[]::new);
     if (geotags.length == 0) {
       return null;
     }
     GpsLocation[] locations = Arrays.stream(geotags).map(Geotag::getGpsLocation).toArray(GpsLocation[]::new);
-    Double[] radians = Arrays.stream(geotags).map(Geotag::getClockwiseRadiansFromNorth).toArray(Double[]::new);
-    return new Geotag(GpsLocation.median(locations), Radian.median(radians));
+    return new Geotag(GpsLocation.median(locations));
   }
 }

@@ -60,17 +60,6 @@ public abstract class TargetSighting extends ClientCreatable {
    */
   @ManyToOne
   private Assignment assignment;
-  /**
-   * The orientation of the target sighting with respect to the top of the image.
-   * This means that
-   * the vector below is 0 and the radians increase in a counterclockwise fashion.
-   */
-  private Double radiansFromTop;
-
-  /**
-   * The confidence the vision system has in the target orientation identification
-   */
-  private Double orientationConfidence;
 
   /**
    * Creates a TargetSighting
@@ -81,9 +70,6 @@ public abstract class TargetSighting extends ClientCreatable {
    *                              target sighting in the specific Image
    * @param pixely                Integer y pixel coordinate of the center of the
    *                              target sighting in the specific Image
-   * @param radiansFromTop        the orientation of the Target Sighting
-   * @param orientationConfidence the confidence the vision system has in the
-   *                              target orientation identification
    * @param mdlcClassConf         the confidence MDLC taggers have in the target
    *                              classification
    * @param assignment            the assignment that created this TargetSighting
@@ -97,8 +83,6 @@ public abstract class TargetSighting extends ClientCreatable {
       Integer width,
       Integer height,
       Geotag geotag,
-      Double radiansFromTop,
-      Double orientationConfidence,
       Confidence mdlcClassConf,
       Assignment assignment) {
     super(creator);
@@ -107,8 +91,6 @@ public abstract class TargetSighting extends ClientCreatable {
     this.width = width;
     this.height = height;
     this.geotag = geotag;
-    this.radiansFromTop = radiansFromTop;
-    this.orientationConfidence = orientationConfidence;
     this.mdlcClassConf = mdlcClassConf;
     this.assignment = assignment;
   }
@@ -137,9 +119,6 @@ public abstract class TargetSighting extends ClientCreatable {
     }
     if (other.getGeotag() != null) {
       this.geotag = other.getGeotag();
-    }
-    if (other.getOrientationConfidence() != null) {
-      this.orientationConfidence = other.getOrientationConfidence();
     }
     if (other.getMdlcClassConf() != null) {
       this.mdlcClassConf = other.getMdlcClassConf();
@@ -265,36 +244,6 @@ public abstract class TargetSighting extends ClientCreatable {
   }
 
   /**
-   * Gets the orientation of the target sighting from the top of the image
-   *
-   * @return Double representing the orientation of the sighting
-   */
-  public Double getRadiansFromTop() {
-    return radiansFromTop;
-  }
-
-  /**
-   * Gets the confidence the vision system has in the target orientation
-   * classification
-   *
-   * @return Double representing the target orientation confidence
-   */
-  public Double getOrientationConfidence() {
-    return orientationConfidence;
-  }
-
-  /**
-   * Sets the confidence the vision system has in the target orientation
-   * classification
-   *
-   * @param orientationConfidence Double representing the target orientation
-   *                              confidence
-   */
-  public void setOrientationConfidence(Double orientationConfidence) {
-    this.orientationConfidence = orientationConfidence;
-  }
-
-  /**
    * Gets the confidence we have in the classification accuracy
    *
    * @return Confidence representing the classification confidence
@@ -331,13 +280,6 @@ public abstract class TargetSighting extends ClientCreatable {
 
     if (!Objects.deepEquals(this.height, other.getHeight()))
       return false;
-
-    if (!Objects.deepEquals(this.radiansFromTop, other.getRadiansFromTop()))
-      return false;
-
-    if (!Objects.deepEquals(this.orientationConfidence, other.getOrientationConfidence())) {
-      return false;
-    }
 
     if (!Objects.deepEquals(this.mdlcClassConf, other.getMdlcClassConf()))
       return false;
