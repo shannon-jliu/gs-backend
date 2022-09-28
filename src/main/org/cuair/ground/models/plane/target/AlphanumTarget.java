@@ -11,7 +11,7 @@ import javax.persistence.Entity;
 import org.cuair.ground.models.Color;
 import org.cuair.ground.models.ODLCUser;
 import org.cuair.ground.models.Shape;
-import org.cuair.ground.models.geotag.CardinalDirection;
+//import org.cuair.ground.models.geotag.CardinalDirection;
 import org.cuair.ground.models.geotag.Geotag;
 import org.cuair.ground.util.Flags;
 
