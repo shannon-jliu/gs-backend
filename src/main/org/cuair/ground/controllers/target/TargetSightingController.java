@@ -85,10 +85,12 @@ public abstract class TargetSightingController<T extends TargetSighting> {
     ts.setAssignment(a);
 
     boolean geotagChanged = Geotag.attemptSetGeotagForTargetSighting(ts);
+    //stores the target sighting in the database
     getTargetSightingDao().create(ts);
 
+    // Updates geotag of the corresponding target in the database
+    //check deviation?? prevent outliers
     if (geotagChanged && ts.getTarget() != null) {
-      // Updates target in dao
       Geotag.updateGeotag(ts.getTarget(), ts);
 
       if (cuairInteropRequests) {

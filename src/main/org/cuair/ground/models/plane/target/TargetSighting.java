@@ -1,6 +1,12 @@
 package org.cuair.ground.models.plane.target;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Objects;
+import java.io.File;
+import javax.imageio.ImageIO;
 import javax.persistence.CascadeType;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
@@ -8,25 +14,38 @@ import javax.persistence.OneToOne;
 import org.cuair.ground.models.Assignment;
 import org.cuair.ground.models.ClientCreatable;
 import org.cuair.ground.models.Confidence;
+import org.cuair.ground.models.Image;
 import org.cuair.ground.models.ODLCUser;
 import org.cuair.ground.models.geotag.Geotag;
+import org.cuair.ground.models.plane.target.Target;
+import org.cuair.ground.util.Flags;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Model to represent a target sighting. The target sighting is the sighting of a target in a
+ * Model to represent a target sighting. The target sighting is the sighting of
+ * a target in a
  * specific image.
  */
 @MappedSuperclass
 public abstract class TargetSighting extends ClientCreatable {
 
   /**
-   * Represents the Geotag of this target sighting that records the gps location and the direction
+   * Represents the Geotag of this target sighting that records the gps location
+   * and the direction
    * that the target sighting is facing
    */
   @OneToOne(cascade = CascadeType.ALL)
   protected Geotag geotag;
-  /** The x pixel coordinate of the center of the target sighting in the specific Image */
+  /**
+   * The x pixel coordinate of the center of the target sighting in the specific
+   * Image
+   */
   protected Integer pixelx;
-  /** The y pixel coordinate of the center of the target sighting in the specific Image */
+  /**
+   * The y pixel coordinate of the center of the target sighting in the specific
+   * Image
+   */
   protected Integer pixely;
   /** The horizontal pixel width of the target sighting in the specific image */
   protected Integer width;
@@ -35,18 +54,22 @@ public abstract class TargetSighting extends ClientCreatable {
   /** The confidence MDLC taggers have in the classification accuracy */
   protected Confidence mdlcClassConf;
   /**
-   * The assignment from which this target sighting was created (contains the image that this target
+   * The assignment from which this target sighting was created (contains the
+   * image that this target
    * sighting was tagged in)
    */
   @ManyToOne
   private Assignment assignment;
   /**
-   * The orientation of the target sighting with respect to the top of the image. This means that
+   * The orientation of the target sighting with respect to the top of the image.
+   * This means that
    * the vector below is 0 and the radians increase in a counterclockwise fashion.
    */
   private Double radiansFromTop;
 
-  /** The confidence the vision system has in the target orientation identification */
+  /**
+   * The confidence the vision system has in the target orientation identification
+   */
   private Double orientationConfidence;
 
   /**
@@ -61,7 +84,8 @@ public abstract class TargetSighting extends ClientCreatable {
    * @param radiansFromTop        the orientation of the Target Sighting
    * @param orientationConfidence the confidence the vision system has in the
    *                              target orientation identification
-   * @param mdlcClassConf         the confidence MDLC taggers have in the target classification
+   * @param mdlcClassConf         the confidence MDLC taggers have in the target
+   *                              classification
    * @param assignment            the assignment that created this TargetSighting
    * @param width                 the horizontal pixel width of the TargetSighting
    * @param height                the vertical pixel height of the TargetSighting
@@ -90,7 +114,8 @@ public abstract class TargetSighting extends ClientCreatable {
   }
 
   /**
-   * Given another target sighting, it updates all fields of this instance if there are any
+   * Given another target sighting, it updates all fields of this instance if
+   * there are any
    * differences
    *
    * @param other TargetSighting containing updated fields
@@ -126,6 +151,37 @@ public abstract class TargetSighting extends ClientCreatable {
 
   /** Sets this target to be null */
   public abstract void makeAssociatedTargetNull();
+
+  /**
+   * Returns the raw content of the thumbnail corresponding to this target
+   * sighting, for
+   * submission to interop.
+   */
+  public byte[] thumbnailImage() throws IOException {
+    Logger logger = LoggerFactory.getLogger(TargetSighting.class);
+    Image image = this.getAssignment().getImage();
+    assert image != null;
+    String imgPathLocal = image.getLocalImageUrl();
+    logger.info(imgPathLocal);
+    // InputStream in = getClass().getResourceAsStream(imgPathLocal);
+    // assert in != null;
+    BufferedImage initialImage = ImageIO.read(new File(imgPathLocal));
+
+    // Produce cropped thumbnail - need to scale up as values are from compressed
+    // frontend image
+    double scaleUpW = Flags.RAW_IMAGE_WIDTH / Flags.FRONTEND_IMAGE_WIDTH;
+    double scaleUpH = Flags.RAW_IMAGE_HEIGHT / Flags.FRONTEND_IMAGE_HEIGHT;
+    BufferedImage croppedThumb = initialImage.getSubimage(
+        (int) (scaleUpW * (pixelx - width / 2)),
+        (int) (scaleUpH * (pixely - height / 2)),
+        (int) (scaleUpW * width),
+        (int) (scaleUpH * height));
+
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    ImageIO.write(croppedThumb, "jpg", baos);
+
+    return baos.toByteArray();
+  }
 
   /**
    * Gets the target
@@ -173,7 +229,8 @@ public abstract class TargetSighting extends ClientCreatable {
   /**
    * Gets the geotag of this TargetSighting
    *
-   * @return Geotag representing the direction and location of the AlphanumTargetSighting
+   * @return Geotag representing the direction and location of the
+   *         AlphanumTargetSighting
    */
   public Geotag getGeotag() {
     return geotag;
@@ -182,7 +239,8 @@ public abstract class TargetSighting extends ClientCreatable {
   /**
    * Sets the geotag of this TargetSighting
    *
-   * @param geotag Geotag representing the direction and location of the AlphanumTargetSighting
+   * @param geotag Geotag representing the direction and location of the
+   *               AlphanumTargetSighting
    */
   public void setGeotag(Geotag geotag) {
     this.geotag = geotag;
@@ -216,7 +274,8 @@ public abstract class TargetSighting extends ClientCreatable {
   }
 
   /**
-   * Gets the confidence the vision system has in the target orientation classification
+   * Gets the confidence the vision system has in the target orientation
+   * classification
    *
    * @return Double representing the target orientation confidence
    */
@@ -225,9 +284,11 @@ public abstract class TargetSighting extends ClientCreatable {
   }
 
   /**
-   * Sets the confidence the vision system has in the target orientation classification
+   * Sets the confidence the vision system has in the target orientation
+   * classification
    *
-   * @param orientationConfidence Double representing the target orientation confidence
+   * @param orientationConfidence Double representing the target orientation
+   *                              confidence
    */
   public void setOrientationConfidence(Double orientationConfidence) {
     this.orientationConfidence = orientationConfidence;
@@ -243,7 +304,8 @@ public abstract class TargetSighting extends ClientCreatable {
   }
 
   /**
-   * Determines if the given object is logically equal to this AlphanumTargetSighting
+   * Determines if the given object is logically equal to this
+   * AlphanumTargetSighting
    *
    * @param o The object to compare
    * @return True if the object equals this AlphanumTargetSighting
@@ -252,25 +314,33 @@ public abstract class TargetSighting extends ClientCreatable {
   public boolean equals(Object o) {
     TargetSighting other = (TargetSighting) o;
 
-    if (!super.equals(o)) return false;
+    if (!super.equals(o))
+      return false;
 
-    if (!Objects.deepEquals(this.geotag, other.getGeotag())) return false;
+    if (!Objects.deepEquals(this.geotag, other.getGeotag()))
+      return false;
 
-    if (!Objects.deepEquals(this.pixelx, other.getpixelx())) return false;
+    if (!Objects.deepEquals(this.pixelx, other.getpixelx()))
+      return false;
 
-    if (!Objects.deepEquals(this.pixely, other.getpixely())) return false;
+    if (!Objects.deepEquals(this.pixely, other.getpixely()))
+      return false;
 
-    if (!Objects.deepEquals(this.width, other.getWidth())) return false;
+    if (!Objects.deepEquals(this.width, other.getWidth()))
+      return false;
 
-    if (!Objects.deepEquals(this.height, other.getHeight())) return false;
+    if (!Objects.deepEquals(this.height, other.getHeight()))
+      return false;
 
-    if (!Objects.deepEquals(this.radiansFromTop, other.getRadiansFromTop())) return false;
+    if (!Objects.deepEquals(this.radiansFromTop, other.getRadiansFromTop()))
+      return false;
 
     if (!Objects.deepEquals(this.orientationConfidence, other.getOrientationConfidence())) {
       return false;
     }
 
-    if (!Objects.deepEquals(this.mdlcClassConf, other.getMdlcClassConf())) return false;
+    if (!Objects.deepEquals(this.mdlcClassConf, other.getMdlcClassConf()))
+      return false;
 
     return Objects.deepEquals(this.assignment, other.getAssignment());
   }

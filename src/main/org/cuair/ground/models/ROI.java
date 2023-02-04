@@ -12,7 +12,8 @@ import org.cuair.ground.util.Geotagging;
 public class ROI extends ClientCreatable {
 
   /**
-   * The assignment from which this ROI was created (contains the image that this ROI was tagged in)
+   * The assignment from which this ROI was created (contains the image that this
+   * ROI was tagged in)
    */
   @ManyToOne
   private Assignment assignment;
@@ -27,15 +28,20 @@ public class ROI extends ClientCreatable {
   @Embedded
   private GpsLocation gpsLocation;
 
-  /** A boolean value representing if this ROI was the result of averaging a cluster */
+  /**
+   * A boolean value representing if this ROI was the result of averaging a
+   * cluster
+   */
   private Boolean averaged;
 
   /**
    * Creates a new non-averaged ROI
    *
    * @param creator    The ODLCUser of the ROI
-   * @param pixelx     Integer x pixel coordinate of the center of the ROI in the specific Image
-   * @param pixely     Integer y pixel coordinate of the center of the ROI in the specific Image
+   * @param pixelx     Integer x pixel coordinate of the center of the ROI in the
+   *                   specific Image
+   * @param pixely     Integer y pixel coordinate of the center of the ROI in the
+   *                   specific Image
    * @param assignment The assignment that created this ROI
    */
   public ROI(
@@ -122,7 +128,8 @@ public class ROI extends ClientCreatable {
   /**
    * Calculates the GpsLocation of this ROI
    *
-   * @return A GpsLocation of the ROI or null if assignment, pixelx, or pixely is null
+   * @return A GpsLocation of the ROI or null if assignment, pixelx, or pixely is
+   *         null
    */
   private GpsLocation calcGpsLocation() {
     if (this.assignment == null || this.pixelx == null || this.pixely == null) {
@@ -149,6 +156,8 @@ public class ROI extends ClientCreatable {
     Double latitude = assignmentGps.getLatitude();
     Double longitude = assignmentGps.getLongitude();
     Double altitude = telemetry.getAltitude();
+    Double planeRoll = telemetry.getGimOrt().getRoll() * Math.PI / 180;
+    Double planePitch = telemetry.getGimOrt().getPitch() * Math.PI / 180;
     Double planeYaw = telemetry.getPlaneYaw() * Math.PI / 180;
 
     if (latitude == null || longitude == null || altitude == null || planeYaw == null) {
@@ -156,6 +165,7 @@ public class ROI extends ClientCreatable {
     }
 
     return Geotagging
-        .getPixelCoordinates(latitude, longitude, altitude, fov, this.pixelx, this.pixely, planeYaw);
+        .getPixelCoordinates(latitude, longitude, altitude, fov, this.pixelx, this.pixely, planeRoll, planePitch,
+            planeYaw);
   }
 }

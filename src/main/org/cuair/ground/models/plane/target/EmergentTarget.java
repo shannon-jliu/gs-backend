@@ -25,14 +25,16 @@ public class EmergentTarget extends Target {
    * @param geotag        Geotag of this Target
    * @param judgeTargetId Long id of this Target on the competition server
    * @param thumbnailTsid Long id of Target Sighting used for thumbnail
+   * @param airdropId     Long id of this Target's airdrop
    */
   public EmergentTarget(
       ODLCUser creator,
       Geotag geotag,
       String description,
       Long judgeTargetId,
-      Long thumbnailTsid) {
-    super(creator, geotag, judgeTargetId, thumbnailTsid);
+      Long thumbnailTsid,
+      Long airdropId) {
+    super(creator, geotag, judgeTargetId, thumbnailTsid, airdropId);
     this.description = description;
   }
 

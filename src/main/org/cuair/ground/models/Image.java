@@ -12,18 +12,21 @@ import org.cuair.ground.models.geotag.GpsLocation;
 import org.cuair.ground.models.geotag.Telemetry;
 import org.cuair.ground.util.Geotagging;
 
-/** Represents an image and its corresponding metadata as sent down from the plane */
+/**
+ * Represents an image and its corresponding metadata as sent down from the
+ * plane
+ */
 
 @Entity
 public class Image extends TimestampModel {
 
-  /** The URL where clients can retrieve the image file  */
+  /** The URL where clients can retrieve the image file */
   private String imageUrl;
 
   /** The local URL where image file lives on the ground server */
   private String localImageUrl;
 
-  /** Closest Telemetry for when this Image was taken  */
+  /** Closest Telemetry for when this Image was taken */
   @OneToOne(cascade = CascadeType.ALL)
   private Telemetry telemetry;
 
@@ -48,12 +51,16 @@ public class Image extends TimestampModel {
     TRACKING("tracking"),
     OFFAXIS("off-axis");
 
-    @JsonValue String value;
-    ImgMode(String value) { this.value = value; }
+    @JsonValue
+    String value;
+
+    ImgMode(String value) {
+      this.value = value;
+    }
   }
 
   // Constructor
-  public Image (String imageUrl, Telemetry telemetry, FOV fov, ImgMode imgMode) {
+  public Image(String imageUrl, Telemetry telemetry, FOV fov, ImgMode imgMode) {
     this.imageUrl = imageUrl;
     this.telemetry = telemetry;
     this.fov = fov;
@@ -61,7 +68,8 @@ public class Image extends TimestampModel {
   }
 
   // Constructor corresponding to original Image class (used in tests)
-  public Image (String imageUrl, Telemetry telemetry, ImgMode imgMode, boolean hasMdlcAssignment, boolean hasAdlcAssignment, double fov) {
+  public Image(String imageUrl, Telemetry telemetry, ImgMode imgMode, boolean hasMdlcAssignment,
+      boolean hasAdlcAssignment, double fov) {
     this.imageUrl = imageUrl;
     this.telemetry = telemetry;
     this.fov = new FOV(fov, fov);
@@ -78,18 +86,22 @@ public class Image extends TimestampModel {
     GpsLocation imageGPS = telemetry.getGps();
     double centerLat = imageGPS.getLatitude();
     double centerLong = imageGPS.getLongitude();
-
+    double planeRoll = telemetry.getGimOrt().getRoll() * Math.PI / 180;
+    double planePitch = telemetry.getGimOrt().getPitch() * Math.PI / 180;
     double planeYaw = telemetry.getPlaneYaw() * Math.PI / 180;
     double altitude = telemetry.getAltitude();
 
     GpsLocation topLeft = Geotagging
-        .getPixelCoordinates(centerLat, centerLong, altitude, fov, 0.0, 0.0, planeYaw);
+        .getPixelCoordinates(centerLat, centerLong, altitude, fov, 0.0, 0.0, planeRoll, planePitch, planeYaw);
     GpsLocation topRight = Geotagging
-        .getPixelCoordinates(centerLat, centerLong, altitude, fov, Geotagging.IMAGE_WIDTH, 0.0, planeYaw);
+        .getPixelCoordinates(centerLat, centerLong, altitude, fov, Geotagging.IMAGE_WIDTH, 0.0, planeRoll, planePitch,
+            planeYaw);
     GpsLocation bottomLeft = Geotagging
-        .getPixelCoordinates(centerLat, centerLong, altitude, fov, 0.0, Geotagging.IMAGE_HEIGHT, planeYaw);
+        .getPixelCoordinates(centerLat, centerLong, altitude, fov, 0.0, Geotagging.IMAGE_HEIGHT, planeRoll, planePitch,
+            planeYaw);
     GpsLocation bottomRight = Geotagging
-        .getPixelCoordinates(centerLat, centerLong, altitude, fov, Geotagging.IMAGE_WIDTH, Geotagging.IMAGE_HEIGHT, planeYaw);
+        .getPixelCoordinates(centerLat, centerLong, altitude, fov, Geotagging.IMAGE_WIDTH, Geotagging.IMAGE_HEIGHT,
+            planeRoll, planePitch, planeYaw);
 
     Map<String, Object> locs = new HashMap<>();
     locs.put("topLeft", topLeft);
@@ -155,6 +167,5 @@ public class Image extends TimestampModel {
   public void setFov(FOV fov) {
     this.fov = fov;
   }
-
 
 }

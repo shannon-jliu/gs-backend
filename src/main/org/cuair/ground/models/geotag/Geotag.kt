@@ -44,11 +44,13 @@ class Geotag(
         val altitude = telemetry.getAltitude()
         val pixelx = sighting.getpixelx().toDouble()
         val pixely = sighting.getpixely().toDouble()
+        val planeRoll = telemetry.getGimOrt().getRoll() * Math.PI / 180
+        val planePitch = telemetry.getGimOrt().getPitch() * Math.PI / 180
         val planeYaw = telemetry.getPlaneYaw() * Math.PI / 180
         val centerLongitude = gps.getLongitude()
         val centerLatitude = gps.getLatitude()
         gpsLocation = Geotagging
-                .getPixelCoordinates(centerLatitude, centerLongitude, altitude, fov, pixelx, pixely, planeYaw)
+                .getPixelCoordinates(centerLatitude, centerLongitude, altitude, fov, pixelx, pixely, planeRoll, planePitch, planeYaw)
         clockwiseRadiansFromNorth = Geotagging.calculateClockwiseRadiansFromNorth(planeYaw, sighting.radiansFromTop)
     }
 

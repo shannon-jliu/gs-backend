@@ -7,6 +7,7 @@ import org.cuair.ground.daos.AlphanumTargetSightingsDatabaseAccessor;
 import org.cuair.ground.daos.DAOFactory;
 import org.cuair.ground.daos.TargetSightingsDatabaseAccessor;
 import org.cuair.ground.models.ODLCUser;
+import org.cuair.ground.models.geotag.Geotag;
 import org.cuair.ground.models.plane.target.AlphanumTarget;
 import org.cuair.ground.models.plane.target.AlphanumTargetSighting;
 import org.cuair.ground.util.Flags;
@@ -57,17 +58,13 @@ public class AlphanumTargetSightingController
     return super.getAll();
   }
 
+  /** Creates a target sighting given sighting data from the frontend. */
+
+
   @Override
   @RequestMapping(value = "/assignment/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   public AlphanumTargetSighting create(@PathVariable Long id,
                                        @RequestBody AlphanumTargetSighting ts) {
-    if (ts.isOffaxis() != null && ts.isOffaxis()) {
-      if (ts.getTarget() != null) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-            "Don't pass targets for off-axis sighting creates");
-      }
-      ts.setTarget(alphaTargetDao.getOffaxisTarget());
-    }
 
     // ordered this way so exception interrupts execution
     final AlphanumTargetSighting retval = super.create(id, ts);
@@ -77,6 +74,7 @@ public class AlphanumTargetSightingController
       if (ts.getTarget() != null) {
         AlphanumTarget t = alphaTargetDao.get(ts.getTarget().getId());
         t.setthumbnailTsid(ts.getId());
+
         alphaTargetDao.update(t);
         if (cuairInteropRequests) {
           // TODO: Add back in once client code is complete

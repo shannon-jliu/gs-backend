@@ -17,15 +17,13 @@ import org.springframework.stereotype.Component;
 /* Lifecycle component, contains startup and shutdown logic for server. */
 @Component
 public class Lifecycle {
-  private static AlphanumTargetDatabaseAccessor<AlphanumTarget> alphaTargetDao =
-      (AlphanumTargetDatabaseAccessor<AlphanumTarget>)
-          DAOFactory.getDAO(
-              DAOFactory.ModelDAOType.ALPHANUM_TARGET_DATABASE_ACCESSOR, AlphanumTarget.class);
+  private static AlphanumTargetDatabaseAccessor<AlphanumTarget> alphaTargetDao = (AlphanumTargetDatabaseAccessor<AlphanumTarget>) DAOFactory
+      .getDAO(
+          DAOFactory.ModelDAOType.ALPHANUM_TARGET_DATABASE_ACCESSOR, AlphanumTarget.class);
 
-  private static ClientCreatableDatabaseAccessor<EmergentTarget> emergentTargetDao =
-      (ClientCreatableDatabaseAccessor<EmergentTarget>)
-          DAOFactory.getDAO(
-              DAOFactory.ModelDAOType.CLIENT_CREATABLE_DATABASE_ACCESSOR, EmergentTarget.class);
+  private static ClientCreatableDatabaseAccessor<EmergentTarget> emergentTargetDao = (ClientCreatableDatabaseAccessor<EmergentTarget>) DAOFactory
+      .getDAO(
+          DAOFactory.ModelDAOType.CLIENT_CREATABLE_DATABASE_ACCESSOR, EmergentTarget.class);
 
   private ODLCUserDatabaseAccessor odlcUserDao = (ODLCUserDatabaseAccessor) DAOFactory
       .getDAO(DAOFactory.ModellessDAOType.ODLCUSER_DATABASE_ACCESSOR);
@@ -34,31 +32,7 @@ public class Lifecycle {
 
   private static String DEFAULT_EMERGENT_TARGET_DESC = Flags.DEFAULT_EMERGENT_TARGET_DESC;
 
-  /**
-   * Creates an initial offaxis target in the db when the backend boots up.
-   * We do this because there is only one offaxis target, and we only want
-   * to update this offaxis target, not create new offaxis ones.
-   */
-  private static void initializeOffaxisTargetDatabase() {
-    AlphanumTarget offaxisTarget = alphaTargetDao.getOffaxisTarget();
-    if (offaxisTarget != null && offaxisTarget.getJudgeTargetId() != null) {
-      return;
-    }
-    if (offaxisTarget == null) {
-      offaxisTarget =
-          new AlphanumTarget(
-              new ODLCUser("interop", "localhost", ODLCUser.UserType.MDLCOPERATOR),
-              null,
-              null,
-              "A",
-              null,
-              true,
-              null,
-              null,
-              0L);
-      alphaTargetDao.create(offaxisTarget);
-    }
-  }
+
 
   /**
    * Creates an initial emergent target in the db when the backend boots up.
@@ -74,13 +48,12 @@ public class Lifecycle {
       return;
     }
     if (emergentTarget == null) {
-      emergentTarget =
-          new EmergentTarget(
-              new ODLCUser("interop", "localhost", ODLCUser.UserType.ADLC),
-              null,
-              DEFAULT_EMERGENT_TARGET_DESC,
-              null,
-              0L);
+      emergentTarget = new EmergentTarget(
+          new ODLCUser("interop", "localhost", ODLCUser.UserType.ADLC),
+          null,
+          DEFAULT_EMERGENT_TARGET_DESC,
+          null,
+          0L, 0L);
       emergentTargetDao.create(emergentTarget);
     }
   }
@@ -90,9 +63,8 @@ public class Lifecycle {
    */
   @PostConstruct
   public void startUp() {
-    interopClient.getMissionData();
-    interopClient.getSentTargets();
-    initializeOffaxisTargetDatabase();
+    // interopClient.getMissionData();
+    // interopClient.getSentTargets();
     initializeEmergentTargetDatabase();
     if (odlcUserDao.getADLCUser() == null) {
       odlcUserDao.create(new ODLCUser("adlc", "", ODLCUser.UserType.ADLC));

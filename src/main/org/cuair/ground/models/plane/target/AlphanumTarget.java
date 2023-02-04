@@ -15,7 +15,13 @@ import org.cuair.ground.models.geotag.CardinalDirection;
 import org.cuair.ground.models.geotag.Geotag;
 import org.cuair.ground.util.Flags;
 
-/** Alphanum Target is target that is associated with Alphanumeric Target Sightings. */
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Alphanum Target is target that is associated with Alphanumeric Target
+ * Sightings.
+ */
 @Entity
 public class AlphanumTarget extends Target {
 
@@ -31,8 +37,8 @@ public class AlphanumTarget extends Target {
   /** The color of the alphanumeric */
   private Color alphaColor;
 
-  /** True if the target is the off axis target, false otherwise */
-  private Boolean offaxis;
+//  /** True if the target is the off axis target, false otherwise */
+//  private Boolean offaxis;
 
   /**
    * Creates an AlphanumTarget
@@ -42,10 +48,10 @@ public class AlphanumTarget extends Target {
    * @param shapeColor    String color of the shape
    * @param alpha         Character alphanumeric of this Target
    * @param alphaColor    String color of the alphanumeric
-   * @param offaxis       Boolean of whether the target is off-axis
    * @param geotag        Geotag of this Target
    * @param judgeTargetId Long id of this Target on the competition server
    * @param thumbnailTsid Long id of Target Sighting used for thumbnail
+   * @param airdropId     Long id of this Target's airdrop
    */
   public AlphanumTarget(
       ODLCUser creator,
@@ -53,20 +59,21 @@ public class AlphanumTarget extends Target {
       Color shapeColor,
       String alpha,
       Color alphaColor,
-      Boolean offaxis,
       Geotag geotag,
       Long judgeTargetId,
-      Long thumbnailTsid) {
-    super(creator, geotag, judgeTargetId, thumbnailTsid);
+      Long thumbnailTsid,
+      Long airdropId) {
+    super(creator, geotag, judgeTargetId, thumbnailTsid, airdropId);
     this.shape = shape;
     this.shapeColor = shapeColor;
     this.alpha = alpha;
     this.alphaColor = alphaColor;
-    this.offaxis = offaxis;
+
   }
 
   /**
-   * Given another target, it updates all fields of this instance if there are any differences
+   * Given another target, it updates all fields of this instance if there are any
+   * differences
    *
    * @param other Target containing updated fields
    */
@@ -91,12 +98,14 @@ public class AlphanumTarget extends Target {
     if (alphaTarget.getAlphaColor() != null) {
       this.alphaColor = alphaTarget.getAlphaColor();
     }
-    if (alphaTarget.isOffaxis() != null) {
-      this.offaxis = alphaTarget.isOffaxis();
-    }
-    if (alphaTarget.getGeotag() != null) {
-      this.geotag = alphaTarget.getGeotag();
-    }
+
+
+    /*
+     * if (alphaTarget.getGeotag() != null) {
+     * this.geotag = alphaTarget.getGeotag();
+     * }
+     */
+
   }
 
   /** Returns class associated with this target */
@@ -177,23 +186,7 @@ public class AlphanumTarget extends Target {
     this.alphaColor = alphaColor;
   }
 
-  /**
-   * Gets whether target is offaxis
-   *
-   * @return Boolean true if target is offaxis, false otherwise
-   */
-  public Boolean isOffaxis() {
-    return offaxis;
-  }
 
-  /**
-   * Sets whether target is offaxis
-   *
-   * @param offaxis Boolean true if target is offaxis, false otherwise
-   */
-  public void setOffaxis(Boolean offaxis) {
-    this.offaxis = offaxis;
-  }
 
   @Override
   public boolean equals(Object o) {
@@ -219,7 +212,8 @@ public class AlphanumTarget extends Target {
       return false;
     }
 
-    return Objects.deepEquals(this.offaxis, other.isOffaxis());
+    return true;
+
   }
 
   @Override
@@ -238,7 +232,9 @@ public class AlphanumTarget extends Target {
 
     rootNode.put("type", "STANDARD");
 
-    if (this.getGeotag() != null && !this.isOffaxis()) {
+    Logger logger = LoggerFactory.getLogger(AlphanumTarget.class);
+    logger.info("geotag is " + this.getGeotag());
+    if (this.getGeotag() != null /* && !this.isOffaxis() */) {
       if (this.getGeotag().getGpsLocation() != null
           && (Double) this.getGeotag().getGpsLocation().getLatitude() != null
           && !((Double) this.getGeotag().getGpsLocation().getLatitude()).isNaN()) {
@@ -256,21 +252,21 @@ public class AlphanumTarget extends Target {
                 .getAbbreviation());
       }
     }
-    if (this.shape != null) rootNode.put("shape", this.shape.getName().toUpperCase());
+    if (this.shape != null)
+      rootNode.put("shape", this.shape.getName().toUpperCase());
 
     rootNode.put("alphanumeric", this.alpha.toString().toUpperCase());
 
     if (this.shapeColor != null) {
-      rootNode.put("shape_color", this.shapeColor.name().toUpperCase());
+      rootNode.put("shapeColor", this.shapeColor.name().toUpperCase());
     }
 
     if (this.alphaColor != null) {
-      rootNode.put("alphanumeric_color", this.alphaColor.name().toUpperCase());
+      rootNode.put("alphanumericColor", this.alphaColor.name().toUpperCase());
     }
     rootNode.put("autonomous", this.getCreator().getUserType() == ODLCUser.UserType.ADLC);
 
     return rootNode;
   }
-
 
 }

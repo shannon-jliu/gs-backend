@@ -3,17 +3,25 @@ package org.cuair.ground.models.plane.target;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
+import javax.imageio.ImageIO;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import org.apache.commons.io.IOUtils;
 import org.cuair.ground.models.Assignment;
 import org.cuair.ground.models.Color;
 import org.cuair.ground.models.Confidence;
+import org.cuair.ground.models.Image;
 import org.cuair.ground.models.ODLCUser;
 import org.cuair.ground.models.Shape;
 import org.cuair.ground.models.geotag.Geotag;
+import org.cuair.ground.util.Flags;
 
 /** Alphanumeric Target Sighting that has features associated with alphanmuerics. */
 @Entity

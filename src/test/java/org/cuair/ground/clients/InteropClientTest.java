@@ -28,7 +28,7 @@ public class InteropClientTest {
 
     @Test
     public void testGetMissionData() throws ExecutionException, InterruptedException {
-        System.out.println(iopClient.getMissionData().get().getBody());
+        System.out.println(iopClient.getMissionData().toString());
     }
 
     @Test
@@ -41,7 +41,7 @@ public class InteropClientTest {
         ODLCUser odlcUser = new ODLCUser("testUser2", "testAddr2", ODLCUser.UserType.MDLCOPERATOR);
 
         GpsLocation gps = new GpsLocation(80, 70.2);
-        Geotag geotag  =  new Geotag(gps, 1.0);
+        Geotag geotag = new Geotag(gps, 1.0);
 
         ListenableFuture<ResponseEntity<String>> beforeTarget = iopClient.getSentTargets();
         System.out.println("response: " + beforeTarget.get());
@@ -52,31 +52,28 @@ public class InteropClientTest {
                 Color.BLUE,
                 "A",
                 Color.BLACK,
-                false,
                 geotag,
                 null,
-                1L
-        );
+                null,
+                1L);
 
         System.out.println(original.toInteropJson());
-        // NOTE: if the database already has NO information comment this out for the test
+        // NOTE: if the database already has NO information comment this out for the
+        // test
         // This assumes that the database begins EMPTY
         iopClient.createTarget(original);
         ListenableFuture<ResponseEntity<String>> afterTarget = iopClient.getSentTarget(original.getJudgeTargetId());
         System.out.println("response: " + afterTarget.get().getBody());
         System.out.println("target id: " + original.getJudgeTargetId());
 
-
         iopClient.createTarget(original);
         // System.out.println("ERROR: " + k);
         // TimeUnit.SECONDS.sleep(4);
-
 
         afterTarget = iopClient.getSentTarget(original.getJudgeTargetId());
 
         System.out.println("response: " + afterTarget.get().getBody());
         System.out.println("target id: " + original.getJudgeTargetId());
-
 
     }
 
@@ -85,7 +82,7 @@ public class InteropClientTest {
         ODLCUser odlcUser = new ODLCUser("testUser2", "testAddr2", ODLCUser.UserType.MDLCOPERATOR);
 
         GpsLocation gps = new GpsLocation(80, 70.2);
-        Geotag geotag  =  new Geotag(gps, 1.0);
+        Geotag geotag = new Geotag(gps, 1.0);
 
         ListenableFuture<ResponseEntity<String>> beforeTarget = iopClient.getSentTargets();
         System.out.println("response: " + beforeTarget.get());
@@ -99,8 +96,7 @@ public class InteropClientTest {
                 false,
                 geotag,
                 null,
-                1L
-        );
+                1L);
 
         iopClient.createTarget(original);
         original.setShapeColor(Color.RED);
@@ -113,27 +109,24 @@ public class InteropClientTest {
         System.out.println(iopClient.getSentTarget(12).get().getBody());
     }
 
-
     @Test
     public void testGetSentTargets2() throws ExecutionException, InterruptedException {
         System.out.println("getSentTargets: " + (iopClient.getSentTargets()).get());
     }
 
     public boolean testTargetCreate(AlphanumTarget t) throws ExecutionException, InterruptedException {
-        try{
+        try {
             iopClient.createTarget(t);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return false;
         }
         return true;
     }
 
-    public boolean testTargetUpdate(AlphanumTarget t){
+    public boolean testTargetUpdate(AlphanumTarget t) {
         try {
             iopClient.updateTarget(t);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
         return true;
@@ -144,10 +137,10 @@ public class InteropClientTest {
         ODLCUser odlcUser = new ODLCUser("testUser2", "testAddr2", ODLCUser.UserType.MDLCOPERATOR);
 
         GpsLocation gps = new GpsLocation(80, 70.2);
-        Geotag geotag  =  new Geotag(gps, 1.0);
+        Geotag geotag = new Geotag(gps, 1.0);
 
         ListenableFuture<ResponseEntity<String>> beforeTarget = iopClient.getSentTargets();
-        //System.out.println("response: " + beforeTarget.get());
+        // System.out.println("response: " + beforeTarget.get());
 
         AlphanumTarget original = new AlphanumTarget(
                 odlcUser,
@@ -158,15 +151,13 @@ public class InteropClientTest {
                 false,
                 geotag,
                 12L,
-                1L
-        );
+                1L);
         assertTrue(testTargetCreate(original));
         testTargetCreate(original);
         original.setAlpha("A");
         testTargetUpdate(original);
-        //assertTrue(testTargetUpdate(original));
+        // assertTrue(testTargetUpdate(original));
     }
-
 
     @After
     public void tearDown() throws Exception {

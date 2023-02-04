@@ -39,7 +39,7 @@ public class AssignmentDatabaseAccessor extends TimestampDatabaseAccessor<Assign
     }
     List<Image> i_list = DB.find(Image.class)
         .where()
-        .eq(propertyName, false)
+        .eq(propertyName, false) //if "hasXdlcAssignment is false, adds it to the list
         .orderBy()
         .asc("id")
         .findList();
