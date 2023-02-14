@@ -5,8 +5,10 @@ import static org.springframework.http.ResponseEntity.ok;
 
 import org.apache.coyote.Response;
 import org.cuair.ground.daos.AlphanumTargetDatabaseAccessor;
+import org.cuair.ground.daos.AlphanumTargetSightingsDatabaseAccessor;
 import org.cuair.ground.daos.DAOFactory;
 import org.cuair.ground.models.plane.target.AlphanumTarget;
+import org.cuair.ground.models.plane.target.AlphanumTargetSighting;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /** Controller to handle creation/retrieval of Alphanumeric Target model objects */
 @CrossOrigin
@@ -25,6 +29,11 @@ public class AlphanumTargetController extends TargetController<AlphanumTarget> {
   private static final AlphanumTargetDatabaseAccessor<AlphanumTarget> targetDao =
       (AlphanumTargetDatabaseAccessor<AlphanumTarget>) DAOFactory.getDAO(
           DAOFactory.ModelDAOType.ALPHANUM_TARGET_DATABASE_ACCESSOR, AlphanumTarget.class);
+
+  /** Database accessor object for alphanum target sightings */
+  private static final AlphanumTargetSightingsDatabaseAccessor<AlphanumTargetSighting> targetSightingsDao =
+          (AlphanumTargetSightingsDatabaseAccessor<AlphanumTargetSighting>) DAOFactory.getDAO(
+                  DAOFactory.ModelDAOType.ALPHANUM_TARGET_SIGHTINGS_DATABASE_ACCESSOR, AlphanumTargetSighting.class);
 
   /** Gets the database accessor object for this target */
   public AlphanumTargetDatabaseAccessor<AlphanumTarget> getTargetDao() {
@@ -80,4 +89,21 @@ public class AlphanumTargetController extends TargetController<AlphanumTarget> {
   public ResponseEntity delete(@PathVariable Long id) {
     return super.delete(id);
   }
+
+
+  /**
+   * Deletes all alphanum targets in the database
+   * @return the list of deleted alphanum targets
+   */
+  @RequestMapping(method = RequestMethod.DELETE)
+  public ResponseEntity deleteAll() {
+    List<AlphanumTarget> targets = targetDao.getAll();
+    for (AlphanumTarget t : targets) {
+      long id = t.getId();
+      targetSightingsDao.unassociateAllTargetSightingsForTarget(id);
+      targetDao.delete(id);
+    }
+    return ok(targets);
+  }
 }
+
