@@ -4,6 +4,7 @@ import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.ok;
 
 import org.apache.coyote.Response;
+import org.cuair.ground.clients.AutopilotClient;
 import org.cuair.ground.daos.AlphanumTargetDatabaseAccessor;
 import org.cuair.ground.daos.AlphanumTargetSightingsDatabaseAccessor;
 import org.cuair.ground.daos.DAOFactory;
@@ -104,6 +105,19 @@ public class AlphanumTargetController extends TargetController<AlphanumTarget> {
       targetDao.delete(id);
     }
     return ok(targets);
+  }
+
+  /**
+   * Calls method to send geolocation data to autopilot
+   * @param t AlphanumTarget
+   * @return sent target
+   */
+  @RequestMapping(value = "/send", method = RequestMethod.POST)
+  public ResponseEntity sendTarget(@RequestBody AlphanumTarget t) {
+    AutopilotClient ac = new AutopilotClient();
+    ac.sendTargetData(t);
+    return ok(t);
+
   }
 }
 

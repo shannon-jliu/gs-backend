@@ -27,9 +27,10 @@ public class AutopilotClient {
 
   private AsyncRestTemplate template = new AsyncRestTemplate();
 
+  //replace this with correct router IP
+  String IP = "192.168.1.3";
   private String autopilotAddress =
-      "http://" + Flags.AUTOPILOT_GROUND_IP + ":" + Flags.AUTOPILOT_GROUND_PORT;
-
+          "http://" + IP + ":" + Flags.AUTOPILOT_GROUND_PORT;
   /**
    * Sends coverage to autopilot ground station of the specified image.
    *
@@ -59,7 +60,7 @@ public class AutopilotClient {
     data.put("id", airdropId);
     data.put("geotag", geotag);
 
-    URI targetURI = URI.create(autopilotAddress); //change this later
+    URI targetURI = URI.create(autopilotAddress + "/targets_set");
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
     HttpEntity<Map<String, Object>> requestEntity =

@@ -121,7 +121,16 @@ public class AlphanumTargetSightingController
             && (ts.getTarget() == null
             || !ts.getTarget().getId().equals(other.getTarget().getId()));
 
+
+    AlphanumTarget oldTarget = ts.getTarget();
+
     final AlphanumTargetSighting retval = updateFromTargetSighting(ts, other);
+
+    // updates geotag of the old target
+    AlphanumTarget newTarget = retval.getTarget();
+    if (oldTarget != null && !oldTarget.equals(newTarget)) {
+      Geotag.updateGeotag(oldTarget, null);
+    }
 
     if (toEraseThumb) {
       if (ts.getCreator().getUserType() == ODLCUser.UserType.MDLCTAGGER
