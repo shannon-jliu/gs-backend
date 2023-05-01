@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import io.ebeaninternal.server.type.ScalarTypeJsonMapPostgres;
-import org.cuair.ground.clients.InteropClient;
 import org.cuair.ground.daos.AlphanumTargetDatabaseAccessor;
 import org.cuair.ground.daos.DAOFactory;
 import org.cuair.ground.models.plane.target.AlphanumTarget;

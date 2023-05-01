@@ -60,7 +60,6 @@ public class Lifecycle {
    */
   @PostConstruct
   public void startUp() {
-    initializeOffaxisTargetDatabase();
     initializeEmergentTargetDatabase();
     if (odlcUserDao.getADLCUser() == null) {
       odlcUserDao.create(new ODLCUser("adlc", "", ODLCUser.UserType.ADLC));

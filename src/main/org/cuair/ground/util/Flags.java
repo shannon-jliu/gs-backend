@@ -18,6 +18,9 @@ public class Flags {
   public static double FRONTEND_IMAGE_WIDTH = RAW_IMAGE_WIDTH; // 1900
   public static double FRONTEND_IMAGE_HEIGHT = RAW_IMAGE_HEIGHT; // 1263
 
+  public static String DEFAULT_EMERGENT_TARGET_DESC = "A lost hiker with a water bottle.";
+
+
   public static int MISSION_NUMBER = 2;
 
   /** Default username if no username specified as part of request */
