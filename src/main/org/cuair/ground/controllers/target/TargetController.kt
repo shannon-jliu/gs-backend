@@ -8,7 +8,6 @@ import org.cuair.ground.daos.TargetSightingsDatabaseAccessor
 import org.cuair.ground.models.plane.target.Target
 import org.cuair.ground.models.plane.target.TargetSighting
 import org.cuair.ground.util.Flags
-import org.cuair.ground.clients.InteropClient
 import org.cuair.ground.models.geotag.Geotag
 
 import org.springframework.http.ResponseEntity.ok
@@ -25,7 +24,6 @@ import kotlin.concurrent.thread
 
 /** Controller to handle creation/retrieval of Emergent Target model objects  */
 abstract class TargetController<T : Target> {
-    var interopClient: InteropClient = InteropClient()
 
     /** Gets the database accessor object for this target  */
     abstract fun getTargetDao(): ClientCreatableDatabaseAccessor<T>
@@ -59,8 +57,6 @@ abstract class TargetController<T : Target> {
         if (t.id != null) return badRequest().body("Don't pass ids for creates")
         if (t.creator == null) return badRequest().body("Create request should have creator")
 
-
-        /** Stores target in database */
         getTargetDao().create(t)
 
         return ok(t)
@@ -85,22 +81,11 @@ abstract class TargetController<T : Target> {
             return badRequest().body("Don't pass creator for updates")
         }
 
-        // ensure other target has same judge target id
-        other.setJudgeTargetId_CREATION(t.getJudgeTargetId())
-
         val isTSIdUpdated = t.getthumbnailTsid() != other.getthumbnailTsid()
 
         t.updateFromTarget(other)
         Geotag.updateGeotag(t, targetSightingDao.get(t.getthumbnailTsid()))
         getTargetDao().update(t)
-
-        // Interop Client code
-        if (Flags.CUAIR_INTEROP_REQUESTS) {
-            interopClient.updateTarget(getTargetDao().get(t.id)) 
-            if (isTSIdUpdated) {
-                interopClient.sendThumbnail(targetSightingDao.get(t.getthumbnailTsid()).thumbnailImage(), t)
-            }
-        }
         return ok(t)
     }
 
@@ -120,19 +105,12 @@ abstract class TargetController<T : Target> {
             DAOFactory.ModelDAOType.TARGET_SIGHTINGS_DATABASE_ACCESSOR,
             t.fetchAssociatedTargetSightingClass()) as TargetSightingsDatabaseAccessor<out TargetSighting>
 
-        // TODO: Add client code
-        // if (CUAIR_INTEROP_REQUESTS) interopClient.deleteTarget(t)
-
         targetSightingDao.unassociateAllTargetSightingsForTarget(id)
         getTargetDao().delete(id)
         return ok(t)
     }
 
     companion object {
-        // TODO: Add client code
-        /** The interop client for communication with the competition server */
-        // private val interopClient = ClientFactory.getInteropClient()
-
         private val logger = LoggerFactory.getLogger(TargetSighting::class.java)
     }
 }

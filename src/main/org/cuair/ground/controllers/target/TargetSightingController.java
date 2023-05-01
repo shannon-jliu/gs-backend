@@ -26,11 +26,6 @@ public abstract class TargetSightingController<T extends TargetSighting> {
       (AssignmentDatabaseAccessor)
           DAOFactory.getDAO(DAOFactory.ModellessDAOType.ASSIGNMENT_DATABASE_ACCESSOR);
 
-  private boolean cuairInteropRequests = Flags.CUAIR_INTEROP_REQUESTS;
-
-  // TODO: Add back in once client code is complete, and add back the documentation
-  // static InteropClient interopClient = ClientFactory.getInteropClient();
-
   /** Gets the database accessor object for this target sighting */
   abstract TargetSightingsDatabaseAccessor<T> getTargetSightingDao();
 
@@ -93,10 +88,6 @@ public abstract class TargetSightingController<T extends TargetSighting> {
     if (geotagChanged && ts.getTarget() != null) {
       Geotag.updateGeotag(ts.getTarget(), ts);
 
-      if (cuairInteropRequests) {
-        // TODO: Add back in once client code is complete
-        // interopClient.updateTarget(ts.getTarget());
-      }
     }
 
     return ts;
@@ -144,10 +135,6 @@ public abstract class TargetSightingController<T extends TargetSighting> {
 
     if (Geotag.attemptSetGeotagForTargetSighting(ts) && other.getTarget() != null) {
       Geotag.updateGeotag(ts.getTarget(), null);
-      if (cuairInteropRequests) {
-        // TODO: Add back in once client code is complete
-        // interopClient.updateTarget(ts.getTarget());
-      }
     }
 
     return ts;
@@ -172,10 +159,6 @@ public abstract class TargetSightingController<T extends TargetSighting> {
 
     if (ts.getTarget() != null) {
       Geotag.updateGeotag(ts.getTarget(), null);
-      if (cuairInteropRequests) {
-        // TODO: Add back in once client code is complete
-        // interopClient.updateTarget(ts.getTarget());
-      }
     }
   }
 }

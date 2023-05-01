@@ -38,7 +38,6 @@ public class AlphanumTargetSightingController
       (AlphanumTargetDatabaseAccessor<AlphanumTarget>)
           DAOFactory.getDAO(
               DAOFactory.ModelDAOType.ALPHANUM_TARGET_DATABASE_ACCESSOR, AlphanumTarget.class);
-  private boolean cuairInteropRequests = Flags.CUAIR_INTEROP_REQUESTS;
 
 
   @Override
@@ -76,10 +75,6 @@ public class AlphanumTargetSightingController
         t.setthumbnailTsid(ts.getId());
 
         alphaTargetDao.update(t);
-        if (cuairInteropRequests) {
-          // TODO: Add back in once client code is complete
-          // interopClient.updateTargetImage(ts);
-        }
       }
     }
     return retval;
@@ -145,10 +140,6 @@ public class AlphanumTargetSightingController
         if (newThumb != null) {
           newThumb.setTarget(tToEraseFrom);
           tToEraseFrom.setthumbnailTsid(newThumb.getId());
-          if (cuairInteropRequests) {
-            // TODO: Add back in once client code is complete
-            // interopClient.updateTargetImage(newThumb);
-          }
         } else {
           tToEraseFrom.setthumbnailTsid(0L);
         }
@@ -162,10 +153,6 @@ public class AlphanumTargetSightingController
         AlphanumTarget t = alphaTargetDao.get(ts.getTarget().getId());
         t.setthumbnailTsid(ts.getId());
         alphaTargetDao.update(t);
-        if (cuairInteropRequests) {
-          // TODO: Add back in once client code is complete
-          // interopClient.updateTargetImage(ts);
-        }
       }
     }
     return retval;
@@ -193,10 +180,6 @@ public class AlphanumTargetSightingController
             alphaTargetSightingDao.getLastSightingForTarget(ts.getTarget().getId());
         if (newThumb != null) {
           ts.getTarget().setthumbnailTsid(newThumb.getId());
-          if (cuairInteropRequests) {
-            // TODO: Add back in once client code is complete
-            // interopClient.updateTargetImage(newThumb);
-          }
         } else {
           ts.getTarget().setthumbnailTsid(0L);
         }

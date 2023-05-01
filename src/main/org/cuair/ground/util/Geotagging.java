@@ -6,7 +6,6 @@ import org.cuair.ground.models.exceptions.InvalidGpsLocationException;
 import org.cuair.ground.models.geotag.FOV;
 import org.cuair.ground.models.geotag.Geotag;
 import org.cuair.ground.models.geotag.GpsLocation;
-import org.cuair.ground.models.geotag.Radian;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +21,7 @@ public class Geotagging {
    * Uses the inverse haversine function to return new gps corresponding to a
    * translation
    * of given distance and direction from an initial gps reading.
-   * 
+   *
    * @param initLat   The initial latitude
    * @param initLong  The initial longitude
    * @param distance  The distance offset travelled (in meters)
@@ -110,7 +109,7 @@ public class Geotagging {
      * // image
      * double dppH = deltapixel_x * dpphoriz;
      * double dppV = deltapixel_y * dppvert;
-     * 
+     *
      * // Do rotation of coordinate system to rotate dppH and dppV to account for
      * yaw
      * double target_dx = dppH * Math.cos(planeYawRadians) + dppV *
@@ -160,11 +159,17 @@ public class Geotagging {
         .filter(g -> g.getGpsLocation() != null)
         .filter(g -> g.getClockwiseRadiansFromNorth() != null)
         .toArray(Geotag[]::new);
+    geotags = Arrays.stream(geotags)
+        .filter(Objects::nonNull)
+        .filter(g -> g.getGpsLocation() != null)
+        .toArray(Geotag[]::new);
     if (geotags.length == 0) {
       return null;
     }
     GpsLocation[] locations = Arrays.stream(geotags).map(Geotag::getGpsLocation).toArray(GpsLocation[]::new);
     Double[] radians = Arrays.stream(geotags).map(Geotag::getClockwiseRadiansFromNorth).toArray(Double[]::new);
     return new Geotag(GpsLocation.median(locations), Radian.median(radians));
+    GpsLocation[] locations = Arrays.stream(geotags).map(Geotag::getGpsLocation).toArray(GpsLocation[]::new);
+    return new Geotag(GpsLocation.median(locations));
   }
 }

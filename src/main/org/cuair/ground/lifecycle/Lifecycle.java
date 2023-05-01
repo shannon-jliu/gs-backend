@@ -3,7 +3,6 @@ package org.cuair.ground.lifecycle;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import org.cuair.ground.clients.InteropClient;
 import org.cuair.ground.daos.AlphanumTargetDatabaseAccessor;
 import org.cuair.ground.daos.ClientCreatableDatabaseAccessor;
 import org.cuair.ground.daos.DAOFactory;
@@ -27,8 +26,6 @@ public class Lifecycle {
 
   private ODLCUserDatabaseAccessor odlcUserDao = (ODLCUserDatabaseAccessor) DAOFactory
       .getDAO(DAOFactory.ModellessDAOType.ODLCUSER_DATABASE_ACCESSOR);
-
-  private static InteropClient interopClient = new InteropClient();
 
   private static String DEFAULT_EMERGENT_TARGET_DESC = Flags.DEFAULT_EMERGENT_TARGET_DESC;
 
@@ -63,8 +60,7 @@ public class Lifecycle {
    */
   @PostConstruct
   public void startUp() {
-    // interopClient.getMissionData();
-    // interopClient.getSentTargets();
+    initializeOffaxisTargetDatabase();
     initializeEmergentTargetDatabase();
     if (odlcUserDao.getADLCUser() == null) {
       odlcUserDao.create(new ODLCUser("adlc", "", ODLCUser.UserType.ADLC));

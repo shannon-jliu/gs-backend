@@ -11,7 +11,7 @@ import javax.persistence.Entity;
 import org.cuair.ground.models.Color;
 import org.cuair.ground.models.ODLCUser;
 import org.cuair.ground.models.Shape;
-import org.cuair.ground.models.geotag.CardinalDirection;
+//import org.cuair.ground.models.geotag.CardinalDirection;
 import org.cuair.ground.models.geotag.Geotag;
 import org.cuair.ground.util.Flags;
 
@@ -244,12 +244,6 @@ public class AlphanumTarget extends Target {
           && (Double) this.getGeotag().getGpsLocation().getLongitude() != null
           && !((Double) this.getGeotag().getGpsLocation().getLongitude()).isNaN()) {
         rootNode.put("longitude", this.getGeotag().getGpsLocation().getLongitude());
-      }
-      if (this.getGeotag().getClockwiseRadiansFromNorth() != null) {
-        rootNode.put(
-            "orientation",
-            CardinalDirection.getFromRadians(this.getGeotag().getClockwiseRadiansFromNorth())
-                .getAbbreviation());
       }
     }
     if (this.shape != null)
