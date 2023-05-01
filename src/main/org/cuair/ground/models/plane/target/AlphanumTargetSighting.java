@@ -111,6 +111,8 @@ public class AlphanumTargetSighting extends TargetSighting {
         width,
         height,
         geotag,
+        radiansFromTop,
+        orientationConfidence,
         mdlcClassConf,
         assignment);
     this.shape = shape;
@@ -158,7 +160,11 @@ public class AlphanumTargetSighting extends TargetSighting {
    * @param other AlphanumTargetSighting containing updated fields
    */
   public void updateFromTargetSighting(TargetSighting other) {
-    boolean updateConf = false;
+    boolean updateConf =
+        other.getOrientationConfidence() != null
+            && !Objects.deepEquals(
+            other.getOrientationConfidence(), this.getOrientationConfidence());
+    super.updateFromTargetSighting(other);
     AlphanumTargetSighting alphaSighting;
 
     assert other instanceof AlphanumTargetSighting;
@@ -225,7 +231,8 @@ public class AlphanumTargetSighting extends TargetSighting {
             alphaConfidence,
             alphaColorConfidence,
             shapeConfidence,
-            shapeColorConfidence
+            shapeColorConfidence,
+            getOrientationConfidence()
         };
 
     // Double comparator where null is always lowest
@@ -404,6 +411,11 @@ public class AlphanumTargetSighting extends TargetSighting {
     return alphaColorConfidence;
   }
 
+  @Override
+  public void setOrientationConfidence(Double orientationConfidence) {
+    super.setOrientationConfidence(orientationConfidence);
+    updateAdlcClassConf();
+  }
 
   /**
    * Determines if the given object is logically equal to this AlphanumTargetSighting

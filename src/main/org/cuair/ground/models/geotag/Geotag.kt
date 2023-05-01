@@ -22,8 +22,9 @@ import javax.persistence.Entity
 class Geotag(
     /** The GPS coordinates of this geotag  */
     @Embedded
-    var gpsLocation: GpsLocation?
-//    I have no idea why this code makes sense
+    var gpsLocation: GpsLocation?,
+    /** The orientation of this geotag represented as radians from north clockwise (NE is clockwise from N, etc.)  */
+    var clockwiseRadiansFromNorth: Double?
 ) : CUAirModel() {
 
     /**
@@ -31,7 +32,7 @@ class Geotag(
      *
      * @param sighting The TargetSighting of this geotag
      */
-    constructor(sighting: TargetSighting?) : this(GpsLocation(0.0, 0.0)) {
+    constructor(sighting: TargetSighting?) : this(null, null) {
         if (sighting == null) {
             return
         }
@@ -49,10 +50,9 @@ class Geotag(
         val centerLongitude = gps.getLongitude()
         val centerLatitude = gps.getLatitude()
         gpsLocation = Geotagging
-                .getPixelCoordinates(centerLatitude, centerLongitude, altitude, fov, pixelx, pixely, planeRoll, planePitch, planeYaw);
+                .getPixelCoordinates(centerLatitude, centerLongitude, altitude, fov, pixelx, pixely, planeRoll, planePitch, planeYaw)
+        clockwiseRadiansFromNorth = Geotagging.calculateClockwiseRadiansFromNorth(planeYaw, sighting.radiansFromTop)
     }
-
-
 
     /**
      * Determines if the given object is logically equal to this Geotag
@@ -62,6 +62,9 @@ class Geotag(
      */
     override fun equals(other: Any?): Boolean {
         if (other !is Geotag) return false
+        if (Radian.equals(clockwiseRadiansFromNorth, other.clockwiseRadiansFromNorth)) {
+            return false
+        }
         return Objects.deepEquals(gpsLocation, other.gpsLocation)
     }
 

@@ -6,6 +6,7 @@ import org.cuair.ground.models.exceptions.InvalidGpsLocationException;
 import org.cuair.ground.models.geotag.FOV;
 import org.cuair.ground.models.geotag.Geotag;
 import org.cuair.ground.models.geotag.GpsLocation;
+import org.cuair.ground.models.geotag.Radian;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,17 +160,11 @@ public class Geotagging {
         .filter(g -> g.getGpsLocation() != null)
         .filter(g -> g.getClockwiseRadiansFromNorth() != null)
         .toArray(Geotag[]::new);
-    geotags = Arrays.stream(geotags)
-        .filter(Objects::nonNull)
-        .filter(g -> g.getGpsLocation() != null)
-        .toArray(Geotag[]::new);
     if (geotags.length == 0) {
       return null;
     }
     GpsLocation[] locations = Arrays.stream(geotags).map(Geotag::getGpsLocation).toArray(GpsLocation[]::new);
     Double[] radians = Arrays.stream(geotags).map(Geotag::getClockwiseRadiansFromNorth).toArray(Double[]::new);
     return new Geotag(GpsLocation.median(locations), Radian.median(radians));
-    GpsLocation[] locations = Arrays.stream(geotags).map(Geotag::getGpsLocation).toArray(GpsLocation[]::new);
-    return new Geotag(GpsLocation.median(locations));
   }
 }
