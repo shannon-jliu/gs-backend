@@ -53,7 +53,10 @@ public class ODLCUserController {
 
     if (username.equals(Flags.MDLC_OPERATOR_USERNAME)) {
       odlcUserDao.create(new ODLCUser(username, address, ODLCUser.UserType.MDLCOPERATOR));
-    } else {
+    } else if (username.equals(Flags.INTSYS_TAGGER_USERNAME)) {
+      odlcUserDao.create(new ODLCUser(username, address, ODLCUser.UserType.INTSYSTAGGER));
+    }
+    else {
       odlcUserDao.create(new ODLCUser(username, address, ODLCUser.UserType.MDLCTAGGER));
     }
     return ok(odlcUserDao.getODLCUserFromUsername(username));

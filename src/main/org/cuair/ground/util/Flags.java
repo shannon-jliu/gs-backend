@@ -3,6 +3,7 @@ package org.cuair.ground.util;
 public class Flags {
   /** Special username */
   public static String MDLC_OPERATOR_USERNAME = "operator";
+  public static String INTSYS_TAGGER_USERNAME = "intsys";
 
   /** Image Directory */
   public static String PLANE_IMAGE_DIR = "images/";
