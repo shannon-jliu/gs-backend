@@ -21,7 +21,8 @@ data class ODLCUser(
     enum class UserType (val mode: String) {
         @EnumValue("0") MDLCTAGGER("tagger"),
         @EnumValue("1") MDLCOPERATOR("operator"),
-        @EnumValue("2") ADLC("adlc")
+        @EnumValue("2") ADLC("adlc"),
+        @EnumValue("3") INTSYSTAGGER("intsys")
     }
 
     /**

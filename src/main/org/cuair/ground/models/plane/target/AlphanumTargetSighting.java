@@ -13,6 +13,8 @@ import java.util.Objects;
 import javax.imageio.ImageIO;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.CascadeType;
 import org.apache.commons.io.IOUtils;
 import org.cuair.ground.models.Assignment;
 import org.cuair.ground.models.Color;
@@ -20,8 +22,12 @@ import org.cuair.ground.models.Confidence;
 import org.cuair.ground.models.Image;
 import org.cuair.ground.models.ODLCUser;
 import org.cuair.ground.models.Shape;
+import org.cuair.ground.models.Point;
 import org.cuair.ground.models.geotag.Geotag;
 import org.cuair.ground.util.Flags;
+import java.util.List;
+import io.ebean.Ebean;
+
 
 /** Alphanumeric Target Sighting that has features associated with alphanmuerics. */
 @Entity
@@ -30,6 +36,11 @@ public class AlphanumTargetSighting extends TargetSighting {
   /** The target of this target sighting */
   @ManyToOne
   protected AlphanumTarget target;
+
+  /** The list of points outlining a target shape */
+  // @OneToMany(mappedBy="alphanumTargetSighting")
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  protected List<Point> points;
 
   /** A description of the shape of the target */
   private Shape shape;
@@ -103,6 +114,7 @@ public class AlphanumTargetSighting extends TargetSighting {
       @JsonProperty("alphaConfidence") Double alphaConfidence,
       @JsonProperty("alphaColorConfidence") Double alphaColorConfidence,
       @JsonProperty("orientationConfidence") Double orientationConfidence,
+      @JsonProperty("points") List<Point> points,
       @JsonProperty("mdlcClassConf") Confidence mdlcClassConf) {
     super(
         creator,
@@ -125,6 +137,7 @@ public class AlphanumTargetSighting extends TargetSighting {
     this.alphaConfidence = alphaConfidence;
     this.alphaColorConfidence = alphaColorConfidence;
     this.offaxis = offaxis;
+    this.points = points;
 
     updateAdlcClassConf();
   }
@@ -212,7 +225,11 @@ public class AlphanumTargetSighting extends TargetSighting {
       }
       this.alphaColorConfidence = alphaSighting.getAlphaColorConfidence();
     }
-
+    if(alphaSighting.getPoints() != null){
+      // https://github.com/ebean-orm/ebean/issues/2127 ???
+      Ebean.deleteAll(this.points);
+      this.points = alphaSighting.getPoints();
+    }
     if (updateConf) {
       updateAdlcClassConf();
     }
@@ -411,6 +428,14 @@ public class AlphanumTargetSighting extends TargetSighting {
     return alphaColorConfidence;
   }
 
+  /**
+   * Gets the points that make up a target shape's outline
+   *
+   * @return List of points that 
+   */
+  public List<Point> getPoints() {
+    return points;
+  }
   @Override
   public void setOrientationConfidence(Double orientationConfidence) {
     super.setOrientationConfidence(orientationConfidence);
@@ -448,6 +473,8 @@ public class AlphanumTargetSighting extends TargetSighting {
     }
 
     if (!Objects.deepEquals(this.alphaConfidence, other.getAlphaConfidence())) return false;
+
+    if (!Objects.deepEquals(this.points, other.getPoints())) return false;
 
     return Objects.deepEquals(this.alphaColorConfidence, other.getAlphaColorConfidence());
   }
