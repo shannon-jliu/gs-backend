@@ -77,10 +77,10 @@ public class Geotagging {
 
     double deltapixel_x = pixelx - (IMAGE_WIDTH / 2);
     double deltapixel_y = (IMAGE_HEIGHT / 2) - pixely;
-    double fPixels = IMAGE_WIDTH / (2 * Math.tan(fov.get(x) / 2));
+    double fPixels = IMAGE_WIDTH / (2 * Math.tan(fov.getX() / 2));
 
     double[] r_target_rel_plane_P = {deltapixel_x, deltapixel_y, -fPixels};
-    double[] r_unit_target_rel_plane_P = MatrixUtil.scaleMultiplyVector(r_unit_target_rel_plane_P, 1 / Math.sqrt(Math.pow(fPixels, 2) + Math.pow(deltapixel_x, 2) + Math.pow(deltapixel_y, 2)));
+    double[] r_unit_target_rel_plane_P = MatrixUtil.scaleMultiplyVector(r_target_rel_plane_P, 1 / Math.sqrt(Math.pow(fPixels, 2) + Math.pow(deltapixel_x, 2) + Math.pow(deltapixel_y, 2)));
     
     
     double[][] c2Roll = {{Math.cos(planeRollRadians), 0, -Math.sin(planeRollRadians)}, {0, 1, 0}, {Math.sin(planeRollRadians), 0, Math.cos(planeRollRadians)}};
@@ -91,7 +91,7 @@ public class Geotagging {
     double[][] I_C_P = MatrixUtil.transpose(P_C_I);
 
     double[] r_unit_target_rel_plane_I = MatrixUtil.arrFromVec(MatrixUtil.transpose(MatrixUtil.multiply(I_C_P, MatrixUtil.vecFromArray(r_unit_target_rel_plane_P))));
-    double[] r_target_plane_I = MatrixUtil.scaleMultiplyVector(r_unit_target_rel_plane_I, altitude / Math.abs(r_unit_target_rel_plane_I[2]))
+    double[] r_target_plane_I = MatrixUtil.scaleMultiplyVector(r_unit_target_rel_plane_I, altitude / Math.abs(r_unit_target_rel_plane_I[2]));
 
     double target_dx = r_target_plane_I[0];
     double target_dy = r_target_plane_I[1];
