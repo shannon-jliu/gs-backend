@@ -21,6 +21,7 @@ public class MatrixUtil {
     return cell;
   }
 
+  // only works for square matrices
   public static double[][] transpose(double[][] A) {
     for (int i = 0; i < A.length; i++)
       for (int j = i + 1; j < A[i].length; j++) {
@@ -30,5 +31,28 @@ public class MatrixUtil {
       }
 
     return A;
+  }
+
+  public static double[] scaleMultiplyVector(double[] vec, double scale) {
+    for (int i = 0; i < vec.length; i++) {
+      vec[i] = scale*vec[i];
+    }
+    return vec;
+  }
+
+  public static double[][] vecFromArray(double[] arr) {
+    double[][] vec = new double[arr.length][1];
+    for (int i = 0; i < arr.length; i++) {
+      vec[i][0] = arr[i];
+    }
+    return vec;
+  }
+
+  public static double[] arrFromVec(double[][] vec) {
+    double[] arr = new double[vec.length];
+    for (int i = 0; i < vec.length; i++) {
+      arr[i] = vec[i][0];
+    }
+    return arr;
   }
 }
