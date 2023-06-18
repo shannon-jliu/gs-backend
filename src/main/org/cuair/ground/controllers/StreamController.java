@@ -101,25 +101,27 @@ public class StreamController {
   }
 
   /** Initialize stream controller - create and play gst pipelines */
-  @PostConstruct
-  public void init() {
-
-    configurePaths();
-
-    Gst.init(Version.BASELINE, "BasicPipeline");
-
-    // initialize pipelines and folders
-    for (int i = 0; i < Flags.MAX_CAMERAS; i++) {
-      createFolder(i);
-
-      pipelines.add((Pipeline) Gst.parseLaunch(ConstructPipeline(i)));
-    }
-
-    // play pipelines
-    for (int i = 0; i < Flags.MAX_CAMERAS; i++) {
-      pipelines.get(i).play();
-    }
-  }
+  /*
+   * @PostConstruct
+   * public void init() {
+   * 
+   * configurePaths();
+   * 
+   * Gst.init(Version.BASELINE, "BasicPipeline");
+   * 
+   * // initialize pipelines and folders
+   * for (int i = 0; i < Flags.MAX_CAMERAS; i++) {
+   * createFolder(i);
+   * 
+   * pipelines.add((Pipeline) Gst.parseLaunch(ConstructPipeline(i)));
+   * }
+   * 
+   * // play pipelines
+   * for (int i = 0; i < Flags.MAX_CAMERAS; i++) {
+   * pipelines.get(i).play();
+   * }
+   * }
+   */
 
   /** Configure paths for gstreamer libraries */
   public static void configurePaths() {
