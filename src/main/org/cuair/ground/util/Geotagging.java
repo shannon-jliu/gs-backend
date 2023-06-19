@@ -96,15 +96,10 @@ public class Geotagging {
     double target_dx = r_target_plane_I[0];
     double target_dy = r_target_plane_I[1];
 
-    /*double fovHoriz = fov.getX();
-    double fovVert = fov.getY();
+    // Use linear approximation
+    // Numbers for St Mary's Airport
+    double[] newGps = { latitude + target_dy * 3.28084 / 364180, longitude + target_dx * 3.28084 / 286928 };
 
-    // total horizontal (x) distance imaged in meters
-    double hdi = 2
-        * altitude
-        * Math.tan(
-            fovHoriz
-                / 2);
 
     // total vertical (y) distance imaged in meters
     double vdi = 2

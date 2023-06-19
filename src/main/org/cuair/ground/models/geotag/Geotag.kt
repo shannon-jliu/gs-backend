@@ -44,9 +44,9 @@ class Geotag(
         val altitude = telemetry.getAltitude()
         val pixelx = sighting.getpixelx().toDouble()
         val pixely = sighting.getpixely().toDouble()
-        val planeRoll = telemetry.getGimOrt().getRoll() * Math.PI / 180
-        val planePitch = telemetry.getGimOrt().getPitch() * Math.PI / 180
-        val planeYaw = telemetry.getPlaneYaw() * Math.PI / 180
+        val planeRoll = telemetry.getGimOrt().getRoll()
+        val planePitch = telemetry.getGimOrt().getPitch()
+        val planeYaw = telemetry.getPlaneYaw()
         val centerLongitude = gps.getLongitude()
         val centerLatitude = gps.getLatitude()
         gpsLocation = Geotagging

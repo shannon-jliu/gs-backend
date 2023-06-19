@@ -2,25 +2,22 @@ package org.cuair.ground.util;
 
 public class MatrixUtil {
   public static double[][] multiply(double[][] firstMatrix, double[][] secondMatrix) {
-    double[][] result = new double[firstMatrix.length][secondMatrix[0].length];
+    int r1 = firstMatrix.length;
+    int c1 = secondMatrix.length;
+    int c2 = secondMatrix[0].length;
 
-    for (int row = 0; row < result.length; row++) {
-      for (int col = 0; col < result[row].length; col++) {
-        result[row][col] = multiplyMatricesCell(firstMatrix, secondMatrix, row, col);
+    double[][] product = new double[r1][c2];
+    for (int i = 0; i < r1; i++) {
+      for (int j = 0; j < c2; j++) {
+        for (int k = 0; k < c1; k++) {
+          product[i][j] += firstMatrix[i][k] * secondMatrix[k][j];
+        }
       }
     }
 
-    return result;
+    return product;
   }
-
-  static double multiplyMatricesCell(double[][] firstMatrix, double[][] secondMatrix, int row, int col) {
-    double cell = 0;
-    for (int i = 0; i < secondMatrix.length; i++) {
-      cell += firstMatrix[row][i] * secondMatrix[i][col];
-    }
-    return cell;
-  }
-
+  
   // only works for square matrices
   public static double[][] transpose(double[][] A) {
     for (int i = 0; i < A.length; i++)
