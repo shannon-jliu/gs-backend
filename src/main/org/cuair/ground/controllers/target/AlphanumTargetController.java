@@ -9,6 +9,8 @@ import org.cuair.ground.daos.AlphanumTargetDatabaseAccessor;
 import org.cuair.ground.daos.AlphanumTargetSightingsDatabaseAccessor;
 import org.cuair.ground.daos.DAOFactory;
 import org.cuair.ground.models.plane.target.AlphanumTarget;
+import org.cuair.ground.models.geotag.Geotag;
+import org.cuair.ground.models.plane.target.TargetSighting;
 import org.cuair.ground.models.plane.target.AlphanumTargetSighting;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,6 +19,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.cuair.ground.util.Geotagging;
+import java.util.Arrays;
+
 
 import java.util.List;
 
@@ -78,7 +83,7 @@ public class AlphanumTargetController extends TargetController<AlphanumTarget> {
     return super.update(t, other);
   }
 
-  @RequestMapping(value="/{id}/geotags", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+  @RequestMapping(value="/{id}/geotags", method = RequestMethod.PUT)
   public ResponseEntity update(@PathVariable Long id, @RequestBody List<Long> ids) {
     AlphanumTarget t = targetDao.get(id);
     if (t == null) {
@@ -92,10 +97,10 @@ public class AlphanumTargetController extends TargetController<AlphanumTarget> {
   public static Geotag medianFromTsIds(List<Long> ids) {
     Geotag[] geotags = new Geotag[ids.size()];
     for (int i = 0; i < ids.size(); i++) {
-      TargetSighting ts = getTargetSightingDao().get(ids[i]);
+      TargetSighting ts = targetSightingsDao.get(ids.get(i));
       geotags[i] = ts.getGeotag();
     }
-    return Geotagging.median(Arrays.stream(geotag));
+    return Geotagging.median(geotags);
   }
 
   /**
