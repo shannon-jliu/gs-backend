@@ -78,6 +78,26 @@ public class AlphanumTargetController extends TargetController<AlphanumTarget> {
     return super.update(t, other);
   }
 
+  @RequestMapping(value="/{id}/geotags", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity update(@PathVariable Long id, @RequestBody List<Long> ids) {
+    AlphanumTarget t = targetDao.get(id);
+    if (t == null) {
+      return notFound().build();
+    }
+    t.setGeotag(medianFromTsIds(ids));
+    targetDao.update(t);
+    return ok(t);
+  }
+
+  public static Geotag medianFromTsIds(List<Long> ids) {
+    Geotag[] geotags = new Geotag[ids.size()];
+    for (int i = 0; i < ids.size(); i++) {
+      TargetSighting ts = getTargetSightingDao().get(ids[i]);
+      geotags[i] = ts.getGeotag();
+    }
+    return Geotagging.median(Arrays.stream(geotag));
+  }
+
   /**
    * Deletes a Target and unassigns all TargetSightings that were assigned to this Target You must
    * send an empty body to do a delete.
