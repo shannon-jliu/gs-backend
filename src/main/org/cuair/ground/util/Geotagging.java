@@ -15,6 +15,8 @@ public class Geotagging {
   /** Width of height and image in pixels */
   public static double IMAGE_WIDTH = Flags.FRONTEND_IMAGE_WIDTH;
   public static double IMAGE_HEIGHT = Flags.FRONTEND_IMAGE_HEIGHT;
+  public static double SENSOR_WIDTH = Flags.CAM_SENSOR_WIDTH;
+  public static double SENSOR_HEIGHT = Flags.CAM_SENSOR_HEIGHT;
   /** An approximation of the radius of the Earth in meters */
   private static double radiusEarth = 6371000.0;
 
@@ -22,7 +24,7 @@ public class Geotagging {
    * Uses the inverse haversine function to return new gps corresponding to a
    * translation
    * of given distance and direction from an initial gps reading.
-   * 
+   *
    * @param initLat   The initial latitude
    * @param initLong  The initial longitude
    * @param distance  The distance offset travelled (in meters)
@@ -73,59 +75,29 @@ public class Geotagging {
       double planePitchRadians,
       double planeYawRadians) {
 
-    double fovHoriz = fov.getX();
-    double fovVert = fov.getY();
-
-    // total horizontal (x) distance imaged in meters
-    double hdi = 2
-        * altitude
-        * Math.tan(
-            fovHoriz
-                / 2);
-
-    // total vertical (y) distance imaged in meters
-    double vdi = 2
-        * altitude
-        * Math.tan(
-            fovVert
-                / 2);
-
-    // Distance covered per pixel in meters/pixel
-    double dpphoriz = hdi / IMAGE_WIDTH;
-    double dppvert = vdi / IMAGE_HEIGHT;
-
-    // Find pixel offset from the center
     double deltapixel_x = pixelx - (IMAGE_WIDTH / 2);
     double deltapixel_y = (IMAGE_HEIGHT / 2) - pixely;
+    double fPixels = IMAGE_WIDTH / (2 * Math.tan(fov.getX() / 2));
+    
+    double[] r_target_rel_plane_P = {deltapixel_x, deltapixel_y, -fPixels};
+    double[] r_unit_target_rel_plane_P = MatrixUtil.scaleMultiplyVector(r_target_rel_plane_P, 1 / Math.sqrt(Math.pow(fPixels, 2) + Math.pow(deltapixel_x, 2) + Math.pow(deltapixel_y, 2)));
+    
+    double[][] c2Roll = {{Math.cos(planeRollRadians), 0, -Math.sin(planeRollRadians)}, {0, 1, 0}, {Math.sin(planeRollRadians), 0, Math.cos(planeRollRadians)}};
+    double[][] c1Pitch = {{1, 0, 0}, {0, Math.cos(planePitchRadians), Math.sin(planePitchRadians)}, {0, -Math.sin(planePitchRadians), Math.cos(planePitchRadians)}};
+    double[][] c3Yaw = {{Math.cos(-planeYawRadians), Math.sin(-planeYawRadians), 0}, {-Math.sin(-planeYawRadians), Math.cos(-planeYawRadians), 0}, {0, 0, 1}};
 
-    // Find x and y distance between plane and target
-    double target_dx = altitude * (Math.tan(-planeRollRadians + fovHoriz * deltapixel_x / IMAGE_WIDTH)
-        * Math.cos(planeYawRadians)
-        + Math.tan(planePitchRadians + fovVert * deltapixel_y / IMAGE_HEIGHT) * Math.sin(planeYawRadians));
-    double target_dy = altitude * (Math.tan(-planeRollRadians + fovHoriz * deltapixel_x / IMAGE_WIDTH)
-        * Math.sin(-planeYawRadians)
-        + Math.tan(planePitchRadians + fovVert * deltapixel_y / IMAGE_HEIGHT) * Math.cos(planeYawRadians));
-    /*
-     * // Find horizontal and vertical physical distance from center with respect to
-     * // image
-     * double dppH = deltapixel_x * dpphoriz;
-     * double dppV = deltapixel_y * dppvert;
-     * 
-     * // Do rotation of coordinate system to rotate dppH and dppV to account for
-     * yaw
-     * double target_dx = dppH * Math.cos(planeYawRadians) + dppV *
-     * Math.sin(planeYawRadians);
-     * double target_dy = dppH * -1 * Math.sin(planeYawRadians) + dppV *
-     * Math.cos(planeYawRadians);
-     */
-    // Compute new gps using inverse haversine
-    double latRadians = Math.PI / 180 * latitude;
-    double longRadians = Math.PI / 180 * longitude;
-    double distance = Math.sqrt(Math.pow(target_dx, 2) + Math.pow(target_dy, 2));
-    // double direction = planeYawRadians + (Math.PI / 2.0 - Math.atan2(target_dy,
-    // target_dx));
-    double direction = Math.PI / 2.0 - Math.atan2(target_dy, target_dx);
-    double[] newGps = inverseHaversine(latRadians, longRadians, distance, direction);
+    double[][] P_C_I = MatrixUtil.multiply(MatrixUtil.multiply(c2Roll, c1Pitch) , c3Yaw);
+    double[][] I_C_P = MatrixUtil.transpose(P_C_I);
+    
+    double[] r_unit_target_rel_plane_I = MatrixUtil.arrFromVec(MatrixUtil.transpose(MatrixUtil.multiply(I_C_P, MatrixUtil.vecFromArray(r_unit_target_rel_plane_P))));
+    double[] r_target_plane_I = MatrixUtil.scaleMultiplyVector(r_unit_target_rel_plane_I, altitude / Math.abs(r_unit_target_rel_plane_I[2]));
+
+    double target_dx = r_target_plane_I[0];
+    double target_dy = r_target_plane_I[1];
+
+    // Use linear approximation
+    // Numbers for St Mary's Airport
+    double[] newGps = { latitude + target_dy * 3.28084 / 364180, longitude + target_dx * 3.28084 / 286928 };
 
     GpsLocation gps = null;
     try {

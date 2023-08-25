@@ -3,7 +3,6 @@ package org.cuair.ground.lifecycle;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import org.cuair.ground.clients.InteropClient;
 import org.cuair.ground.daos.AlphanumTargetDatabaseAccessor;
 import org.cuair.ground.daos.ClientCreatableDatabaseAccessor;
 import org.cuair.ground.daos.DAOFactory;
@@ -28,34 +27,9 @@ public class Lifecycle {
   private ODLCUserDatabaseAccessor odlcUserDao = (ODLCUserDatabaseAccessor) DAOFactory
       .getDAO(DAOFactory.ModellessDAOType.ODLCUSER_DATABASE_ACCESSOR);
 
-  private static InteropClient interopClient = new InteropClient();
-
   private static String DEFAULT_EMERGENT_TARGET_DESC = Flags.DEFAULT_EMERGENT_TARGET_DESC;
 
-  /**
-   * Creates an initial offaxis target in the db when the backend boots up.
-   * We do this because there is only one offaxis target, and we only want
-   * to update this offaxis target, not create new offaxis ones.
-   */
-  private static void initializeOffaxisTargetDatabase() {
-    AlphanumTarget offaxisTarget = alphaTargetDao.getOffaxisTarget();
-    if (offaxisTarget != null && offaxisTarget.getJudgeTargetId() != null) {
-      return;
-    }
-    if (offaxisTarget == null) {
-      offaxisTarget = new AlphanumTarget(
-          new ODLCUser("interop", "localhost", ODLCUser.UserType.MDLCOPERATOR),
-          null,
-          null,
-          "A",
-          null,
-          true,
-          null,
-          null,
-          0L);
-      alphaTargetDao.create(offaxisTarget);
-    }
-  }
+
 
   /**
    * Creates an initial emergent target in the db when the backend boots up.
@@ -76,7 +50,7 @@ public class Lifecycle {
           null,
           DEFAULT_EMERGENT_TARGET_DESC,
           null,
-          0L);
+          0L, 0L);
       emergentTargetDao.create(emergentTarget);
     }
   }
@@ -86,9 +60,6 @@ public class Lifecycle {
    */
   @PostConstruct
   public void startUp() {
-    // interopClient.getMissionData();
-    // interopClient.getSentTargets();
-    initializeOffaxisTargetDatabase();
     initializeEmergentTargetDatabase();
     if (odlcUserDao.getADLCUser() == null) {
       odlcUserDao.create(new ODLCUser("adlc", "", ODLCUser.UserType.ADLC));

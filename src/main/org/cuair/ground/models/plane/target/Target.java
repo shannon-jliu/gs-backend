@@ -42,6 +42,9 @@ public abstract class Target extends ClientCreatable {
   // @Column(name = "thumbnailTSId")
   private Long thumbnailTsid;
 
+  /** Id of airdrop target from 0-4 */
+  private Long airdropId;
+
   /**
    * Creates a target
    *
@@ -49,12 +52,14 @@ public abstract class Target extends ClientCreatable {
    * @param geotag        Geotag of this Target
    * @param judgeTargetId Long id of this target on the competition server
    * @param thumbnailTsid Long id of Target Sighting used for thumbnail
+   * @param airdropId     Long id of the corresponding airdrop target
    */
-  public Target(ODLCUser creator, Geotag geotag, Long judgeTargetId, Long thumbnailTsid) {
+  public Target(ODLCUser creator, Geotag geotag, Long judgeTargetId, Long thumbnailTsid, Long airdropId) {
     super(creator);
     this.geotag = geotag;
     this.judgeTargetId = judgeTargetId;
     this.thumbnailTsid = thumbnailTsid;
+    this.airdropId = airdropId;
   }
 
   /**
@@ -76,16 +81,6 @@ public abstract class Target extends ClientCreatable {
    */
   public abstract JsonNode toJson();
 
-  /**
-   * Creates a JSON object with a mission number
-   * 
-   * @return JsonNode with required parameters to send to interop
-   */
-  public JsonNode toInteropJson() {
-    ObjectNode rootNode = (ObjectNode) toJson();
-    rootNode.put("mission", Flags.MISSION_NUMBER);
-    return rootNode;
-  }
 
   /**
    * Returns the class of targetSighting associated with this target
@@ -152,6 +147,13 @@ public abstract class Target extends ClientCreatable {
   }
 
   /**
+   * Gets the airdrop id of the target
+   *
+   * @return int airdrop id
+   */
+  public Long getAirdropId() { return airdropId; }
+
+  /**
    * Gets the String representation of the target type
    *
    * @return String the type
@@ -176,6 +178,9 @@ public abstract class Target extends ClientCreatable {
       return false;
 
     if (!Objects.deepEquals(this.judgeTargetId, other.getJudgeTargetId()))
+      return false;
+
+    if (!Objects.deepEquals(this.airdropId, other.getAirdropId()))
       return false;
 
     return Objects.deepEquals(this.thumbnailTsid, other.getthumbnailTsid());

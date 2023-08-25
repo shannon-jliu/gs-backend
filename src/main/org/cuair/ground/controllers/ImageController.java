@@ -192,7 +192,7 @@ public class ImageController {
    * @param file       the file of the multipart request
    * @return 200 with the uploaded image on success, 400 when request parts are
    *         missing or
-   *         if the requset json is invalid, or 500 on errors converting file to
+   *         if the request json is invalid, or 500 on errors converting file to
    *         an image and saving
    *         the image in the db
    */
@@ -359,6 +359,7 @@ public class ImageController {
     // display on the frontend
     BufferedImage image = ImageIO.read(imageFile);
     ImageIO.write(image, "jpg", imageFile);
+        
 
     return focalLength;
   }

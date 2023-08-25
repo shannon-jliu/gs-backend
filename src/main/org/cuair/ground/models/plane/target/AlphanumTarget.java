@@ -37,8 +37,8 @@ public class AlphanumTarget extends Target {
   /** The color of the alphanumeric */
   private Color alphaColor;
 
-  /** True if the target is the off axis target, false otherwise */
-  private Boolean offaxis;
+//  /** True if the target is the off axis target, false otherwise */
+//  private Boolean offaxis;
 
   /**
    * Creates an AlphanumTarget
@@ -48,10 +48,10 @@ public class AlphanumTarget extends Target {
    * @param shapeColor    String color of the shape
    * @param alpha         Character alphanumeric of this Target
    * @param alphaColor    String color of the alphanumeric
-   * @param offaxis       Boolean of whether the target is off-axis
    * @param geotag        Geotag of this Target
    * @param judgeTargetId Long id of this Target on the competition server
    * @param thumbnailTsid Long id of Target Sighting used for thumbnail
+   * @param airdropId     Long id of this Target's airdrop
    */
   public AlphanumTarget(
       ODLCUser creator,
@@ -59,16 +59,16 @@ public class AlphanumTarget extends Target {
       Color shapeColor,
       String alpha,
       Color alphaColor,
-      Boolean offaxis,
       Geotag geotag,
       Long judgeTargetId,
-      Long thumbnailTsid) {
-    super(creator, geotag, judgeTargetId, thumbnailTsid);
+      Long thumbnailTsid,
+      Long airdropId) {
+    super(creator, geotag, judgeTargetId, thumbnailTsid, airdropId);
     this.shape = shape;
     this.shapeColor = shapeColor;
     this.alpha = alpha;
     this.alphaColor = alphaColor;
-    this.offaxis = offaxis;
+
   }
 
   /**
@@ -98,9 +98,7 @@ public class AlphanumTarget extends Target {
     if (alphaTarget.getAlphaColor() != null) {
       this.alphaColor = alphaTarget.getAlphaColor();
     }
-    if (alphaTarget.isOffaxis() != null) {
-      this.offaxis = alphaTarget.isOffaxis();
-    }
+
 
     /*
      * if (alphaTarget.getGeotag() != null) {
@@ -188,23 +186,7 @@ public class AlphanumTarget extends Target {
     this.alphaColor = alphaColor;
   }
 
-  /**
-   * Gets whether target is offaxis
-   *
-   * @return Boolean true if target is offaxis, false otherwise
-   */
-  public Boolean isOffaxis() {
-    return offaxis;
-  }
 
-  /**
-   * Sets whether target is offaxis
-   *
-   * @param offaxis Boolean true if target is offaxis, false otherwise
-   */
-  public void setOffaxis(Boolean offaxis) {
-    this.offaxis = offaxis;
-  }
 
   @Override
   public boolean equals(Object o) {
@@ -230,7 +212,8 @@ public class AlphanumTarget extends Target {
       return false;
     }
 
-    return Objects.deepEquals(this.offaxis, other.isOffaxis());
+    return true;
+
   }
 
   @Override

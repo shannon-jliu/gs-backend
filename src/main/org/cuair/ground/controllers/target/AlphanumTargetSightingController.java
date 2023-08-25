@@ -7,6 +7,7 @@ import org.cuair.ground.daos.AlphanumTargetSightingsDatabaseAccessor;
 import org.cuair.ground.daos.DAOFactory;
 import org.cuair.ground.daos.TargetSightingsDatabaseAccessor;
 import org.cuair.ground.models.ODLCUser;
+import org.cuair.ground.models.geotag.Geotag;
 import org.cuair.ground.models.plane.target.AlphanumTarget;
 import org.cuair.ground.models.plane.target.AlphanumTargetSighting;
 import org.cuair.ground.util.Flags;
@@ -37,7 +38,6 @@ public class AlphanumTargetSightingController
       (AlphanumTargetDatabaseAccessor<AlphanumTarget>)
           DAOFactory.getDAO(
               DAOFactory.ModelDAOType.ALPHANUM_TARGET_DATABASE_ACCESSOR, AlphanumTarget.class);
-  private boolean cuairInteropRequests = Flags.CUAIR_INTEROP_REQUESTS;
 
 
   @Override
@@ -57,17 +57,13 @@ public class AlphanumTargetSightingController
     return super.getAll();
   }
 
+  /** Creates a target sighting given sighting data from the frontend. */
+
+
   @Override
   @RequestMapping(value = "/assignment/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
   public AlphanumTargetSighting create(@PathVariable Long id,
                                        @RequestBody AlphanumTargetSighting ts) {
-    if (ts.isOffaxis() != null && ts.isOffaxis()) {
-      if (ts.getTarget() != null) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-            "Don't pass targets for off-axis sighting creates");
-      }
-      ts.setTarget(alphaTargetDao.getOffaxisTarget());
-    }
 
     // ordered this way so exception interrupts execution
     final AlphanumTargetSighting retval = super.create(id, ts);
@@ -77,11 +73,8 @@ public class AlphanumTargetSightingController
       if (ts.getTarget() != null) {
         AlphanumTarget t = alphaTargetDao.get(ts.getTarget().getId());
         t.setthumbnailTsid(ts.getId());
+
         alphaTargetDao.update(t);
-        if (cuairInteropRequests) {
-          // TODO: Add back in once client code is complete
-          // interopClient.updateTargetImage(ts);
-        }
       }
     }
     return retval;
@@ -123,7 +116,16 @@ public class AlphanumTargetSightingController
             && (ts.getTarget() == null
             || !ts.getTarget().getId().equals(other.getTarget().getId()));
 
+
+    AlphanumTarget oldTarget = ts.getTarget();
+
     final AlphanumTargetSighting retval = updateFromTargetSighting(ts, other);
+
+    // updates geotag of the old target
+    AlphanumTarget newTarget = retval.getTarget();
+    if (oldTarget != null && !oldTarget.equals(newTarget)) {
+      Geotag.updateGeotag(oldTarget, null);
+    }
 
     if (toEraseThumb) {
       if (ts.getCreator().getUserType() == ODLCUser.UserType.MDLCTAGGER
@@ -138,10 +140,6 @@ public class AlphanumTargetSightingController
         if (newThumb != null) {
           newThumb.setTarget(tToEraseFrom);
           tToEraseFrom.setthumbnailTsid(newThumb.getId());
-          if (cuairInteropRequests) {
-            // TODO: Add back in once client code is complete
-            // interopClient.updateTargetImage(newThumb);
-          }
         } else {
           tToEraseFrom.setthumbnailTsid(0L);
         }
@@ -155,10 +153,6 @@ public class AlphanumTargetSightingController
         AlphanumTarget t = alphaTargetDao.get(ts.getTarget().getId());
         t.setthumbnailTsid(ts.getId());
         alphaTargetDao.update(t);
-        if (cuairInteropRequests) {
-          // TODO: Add back in once client code is complete
-          // interopClient.updateTargetImage(ts);
-        }
       }
     }
     return retval;
@@ -186,10 +180,6 @@ public class AlphanumTargetSightingController
             alphaTargetSightingDao.getLastSightingForTarget(ts.getTarget().getId());
         if (newThumb != null) {
           ts.getTarget().setthumbnailTsid(newThumb.getId());
-          if (cuairInteropRequests) {
-            // TODO: Add back in once client code is complete
-            // interopClient.updateTargetImage(newThumb);
-          }
         } else {
           ts.getTarget().setthumbnailTsid(0L);
         }

@@ -156,9 +156,9 @@ public class ROI extends ClientCreatable {
     Double latitude = assignmentGps.getLatitude();
     Double longitude = assignmentGps.getLongitude();
     Double altitude = telemetry.getAltitude();
-    Double planeRoll = telemetry.getGimOrt().getRoll() * Math.PI / 180;
-    Double planePitch = telemetry.getGimOrt().getPitch() * Math.PI / 180;
-    Double planeYaw = telemetry.getPlaneYaw() * Math.PI / 180;
+    Double planeRoll = telemetry.getGimOrt().getRoll();
+    Double planePitch = telemetry.getGimOrt().getPitch();
+    Double planeYaw = telemetry.getPlaneYaw();
 
     if (latitude == null || longitude == null || altitude == null || planeYaw == null) {
       return null;
