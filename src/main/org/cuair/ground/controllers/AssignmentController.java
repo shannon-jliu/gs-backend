@@ -4,6 +4,7 @@ import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.ok;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.cuair.ground.daos.AssignmentDatabaseAccessor;
 import org.cuair.ground.daos.DAOFactory;
@@ -33,17 +34,14 @@ public class AssignmentController {
   private static boolean USERS_ENABLED = Flags.USERS_ENABLED;
 
   /** The database accessor object for the assignment database */
-  private AssignmentDatabaseAccessor assignmentDao =
-      (AssignmentDatabaseAccessor)
-          DAOFactory.getDAO(DAOFactory.ModellessDAOType.ASSIGNMENT_DATABASE_ACCESSOR);
+  private AssignmentDatabaseAccessor assignmentDao = (AssignmentDatabaseAccessor) DAOFactory
+      .getDAO(DAOFactory.ModellessDAOType.ASSIGNMENT_DATABASE_ACCESSOR);
   /** The database accessor object for the image database */
-  private ImageDatabaseAccessor imageDao =
-      (ImageDatabaseAccessor)
-          DAOFactory.getDAO(DAOFactory.ModellessDAOType.IMAGE_DATABASE_ACCESSOR);
+  private ImageDatabaseAccessor imageDao = (ImageDatabaseAccessor) DAOFactory
+      .getDAO(DAOFactory.ModellessDAOType.IMAGE_DATABASE_ACCESSOR);
   /** The database accessor object for the username database */
-  private ODLCUserDatabaseAccessor odlcUserDao =
-      (ODLCUserDatabaseAccessor)
-          DAOFactory.getDAO(DAOFactory.ModellessDAOType.ODLCUSER_DATABASE_ACCESSOR);
+  private ODLCUserDatabaseAccessor odlcUserDao = (ODLCUserDatabaseAccessor) DAOFactory
+      .getDAO(DAOFactory.ModellessDAOType.ODLCUSER_DATABASE_ACCESSOR);
 
   /**
    * Gets an assignment given an id
@@ -61,12 +59,15 @@ public class AssignmentController {
   }
 
   /**
-   * Generates an assignment for an unprocessed image and the given client if auth is disabled
-   * If the client is MDLC and Auth is enabled, it will get the next image that the user is not
+   * Generates an assignment for an unprocessed image and the given client if auth
+   * is disabled
+   * If the client is MDLC and Auth is enabled, it will get the next image that
+   * the user is not
    * already assigned to
    *
-   * @return 200 with the generated assignment as json on sucess, 204 if there are no new
-   * assignments, or 400 on error
+   * @return 200 with the generated assignment as json on sucess, 204 if there are
+   *         no new
+   *         assignments, or 400 on error
    */
   @RequestMapping(value = "/work", method = RequestMethod.POST)
   public ResponseEntity createWork(@RequestHeader HttpHeaders headers) {
@@ -107,6 +108,22 @@ public class AssignmentController {
   }
 
   /**
+   * Method from planelets/mission-progress branch
+   *
+   */
+  @RequestMapping(value = "/allusers", method = RequestMethod.GET)
+  public ResponseEntity getAll() {
+    List<ODLCUser> taggers = odlcUserDao.getMDLCTaggers();
+    List<Assignment> a_list = new ArrayList<>();
+    for (ODLCUser t : taggers) {
+      for (Assignment a : assignmentDao.getAllForUser(t)) {
+        a_list.add(a);
+      }
+    }
+    return ok(a_list);
+  }
+
+  /**
    * Updates the status of an assignment, marking it as done
    *
    * @param id the id of the assignment to update
@@ -129,10 +146,12 @@ public class AssignmentController {
   }
 
   /**
-   * Gets the username string from the header and returns the associated ODLCUser object
+   * Gets the username string from the header and returns the associated ODLCUser
+   * object
    *
    * @param headers the HttpHeaders object from the request
-   * @return ODLCUser corresponding to the username in the headers or null if none exists
+   * @return ODLCUser corresponding to the username in the headers or null if none
+   *         exists
    */
   private ODLCUser extractUserFromHeaders(HttpHeaders headers) {
     String username = headers.getFirst("Username");
