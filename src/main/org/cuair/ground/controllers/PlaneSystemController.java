@@ -55,7 +55,7 @@ public class PlaneSystemController {
    * @return
    * changes the ps mode to pan-search
    */
-  @RequestMapping(value = "/pan-search", method = RequestMethod.POST)
+  @RequestMapping(value = "/pan-search", method = RequestMethod.GET)
   public ResponseEntity startPanSearch() {
     // TODO: add actual toggle call to start search - does it just start or does it toggle?
     return ok().body("started panning");
@@ -65,7 +65,7 @@ public class PlaneSystemController {
    * @return
    * changes the ps mode to manual-search
    */
-  @RequestMapping(value = "/manual-search", method = RequestMethod.POST)
+  @RequestMapping(value = "/manual-search", method = RequestMethod.GET)
   public ResponseEntity toggleManualSearch() {
     // TODO: add actual toggle call - if call fails, return err
     return ok().body("toggled manual search");
@@ -75,7 +75,7 @@ public class PlaneSystemController {
    * @return
    * changes the ps mode to distance-search
    */
-  @RequestMapping(value = "/distance-search", method = RequestMethod.POST)
+  @RequestMapping(value = "/distance-search", method = RequestMethod.GET)
   public ResponseEntity startDistanceSearch() {
     // TODO: add actual toggle call
     return ok().body("running distance search");
@@ -85,7 +85,7 @@ public class PlaneSystemController {
    * @return
    * changes the ps mode to distance-search
    */
-  @RequestMapping(value = "/time-search", method = RequestMethod.POST)
+  @RequestMapping(value = "/time-search", method = RequestMethod.GET)
   public ResponseEntity startDistanceSearch(@RequestHeader("inactiveTime") Float inactiveTime, @RequestHeader("activeTime") Float activeTime) {
     // TODO: add actual toggle call
     if (activeTime >= 0 && inactiveTime >= 0) {
