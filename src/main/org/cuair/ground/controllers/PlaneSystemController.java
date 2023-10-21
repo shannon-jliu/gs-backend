@@ -24,17 +24,46 @@ public class PlaneSystemController {
   private static final Logger logger = LoggerFactory.getLogger(ImageController.class);
 
   /**
-   * @return something...
-   * calls plane system with new focal length
+   * @return
+   * changes the ps mode to pan-search
    */
-  @RequestMapping(value = "/focal-len", method = RequestMethod.POST)
-  public ResponseEntity focalLengthUpdate(@RequestHeader("focalLength") Float focalLength) {
-    if (focalLength != null && focalLength >= 0) {
-      logger.info("Focal length post request: " + focalLength);
-      // TODO: call focalLength endpoint thing plane system
-      return ok().body("Focal length updated successfully " + focalLength);
+  @RequestMapping(value = "/pan-search", method = RequestMethod.GET)
+  public ResponseEntity startPanSearch() {
+    // TODO: add actual toggle call to start search - does it just start or does it toggle?
+    return ok().body("started panning");
+  }
+
+  /**
+   * @return
+   * changes the ps mode to manual-search
+   */
+  @RequestMapping(value = "/manual-search", method = RequestMethod.POST)
+  public ResponseEntity toggleManualSearch() {
+    // TODO: add actual toggle call - if call fails, return err
+    return ok().body("toggled manual search");
+  }
+
+  /**
+   * @return
+   * changes the ps mode to distance-search
+   */
+  @RequestMapping(value = "/distance-search", method = RequestMethod.POST)
+  public ResponseEntity startDistanceSearch() {
+    // TODO: add actual toggle call
+    return ok().body("running distance search");
+  }
+
+  /**
+   * @return
+   * changes the ps mode to time-search
+   */
+  @RequestMapping(value = "/time-search", method = RequestMethod.POST)
+  public ResponseEntity startTimeSearch(@RequestHeader("inactive") Float inactiveTime, @RequestHeader("active") Float activeTime) {
+    // TODO: add actual toggle call
+    if (activeTime >= 0 && inactiveTime >= 0) {
+      return ok().body("running time search");
     }
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error, invalid focal length values " + focalLength);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error, invalid inactive & active times, inactive time: " + inactiveTime + ", active time: " + activeTime);
   }
 
   /**
@@ -52,46 +81,57 @@ public class PlaneSystemController {
   }
 
   /**
-   * @return
-   * changes the ps mode to pan-search
+   * @return something...
+   * calls plane system with new focal length
+   * /set-zoom-focal-length, takes json with f32 field “focal_length”
    */
-  @RequestMapping(value = "/pan-search", method = RequestMethod.GET)
-  public ResponseEntity startPanSearch() {
-    // TODO: add actual toggle call to start search - does it just start or does it toggle?
-    return ok().body("started panning");
-  }
-
-  /**
-   * @return
-   * changes the ps mode to manual-search
-   */
-  @RequestMapping(value = "/manual-search", method = RequestMethod.GET)
-  public ResponseEntity toggleManualSearch() {
-    // TODO: add actual toggle call - if call fails, return err
-    return ok().body("toggled manual search");
-  }
-
-  /**
-   * @return
-   * changes the ps mode to distance-search
-   */
-  @RequestMapping(value = "/distance-search", method = RequestMethod.GET)
-  public ResponseEntity startDistanceSearch() {
-    // TODO: add actual toggle call
-    return ok().body("running distance search");
-  }
-
-  /**
-   * @return
-   * changes the ps mode to distance-search
-   */
-  @RequestMapping(value = "/time-search", method = RequestMethod.GET)
-  public ResponseEntity startDistanceSearch(@RequestHeader("inactiveTime") Float inactiveTime, @RequestHeader("activeTime") Float activeTime) {
-    // TODO: add actual toggle call
-    if (activeTime >= 0 && inactiveTime >= 0) {
-      return ok().body("running time search");
+  @RequestMapping(value = "/focal-len", method = RequestMethod.POST)
+  public ResponseEntity setFocalLength(@RequestHeader("focalLength") Float focalLength) {
+    if (focalLength != null && focalLength >= 0) {
+      logger.info("Focal length post request: " + focalLength);
+//      /set-zoom-focal-length, takes json with f32 field “focal_length”
+      // TODO: call focalLength endpoint thing plane system
+      return ok().body("Focal length updated successfully " + focalLength);
     }
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error, invalid inactive & active times, inactive time: " + inactiveTime + ", active time: " + activeTime);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error, invalid focal length values " + focalLength);
+  }
+
+  /**
+   * @return something...
+   * /set-zoom-level, takes json with u8 field “level” (0-60, any past 30 is digital zoom)
+   */
+  @RequestMapping(value = "/set-zoom-level", method = RequestMethod.POST)
+  public ResponseEntity setZoomLevel (@RequestHeader("level") Float level) {
+    if (level >= 0 && level <= 60) {
+      logger.info("set zoom level post request: " + level);
+      // TODO: call set zoom level endpoint thing plane system
+      return ok().body("Zoom level updated successfully " + level);
+    }
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error, invalid zoom level input " + level);
+  }
+
+  /**
+   * @return something...
+   * /capture, takes a single image. Don’t call when ps modes are running for now.
+   */
+  @RequestMapping(value = "/capture", method = RequestMethod.POST)
+  public ResponseEntity capture () {
+    // if psmodes not running
+    logger.info("capture image request");
+//  /set-zoom-focal-length, takes json with f32 field “focal_length”
+    // TODO: call capture endpoint thing plane system
+    return ok().body("image finished capturing");
+  }
+
+  /**
+   * @return something...
+   * /get-zoom-level, return the zoom level as an integer (0-60)
+   */
+  @RequestMapping(value = "/get-zoom-level", method = RequestMethod.GET)
+  public ResponseEntity getZoomLevel () {
+    logger.info("getting zoom level");
+    // TODO: call get zoom level endpoint thing plane system and pass that in to return statement
+    return ok().body("image finished capturing");
   }
 
   /*
