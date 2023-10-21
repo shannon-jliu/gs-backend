@@ -1,7 +1,10 @@
 package org.cuair.ground.controllers;
 
 import static org.springframework.http.ResponseEntity.ok;
+
+import org.cuair.ground.clients.AutopilotClient;
 import org.cuair.ground.clients.CameraGimbalClient;
+import org.cuair.ground.clients.SettingsClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -22,13 +25,19 @@ import org.springframework.web.bind.annotation.RestController;
 //TODO: fix naming conventions...
 public class PlaneSystemController {
   private static final Logger logger = LoggerFactory.getLogger(ImageController.class);
-
+  private SettingsClient sc = new SettingsClient();
   /**
    * @return
    * changes the ps mode to pan-search
+   * // TODO: potentially change post methods to get for the ps mode questions
    */
-  @RequestMapping(value = "/pan-search", method = RequestMethod.GET)
+  @RequestMapping(value = "/pan-search", method = RequestMethod.POST)
   public ResponseEntity startPanSearch() {
+    try {
+      sc.getPanSearch();
+    } catch (Exception e) {
+      logger.info("error with calling plane system... " + e.getMessage());
+    }
     // TODO: add actual toggle call to start search - does it just start or does it toggle?
     return ok().body("started panning");
   }
@@ -40,6 +49,11 @@ public class PlaneSystemController {
   @RequestMapping(value = "/manual-search", method = RequestMethod.POST)
   public ResponseEntity toggleManualSearch() {
     // TODO: add actual toggle call - if call fails, return err
+    try {
+      sc.getManualSearch();
+    } catch (Exception e) {
+      logger.info("error... " + e.getMessage());
+    }
     return ok().body("toggled manual search");
   }
 
@@ -50,6 +64,11 @@ public class PlaneSystemController {
   @RequestMapping(value = "/distance-search", method = RequestMethod.POST)
   public ResponseEntity startDistanceSearch() {
     // TODO: add actual toggle call
+    try {
+      sc.getDistanceSearch();
+    } catch (Exception e) {
+      logger.info("error... " + e.getMessage());
+    }
     return ok().body("running distance search");
   }
 
@@ -58,9 +77,14 @@ public class PlaneSystemController {
    * changes the ps mode to time-search
    */
   @RequestMapping(value = "/time-search", method = RequestMethod.POST)
-  public ResponseEntity startTimeSearch(@RequestHeader("inactive") Float inactiveTime, @RequestHeader("active") Float activeTime) {
+  public ResponseEntity startTimeSearch(@RequestHeader("inactive") Integer inactiveTime, @RequestHeader("active") Integer activeTime) {
     // TODO: add actual toggle call
     if (activeTime >= 0 && inactiveTime >= 0) {
+      try {
+        sc.getTimeSearch(inactiveTime, activeTime);
+      } catch (Exception e) {
+        logger.info("error... " + e.getMessage());
+      }
       return ok().body("running time search");
     }
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error, invalid inactive & active times, inactive time: " + inactiveTime + ", active time: " + activeTime);
@@ -75,6 +99,11 @@ public class PlaneSystemController {
     // TODO: change to actual validation values
     if (roll >= 0 && pitch >= 0) {
       // TODO: call plane system with pitch & roll values
+      try {
+        sc.setGimbalPosition(roll, pitch);
+      } catch (Exception e) {
+        logger.info("error... " + e.getMessage());
+      }
       return ok().body("Gimbal position changed successfully, roll: " + roll + " pitch: " + pitch);
     }
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error, invalid roll and pitch values, roll: " + roll + ", pitch: " + pitch);
@@ -91,6 +120,7 @@ public class PlaneSystemController {
       logger.info("Focal length post request: " + focalLength);
 //      /set-zoom-focal-length, takes json with f32 field “focal_length”
       // TODO: call focalLength endpoint thing plane system
+      sc.changeFocalLength(focalLength);
       return ok().body("Focal length updated successfully " + focalLength);
     }
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error, invalid focal length values " + focalLength);
@@ -105,6 +135,11 @@ public class PlaneSystemController {
     if (level >= 0 && level <= 60) {
       logger.info("set zoom level post request: " + level);
       // TODO: call set zoom level endpoint thing plane system
+      try {
+        sc.changeZoomLevel(level);
+      } catch (Exception e) {
+        logger.info("error... " + e.getMessage());
+      }
       return ok().body("Zoom level updated successfully " + level);
     }
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error, invalid zoom level input " + level);
@@ -120,6 +155,7 @@ public class PlaneSystemController {
     logger.info("capture image request");
 //  /set-zoom-focal-length, takes json with f32 field “focal_length”
     // TODO: call capture endpoint thing plane system
+    sc.capture();
     return ok().body("image finished capturing");
   }
 
@@ -131,6 +167,11 @@ public class PlaneSystemController {
   public ResponseEntity getZoomLevel () {
     logger.info("getting zoom level");
     // TODO: call get zoom level endpoint thing plane system and pass that in to return statement
+    try {
+      sc.getZoomLevel();
+    } catch (Exception e) {
+      logger.info("error... " + e.getMessage());
+    }
     return ok().body("image finished capturing");
   }
 

@@ -53,6 +53,22 @@ public class Flags {
   public static String GET_CAM_GIM_MODE_SETTINGS_ROUTE = "/api/state";
   public static String GET_AIRDROP_SETTINGS_ROUTE = "/v1/airdrop/state";
 
+  public static String PS_COMMANDS_PORT = "8080"; // TODO: think about naming..
+  public static String SET_FOCAL_LENGTH_ROUTE = "/set-zoom-focal-length";
+  public static String SET_GIMBAL_ROUTE = "/set-gimbal";
+  public static String SET_ZOOM_LEVEL_ROUTE = "/set-zoom-level";
+
+  public static String SET_PAN_SEARCH_ROUTE = "/pan-search";
+  public static String SET_MANUAL_SEARCH_ROUTE = "/manual-search";
+  public static String SET_DISTANCE_SEARCH_ROUTE = "/distance-search";
+  public static String SET_TIME_SEARCH_ROUTE = "/time-search";
+
+  public static String CAPTURE_ROUTE = "/capture";
+
+  public static String GET_ZOOM_LEVEL_ROUTE = "/get-zoom-level";
+
+
+
   /** Streaming */
   public static String STREAM_CLIP_DIR = "src/main/org/cuair/ground/";
   public static int MAX_CAMERAS = 5;
