@@ -58,6 +58,10 @@ public class Flags {
   public static String SET_GIMBAL_ROUTE = "/set-gimbal";
   public static String SET_ZOOM_LEVEL_ROUTE = "/set-zoom-level";
 
+  public static String SET_APERTURE_ROUTE = "/set-aperture";
+
+  public static String SET_SHUTTER_SPEED_ROUTE = "/set-shutter-speed";
+
   public static String SET_PAN_SEARCH_ROUTE = "/pan-search";
   public static String SET_MANUAL_SEARCH_ROUTE = "/manual-search";
   public static String SET_DISTANCE_SEARCH_ROUTE = "/distance-search";
