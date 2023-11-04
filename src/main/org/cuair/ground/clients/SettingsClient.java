@@ -117,13 +117,12 @@ public class SettingsClient<T> {
    * Gets the gimbal position from the plane server
    */
   public ResponseEntity<String> setGimbalPosition(Float roll, Float pitch) throws Exception {
-//    TODO: look into potential bug - not logging anything
     Map<String, Object> data = new HashMap<>();
     data.put("pitch", pitch);
     data.put("roll", roll);
     URI settingsURI = URI.create(psModesAddress + serverPort8080 + setGimbalRoute);
     HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(data, RequestUtil.getDefaultHeaders());
-    ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.GET,
+    ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.POST,
         requestEntity, String.class);
     logger.info("works - set gimbal pos...");
     return settingsFuture.get();
@@ -174,7 +173,7 @@ public class SettingsClient<T> {
     data.put("inactive", inactive);
     data.put("active", active);
     HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(data, RequestUtil.getDefaultHeaders());
-    ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.GET,
+    ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.POST,
         requestEntity, String.class);
     logger.info("works - time search...");
     return settingsFuture.get();
@@ -186,12 +185,11 @@ public class SettingsClient<T> {
    * @param focalLength the new focal length to change to
    */
   public ResponseEntity<String> setFocalLength(Float focalLength) throws Exception{
-    logger.info("server port " + serverPort);
     URI settingsURI = URI.create(cameraCommandsAddress + serverPort8080 + setFocalLengthRoute);
     HttpEntity<Float> requestEntity = new HttpEntity<>(focalLength, RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.POST,
         requestEntity, String.class);
-    logger.info("works? - change focaL length... " + focalLength);
+    logger.info("works - change focaL length... " + focalLength);
     RequestUtil.futureCallback(settingsURI, settingsFuture);
     return settingsFuture.get();
   }

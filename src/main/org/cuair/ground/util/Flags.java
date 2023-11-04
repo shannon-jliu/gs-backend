@@ -44,7 +44,7 @@ public class Flags {
   /** Plane servers */
   public static boolean PRINT_CLIENT_LOGS = true;
   public static String OBC_IP = "192.168.0.21";
-  public static String PS_MODES_IP = "192.168.1.23";
+  public static String PS_MODES_IP = "127.0.0.1;"; //"192.168.1.23";
   public static String GIMBAL_COMMANDS_IP = "192.168.1.24";
   public static String CAMERA_COMMANDS_IP = "192.168.1.25";
   public static String CAM_GIM_PORT = "5000";
@@ -53,7 +53,7 @@ public class Flags {
   public static String GET_CAM_GIM_MODE_SETTINGS_ROUTE = "/api/state";
   public static String GET_AIRDROP_SETTINGS_ROUTE = "/v1/airdrop/state";
 
-  public static String PS_COMMANDS_PORT = "8080"; // TODO: think about naming..
+  public static String PS_COMMANDS_PORT = "8080";
   public static String SET_FOCAL_LENGTH_ROUTE = "/set-zoom-focal-length";
   public static String SET_GIMBAL_ROUTE = "/set-gimbal";
   public static String SET_ZOOM_LEVEL_ROUTE = "/set-zoom-level";

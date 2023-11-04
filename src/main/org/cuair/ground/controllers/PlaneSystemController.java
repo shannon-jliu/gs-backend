@@ -80,6 +80,7 @@ public class PlaneSystemController {
    */
   @RequestMapping(value = "/time-search", method = RequestMethod.POST)
   public ResponseEntity startTimeSearch(@RequestHeader("inactive") Integer inactiveTime, @RequestHeader("active") Integer activeTime) {
+    logger.info("beginning log time search " + inactiveTime + " " + activeTime);
     if (activeTime >= 0 && inactiveTime >= 0) {
       try {
         sc.setTimeSearch(inactiveTime, activeTime);
@@ -98,6 +99,7 @@ public class PlaneSystemController {
    */
   @RequestMapping(value = "/set-gimbal", method = RequestMethod.POST)
   public ResponseEntity setGimbal(@RequestHeader("roll") Float roll, @RequestHeader("pitch") Float pitch) {
+    logger.info("beginning log gimbal " + roll + " " + pitch);
     if (roll >= 0 && pitch >= 0) {
       try {
         sc.setGimbalPosition(roll, pitch);
@@ -177,7 +179,7 @@ public class PlaneSystemController {
    */
   @RequestMapping(value = "/set-shutter-speed", method = RequestMethod.POST)
   public ResponseEntity setZoomLevel (@RequestHeader("numerator") Integer numerator, @RequestHeader("denominator") Integer denominator) {
-    if (numerator >= 0 && denominator > 60) {
+    if (numerator >= 0 && denominator > 0) {
       logger.info("set shutter speed post request: " + numerator + " " + denominator);
       try {
         sc.setShutterSpeed(numerator, denominator);
@@ -205,7 +207,6 @@ public class PlaneSystemController {
         logger.info("error with capture " + e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: with capture");
     }
-    logger.info("error with capture");
     return ok("image finished capturing");
   }
 
@@ -222,7 +223,6 @@ public class PlaneSystemController {
       logger.info("error with getting the zoom level " + e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: zoom level");
     }
-    logger.info("error with zoom level get");
     return ok("image finished capturing");
   }
 }
