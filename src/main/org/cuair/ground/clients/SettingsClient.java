@@ -33,11 +33,10 @@ public class SettingsClient<T> {
   private String gimbalCommandsAddress = "http://" + Flags.GIMBAL_COMMANDS_IP + ":";
 
   private String cameraCommandsAddress = "http://" + Flags.CAMERA_COMMANDS_IP + ":";
-
-  private String serverPort8080 = "8080"; // TODO: fix later...
-
-
   protected String serverPort;
+  protected String psModesPort;
+  protected String gimbalCommandsPort;
+  protected String mainCameraCommandsPort;
   protected String setModeRoute;
 
   protected String getModeRoute;
@@ -66,7 +65,7 @@ public class SettingsClient<T> {
   /**
    * Changes the mode of the plane server
    *
-   * @param setting the new setting to change to
+   * @param setting the new setting to change to - NOTE: DEPRECATED
    */
   public void changeMode(T setting) {
     URI settingsURI = URI.create(obcAddress + serverPort + setModeRoute);
@@ -77,7 +76,7 @@ public class SettingsClient<T> {
   }
 
   /**
-   * Gets the mode of the plane server
+   * Gets the mode of the plane server - NOTE: DEPRECATED
    */
   public ResponseEntity<String> getMode() throws Exception {
     URI settingsURI = URI.create(obcAddress + serverPort + getModeRoute);
@@ -88,11 +87,11 @@ public class SettingsClient<T> {
   }
 
   /**
-   * Gets the focal length from the plane server
+   * Gets the focal length from the plane server - NOTE: NOT CURR IMPLEMENTED
    */
   public ResponseEntity<String> getFocalLength() throws Exception {
     // switch 0 to the address
-    URI settingsURI = URI.create(psModesAddress + serverPort8080 + setFocalLengthRoute);
+    URI settingsURI = URI.create(psModesAddress + serverPort + "getFocalLengthRoute");
     HttpEntity<String> requestEntity = new HttpEntity<String>(RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.GET,
         requestEntity, String.class);
@@ -101,11 +100,11 @@ public class SettingsClient<T> {
   }
 
   /**
-   * Gets the gimbal position from the plane server
+   * Gets the gimbal position from the plane server - NOTE: NOT CURR IMPLEMENTED
    */
   public ResponseEntity<String> getGimbalPosition() throws Exception {
     // !!! not actually implemented on PS side rn - ignore for now
-    URI settingsURI = URI.create(psModesAddress + serverPort8080 + "get gimbal route");
+    URI settingsURI = URI.create(psModesAddress + serverPort + "get gimbal route");
     HttpEntity<String> requestEntity = new HttpEntity<String>(RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.GET,
         requestEntity, String.class);
@@ -114,13 +113,13 @@ public class SettingsClient<T> {
   }
 
   /**
-   * Gets the gimbal position from the plane server
+   * Sets the gimbal position - sends roll and pitch to the plane server
    */
   public ResponseEntity<String> setGimbalPosition(Float roll, Float pitch) throws Exception {
     Map<String, Object> data = new HashMap<>();
     data.put("pitch", pitch);
     data.put("roll", roll);
-    URI settingsURI = URI.create(psModesAddress + serverPort8080 + setGimbalRoute);
+    URI settingsURI = URI.create(psModesAddress + gimbalCommandsPort + setGimbalRoute);
     HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(data, RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.POST,
         requestEntity, String.class);
@@ -132,7 +131,7 @@ public class SettingsClient<T> {
    * Sets the plane system mode as pan search
    */
   public ResponseEntity<String> setPanSearch() throws Exception {
-    URI settingsURI = URI.create(psModesAddress + serverPort8080 + setPanSearchRoute);
+    URI settingsURI = URI.create(psModesAddress + psModesPort + setPanSearchRoute);
     HttpEntity<String> requestEntity = new HttpEntity<String>(RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.GET,
         requestEntity, String.class);
@@ -144,7 +143,7 @@ public class SettingsClient<T> {
    * Sets the plane system mode as manual search
    */
   public ResponseEntity<String> setManualSearch() throws Exception {
-    URI settingsURI = URI.create(psModesAddress + serverPort8080 + setManualSearchRoute);
+    URI settingsURI = URI.create(psModesAddress + psModesPort + setManualSearchRoute);
     HttpEntity<String> requestEntity = new HttpEntity<String>(RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.GET,
         requestEntity, String.class);
@@ -156,7 +155,7 @@ public class SettingsClient<T> {
    * Sets the plane system mode as distance search
    */
   public ResponseEntity<String> setDistanceSearch() throws Exception {
-    URI settingsURI = URI.create(psModesAddress + serverPort8080 + setDistanceSearchRoute);
+    URI settingsURI = URI.create(psModesAddress + psModesPort + setDistanceSearchRoute);
     HttpEntity<String> requestEntity = new HttpEntity<String>(RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.GET,
         requestEntity, String.class);
@@ -168,7 +167,7 @@ public class SettingsClient<T> {
    * Sets the plane system mode as time search
    */
   public ResponseEntity<String> setTimeSearch(Integer inactive, Integer active) throws Exception {
-    URI settingsURI = URI.create(psModesAddress + serverPort8080 + setTimeSearchRoute);
+    URI settingsURI = URI.create(psModesAddress + psModesPort + setTimeSearchRoute);
     Map<String, Object> data = new HashMap<>();
     data.put("inactive", inactive);
     data.put("active", active);
@@ -185,7 +184,7 @@ public class SettingsClient<T> {
    * @param focalLength the new focal length to change to
    */
   public ResponseEntity<String> setFocalLength(Float focalLength) throws Exception{
-    URI settingsURI = URI.create(cameraCommandsAddress + serverPort8080 + setFocalLengthRoute);
+    URI settingsURI = URI.create(cameraCommandsAddress + mainCameraCommandsPort + setFocalLengthRoute);
     HttpEntity<Float> requestEntity = new HttpEntity<>(focalLength, RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.POST,
         requestEntity, String.class);
@@ -200,7 +199,7 @@ public class SettingsClient<T> {
    * @param level the new zoom level to change to
    */
   public ResponseEntity<String> setZoomLevel(Float level) throws Exception {
-    URI settingsURI = URI.create(cameraCommandsAddress + serverPort8080 + setZoomLevelRoute);
+    URI settingsURI = URI.create(cameraCommandsAddress + mainCameraCommandsPort + setZoomLevelRoute);
     HttpEntity<Float> requestEntity = new HttpEntity<>(level, RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.POST,
         requestEntity, String.class);
@@ -215,7 +214,7 @@ public class SettingsClient<T> {
    * @param aperture the new aperture to change to
    */
   public ResponseEntity<String> setAperture(Integer aperture) throws Exception {
-    URI settingsURI = URI.create(cameraCommandsAddress + serverPort8080 + setAperatureRoute);
+    URI settingsURI = URI.create(cameraCommandsAddress + mainCameraCommandsPort + setAperatureRoute);
     HttpEntity<Integer> requestEntity = new HttpEntity<>(aperture, RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.POST,
         requestEntity, String.class);
@@ -234,7 +233,7 @@ public class SettingsClient<T> {
     Map<String, Integer> data = new HashMap<>();
     data.put("numerator", numerator);
     data.put("denominator", denominator);
-    URI settingsURI = URI.create(cameraCommandsAddress + serverPort8080 + setShutterSpeed);
+    URI settingsURI = URI.create(cameraCommandsAddress + mainCameraCommandsPort + setShutterSpeed);
     HttpEntity<Map<String, Integer>> requestEntity = new HttpEntity<>(data, RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.POST,
         requestEntity, String.class);
@@ -247,7 +246,7 @@ public class SettingsClient<T> {
    * Gets the zoom level of the plane server
    */
   public ResponseEntity<String> getZoomLevel() throws Exception {
-    URI settingsURI = URI.create(cameraCommandsAddress + serverPort8080 + getZoomLevelRoute);
+    URI settingsURI = URI.create(cameraCommandsAddress + mainCameraCommandsPort + getZoomLevelRoute);
     HttpEntity<String> requestEntity = new HttpEntity<String>(RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.GET,
         requestEntity, String.class);
@@ -260,7 +259,7 @@ public class SettingsClient<T> {
    * Command to capture an image
    */
   public ResponseEntity<String> capture() throws Exception {
-    URI settingsURI = URI.create(cameraCommandsAddress + serverPort8080 + setCaptureRoute);
+    URI settingsURI = URI.create(cameraCommandsAddress + mainCameraCommandsPort + setCaptureRoute);
     HttpEntity<String> requestEntity = new HttpEntity<String>(RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.POST,
         requestEntity, String.class);

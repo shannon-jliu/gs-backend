@@ -53,7 +53,10 @@ public class Flags {
   public static String GET_CAM_GIM_MODE_SETTINGS_ROUTE = "/api/state";
   public static String GET_AIRDROP_SETTINGS_ROUTE = "/v1/airdrop/state";
 
-  public static String PS_COMMANDS_PORT = "8080";
+  public static String PS_COMMANDS_PORT = "8080"; // TODO: deprecate this
+  public static String PS_MODES_PORT = "4201";
+  public static String GIMBAL_COMMANDS_PORT = "4202";
+  public static String MAIN_CAMERA_COMMANDS_PORT = "4200";
   public static String SET_FOCAL_LENGTH_ROUTE = "/set-zoom-focal-length";
   public static String SET_GIMBAL_ROUTE = "/set-gimbal";
   public static String SET_ZOOM_LEVEL_ROUTE = "/set-zoom-level";
