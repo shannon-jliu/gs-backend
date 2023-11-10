@@ -26,41 +26,43 @@ public class SettingsClient<T> {
 
   private AsyncRestTemplate template = new AsyncRestTemplate();
 
-  private String obcAddress = "http://" + Flags.OBC_IP + ":";
+  private final String obcAddress = "http://" + Flags.OBC_IP + ":";
 
-  private String psModesAddress = "http://" + Flags.PS_MODES_IP + ":";
+  private final String psModesAddress = "http://" + Flags.PS_MODES_IP + ":";
 
   private String gimbalCommandsAddress = "http://" + Flags.GIMBAL_COMMANDS_IP + ":";
 
-  private String cameraCommandsAddress = "http://" + Flags.CAMERA_COMMANDS_IP + ":";
+  private final String cameraCommandsAddress = "http://" + Flags.CAMERA_COMMANDS_IP + ":";
   protected String serverPort;
-  protected String psModesPort;
-  protected String gimbalCommandsPort;
-  protected String mainCameraCommandsPort;
-  protected String setModeRoute;
+  private final String psModesPort = Flags.PS_MODES_PORT;
+  private final String gimbalCommandsPort = Flags.GIMBAL_COMMANDS_PORT;
+  private final String mainCameraCommandsPort = Flags.MAIN_CAMERA_COMMANDS_PORT;
+  private String setModeRoute;
 
+//  note: the protected syntax doesn't really work - is null somehow ?
+//  for now, just use private final String _ = Flags._ instead
   protected String getModeRoute;
-  private String setFocalLengthRoute = Flags.SET_FOCAL_LENGTH_ROUTE;
+  private final String setFocalLengthRoute = Flags.SET_FOCAL_LENGTH_ROUTE;
 
-  private String setZoomLevelRoute = Flags.SET_ZOOM_LEVEL_ROUTE;
+  private final String setZoomLevelRoute = Flags.SET_ZOOM_LEVEL_ROUTE;
 
-  private String setAperatureRoute = Flags.SET_APERTURE_ROUTE;
+  private final String setAperatureRoute = Flags.SET_APERTURE_ROUTE;
 
-  private String setShutterSpeed = Flags.SET_SHUTTER_SPEED_ROUTE;
+  private final String setShutterSpeed = Flags.SET_SHUTTER_SPEED_ROUTE;
 
-  private String setGimbalRoute = Flags.SET_GIMBAL_ROUTE;
+  private final String setGimbalRoute = Flags.SET_GIMBAL_ROUTE;
 
-  private String setPanSearchRoute = Flags.SET_PAN_SEARCH_ROUTE;
+  private final String setPanSearchRoute = Flags.SET_PAN_SEARCH_ROUTE;
 
-  private String setManualSearchRoute = Flags.SET_MANUAL_SEARCH_ROUTE;
+  private final String setManualSearchRoute = Flags.SET_MANUAL_SEARCH_ROUTE;
 
-  private String setDistanceSearchRoute = Flags.SET_DISTANCE_SEARCH_ROUTE;
+  private final String setDistanceSearchRoute = Flags.SET_DISTANCE_SEARCH_ROUTE;
 
-  private String setTimeSearchRoute = Flags.SET_TIME_SEARCH_ROUTE;
+  private final String setTimeSearchRoute = Flags.SET_TIME_SEARCH_ROUTE;
 
-  private String setCaptureRoute = Flags.CAPTURE_ROUTE;
+  private final String setCaptureRoute = Flags.CAPTURE_ROUTE;
 
-  private String getZoomLevelRoute = Flags.GET_ZOOM_LEVEL_ROUTE;
+  private final String getZoomLevelRoute = Flags.GET_ZOOM_LEVEL_ROUTE;
 
   /**
    * Changes the mode of the plane server
