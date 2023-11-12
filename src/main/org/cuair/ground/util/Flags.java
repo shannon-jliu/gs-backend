@@ -44,9 +44,10 @@ public class Flags {
   /** Plane servers */
   public static boolean PRINT_CLIENT_LOGS = true;
   public static String OBC_IP = "192.168.0.21";
-  public static String PS_MODES_IP = "127.0.0.1;"; //"192.168.1.23";
+//  change PS_MODES_IP and CAMERA_COMMANDS_IP
+  public static String PS_MODES_IP = "192.168.1.5;"; //"192.168.1.23";
   public static String GIMBAL_COMMANDS_IP = "192.168.1.24";
-  public static String CAMERA_COMMANDS_IP = "192.168.1.25";
+  public static String CAMERA_COMMANDS_IP = "192.168.1.5"; //"192.168.1.25"
   public static String CAM_GIM_PORT = "5000";
   public static String SET_CAM_GIM_MODE_SETTINGS_ROUTE = "/api/mode";
   public static String SET_AIRDROP_SETTINGS_ROUTE = "/v1/airdrop/setting";

@@ -7,6 +7,7 @@ import org.apache.coyote.Response;
 import org.cuair.ground.controllers.ImageController;
 import org.cuair.ground.util.Flags;
 import org.cuair.ground.util.RequestUtil;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -118,11 +119,11 @@ public class SettingsClient<T> {
    * Sets the gimbal position - sends roll and pitch to the plane server
    */
   public ResponseEntity<String> setGimbalPosition(Float roll, Float pitch) throws Exception {
-    Map<String, Object> data = new HashMap<>();
-    data.put("pitch", pitch);
-    data.put("roll", roll);
     URI settingsURI = URI.create(psModesAddress + gimbalCommandsPort + setGimbalRoute);
-    HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(data, RequestUtil.getDefaultHeaders());
+    JSONObject json = new JSONObject();
+    json.put("pitch", pitch);
+    json.put("roll", roll);
+    HttpEntity<String> requestEntity = new HttpEntity<>(json.toString(), RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.POST,
         requestEntity, String.class);
     logger.info("works - set gimbal pos...");
@@ -170,11 +171,11 @@ public class SettingsClient<T> {
    */
   public ResponseEntity<String> setTimeSearch(Integer inactive, Integer active) throws Exception {
     URI settingsURI = URI.create(psModesAddress + psModesPort + setTimeSearchRoute);
-    Map<String, Object> data = new HashMap<>();
-    data.put("inactive", inactive);
-    data.put("active", active);
-    HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(data, RequestUtil.getDefaultHeaders());
-    ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.POST,
+    JSONObject json = new JSONObject();
+    json.put("inactive", inactive);
+    json.put("active", active);
+    HttpEntity<String> requestEntity = new HttpEntity<>(json.toString(), RequestUtil.getDefaultHeaders());
+    ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.GET,
         requestEntity, String.class);
     logger.info("works - time search...");
     return settingsFuture.get();
@@ -187,7 +188,9 @@ public class SettingsClient<T> {
    */
   public ResponseEntity<String> setFocalLength(Float focalLength) throws Exception{
     URI settingsURI = URI.create(cameraCommandsAddress + mainCameraCommandsPort + setFocalLengthRoute);
-    HttpEntity<Float> requestEntity = new HttpEntity<>(focalLength, RequestUtil.getDefaultHeaders());
+    JSONObject json = new JSONObject();
+    json.put("focalLength", focalLength);
+    HttpEntity<String> requestEntity = new HttpEntity<>(json.toString(), RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.POST,
         requestEntity, String.class);
     logger.info("works - change focaL length... " + focalLength);
@@ -200,9 +203,12 @@ public class SettingsClient<T> {
    *
    * @param level the new zoom level to change to
    */
-  public ResponseEntity<String> setZoomLevel(Float level) throws Exception {
+  public ResponseEntity<String> setZoomLevel(Integer level) throws Exception {
     URI settingsURI = URI.create(cameraCommandsAddress + mainCameraCommandsPort + setZoomLevelRoute);
-    HttpEntity<Float> requestEntity = new HttpEntity<>(level, RequestUtil.getDefaultHeaders());
+    JSONObject json = new JSONObject();
+    json.put("level", level);
+    HttpEntity<JSONObject> requestEntity = new HttpEntity<>(json, RequestUtil.getDefaultHeaders());
+    logger.info("req entity " + String.valueOf(requestEntity));
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.POST,
         requestEntity, String.class);
     logger.info("works - change zoom level... " + level);
@@ -217,7 +223,9 @@ public class SettingsClient<T> {
    */
   public ResponseEntity<String> setAperture(Integer aperture) throws Exception {
     URI settingsURI = URI.create(cameraCommandsAddress + mainCameraCommandsPort + setAperatureRoute);
-    HttpEntity<Integer> requestEntity = new HttpEntity<>(aperture, RequestUtil.getDefaultHeaders());
+    JSONObject json = new JSONObject();
+    json.put("aperture", aperture);
+    HttpEntity<String> requestEntity = new HttpEntity<>(json.toString(), RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.POST,
         requestEntity, String.class);
     logger.info("works - change aperture... " + aperture);
@@ -232,11 +240,11 @@ public class SettingsClient<T> {
    * @param denominator to pass into plane system (u16)
    */
   public ResponseEntity<String> setShutterSpeed(Integer numerator, Integer denominator) throws Exception {
-    Map<String, Integer> data = new HashMap<>();
-    data.put("numerator", numerator);
-    data.put("denominator", denominator);
+    JSONObject json = new JSONObject();
+    json.put("numerator", numerator);
+    json.put("denominator", denominator);
     URI settingsURI = URI.create(cameraCommandsAddress + mainCameraCommandsPort + setShutterSpeed);
-    HttpEntity<Map<String, Integer>> requestEntity = new HttpEntity<>(data, RequestUtil.getDefaultHeaders());
+    HttpEntity<String> requestEntity = new HttpEntity<>(json.toString(), RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.POST,
         requestEntity, String.class);
     logger.info("works - change shutter speed... " + numerator + " " + denominator);
@@ -263,7 +271,7 @@ public class SettingsClient<T> {
   public ResponseEntity<String> capture() throws Exception {
     URI settingsURI = URI.create(cameraCommandsAddress + mainCameraCommandsPort + setCaptureRoute);
     HttpEntity<String> requestEntity = new HttpEntity<String>(RequestUtil.getDefaultHeaders());
-    ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.POST,
+    ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.GET,
         requestEntity, String.class);
     logger.info("works - capture ...");
     RequestUtil.futureCallback(settingsURI, settingsFuture);

@@ -33,7 +33,7 @@ public class PlaneSystemController {
    * // TODO: potentially change post methods to get for the ps mode questions
    * // TODO: figure out what is returned
    */
-  @RequestMapping(value = "/pan-search", method = RequestMethod.POST)
+  @RequestMapping(value = "/pan-search", method = RequestMethod.GET)
   public ResponseEntity startPanSearch() {
     try {
       sc.setPanSearch();
@@ -138,7 +138,7 @@ public class PlaneSystemController {
    * /set-zoom-level, takes json with u8 field “level” (0-60, any past 30 is digital zoom)
    */
   @RequestMapping(value = "/set-zoom-level", method = RequestMethod.POST)
-  public ResponseEntity setZoomLevel (@RequestHeader("level") Float level) {
+  public ResponseEntity setZoomLevel (@RequestHeader("level") Integer level) {
     if (level >= 0 && level <= 60) {
       logger.info("set zoom level post request: " + level);
       try {
@@ -178,7 +178,7 @@ public class PlaneSystemController {
    * /set-shutter-speed, sets the shutter speed, json with values numerator, denominator, both u16
    */
   @RequestMapping(value = "/set-shutter-speed", method = RequestMethod.POST)
-  public ResponseEntity setZoomLevel (@RequestHeader("numerator") Integer numerator, @RequestHeader("denominator") Integer denominator) {
+  public ResponseEntity setShutterSpeed (@RequestHeader("numerator") Integer numerator, @RequestHeader("denominator") Integer denominator) {
     if (numerator >= 0 && denominator > 0) {
       logger.info("set shutter speed post request: " + numerator + " " + denominator);
       try {
