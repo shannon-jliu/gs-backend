@@ -31,7 +31,7 @@ public class SettingsClient<T> {
 
   private final String psModesAddress = "http://" + Flags.PS_MODES_IP + ":";
 
-  private String gimbalCommandsAddress = "http://" + Flags.GIMBAL_COMMANDS_IP + ":";
+  private String gimbalCommandsAddress = "http://" + Flags.GIMBAL_COMMANDS_IP + ":"; // NOT USED...?
 
   private final String cameraCommandsAddress = "http://" + Flags.CAMERA_COMMANDS_IP + ":";
   protected String serverPort;
@@ -205,12 +205,13 @@ public class SettingsClient<T> {
    */
   public ResponseEntity<String> setZoomLevel(Integer level) throws Exception {
     URI settingsURI = URI.create(cameraCommandsAddress + mainCameraCommandsPort + setZoomLevelRoute);
-    JSONObject json = new JSONObject();
+    Map<String, Integer> json = new HashMap<>();
     json.put("level", level);
-    HttpEntity<JSONObject> requestEntity = new HttpEntity<>(json, RequestUtil.getDefaultHeaders());
-    logger.info("req entity " + String.valueOf(requestEntity));
+    json.put("focal_length", 0); // TODO: WILL BE CHANGED LATER!
+    HttpEntity<Map<String, Integer>> requestEntity = new HttpEntity<>(json, RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.POST,
         requestEntity, String.class);
+    logger.info("req entity " + String.valueOf(requestEntity));
     logger.info("works - change zoom level... " + level);
     RequestUtil.futureCallback(settingsURI, settingsFuture);
     return settingsFuture.get();
