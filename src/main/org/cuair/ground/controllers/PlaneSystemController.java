@@ -2,6 +2,8 @@ package org.cuair.ground.controllers;
 
 import static org.springframework.http.ResponseEntity.ok;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.cuair.ground.clients.AutopilotClient;
 import org.cuair.ground.clients.CameraGimbalClient;
 import org.cuair.ground.clients.SettingsClient;
@@ -22,23 +24,64 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin
 @RestController
 @RequestMapping(value = "/progress")
-//TODO: fix naming conventions...
 public class PlaneSystemController {
   private static final Logger logger = LoggerFactory.getLogger(ImageController.class);
-  private SettingsClient sc = new SettingsClient();
+  private final SettingsClient sc = new SettingsClient();
+
+//  GET REQUESTS:
+  /**
+   * @return 200 on success, 400 on error
+   * /capture, takes a single image. Don’t call when ps modes are running for now.
+   */
+  @RequestMapping(value = "/capture", method = RequestMethod.GET)
+  public ResponseEntity capture () {
+    // TODO: check that ps modes are not running
+    try {
+      sc.capture();
+    } catch (Exception e) {
+      logger.info("Error with capture " + e.getMessage());
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: with capture");
+    }
+    return ok("Image finished capturing");
+  }
+
+  /**
+   * @return 200 on success, 400 on error
+   * Returns json with ints: “shutter_speed_num” and “shutter_speed_den”, “aperture”, and “iso,”
+   * and strings: “exposure_mode” and “focus_mode”
+   */
+  @RequestMapping(value = "/get-status", method = RequestMethod.GET)
+  public ResponseEntity getStatus () {
+    // temp hardcoded json for testing
+    Map<String, Object> map = new HashMap<>();
+    map.put("shutter_speed_num", 1); // int
+    map.put("shutter_speed_den", 2); // int
+    map.put("aperture", 3); // int
+    map.put("iso", 4); // int
+    map.put("exposure_mode", "some exposure mode"); // string
+    map.put("focus_mode", "some focus mode"); // string
+
+    return new ResponseEntity<Object>(map, HttpStatus.OK);
+
+//    try {
+//      return sc.getStatus();
+//    } catch (Exception e) {
+//      logger.info("Error with getting the status " + e.getMessage());
+//      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: get status");
+//    }
+  }
+
   /**
    * Starts pan search
-   *
    * @return 200 on success, 400 on error
-   * // TODO: potentially change post methods to get for the ps mode questions
-   * // TODO: figure out what is returned
+   * TODO: figure out what is returned
    */
   @RequestMapping(value = "/pan-search", method = RequestMethod.GET)
   public ResponseEntity startPanSearch() {
     try {
       sc.setPanSearch();
     } catch (Exception e) {
-      logger.info("error with start pan search " + e.getMessage());
+      logger.info("Error with start pan search " + e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: pan search");
     }
     return ok("started panning");
@@ -48,67 +91,67 @@ public class PlaneSystemController {
    * @return 200 on success, 400 on error
    * changes the ps mode to manual-search
    */
-  @RequestMapping(value = "/manual-search", method = RequestMethod.POST)
+  @RequestMapping(value = "/manual-search", method = RequestMethod.GET)
   public ResponseEntity toggleManualSearch() {
     try {
       sc.setManualSearch();
     } catch (Exception e) {
-      logger.info("error with toggling manual search " + e.getMessage());
+      logger.info("Error with toggling manual search " + e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: manual search");
     }
-    return ok("toggled manual search");
+    return ok("Toggled manual search");
   }
 
   /**
    * @return 200 on success, 400 on error
    * changes the ps mode to distance-search
    */
-  @RequestMapping(value = "/distance-search", method = RequestMethod.POST)
+  @RequestMapping(value = "/distance-search", method = RequestMethod.GET)
   public ResponseEntity startDistanceSearch() {
     try {
       sc.setDistanceSearch();
     } catch (Exception e) {
-      logger.info("error with starting distance search " + e.getMessage());
+      logger.info("Error with starting distance search " + e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: distance search");
     }
-    return ok("running distance search");
+    return ok("Running distance search");
   }
 
   /**
    * @return 200 on success, 400 on error
    * changes the ps mode to time-search
    */
-  @RequestMapping(value = "/time-search", method = RequestMethod.POST)
+  @RequestMapping(value = "/time-search", method = RequestMethod.GET)
   public ResponseEntity startTimeSearch(@RequestHeader("inactive") Integer inactiveTime, @RequestHeader("active") Integer activeTime) {
-    logger.info("beginning log time search " + inactiveTime + " " + activeTime);
     if (activeTime >= 0 && inactiveTime >= 0) {
       try {
         sc.setTimeSearch(inactiveTime, activeTime);
       } catch (Exception e) {
-        logger.info("error with starting time search " + e.getMessage());
+        logger.info("Error with starting time search " + e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: time search");
       }
-      return ok("running time search");
+      return ok("Running time search");
     }
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error, invalid inactive & active times, inactive time: " + inactiveTime + ", active time: " + activeTime);
   }
 
+//  POST REQUESTS
   /**
    * @return 200 on success, 400 on error
    * calls plane system with new pitch & roll values, sends request to gimbal to move to new position
    */
   @RequestMapping(value = "/set-gimbal", method = RequestMethod.POST)
   public ResponseEntity setGimbal(@RequestHeader("roll") Float roll, @RequestHeader("pitch") Float pitch) {
-    logger.info("beginning log gimbal " + roll + " " + pitch);
     if (roll >= 0 && pitch >= 0) {
       try {
         sc.setGimbalPosition(roll, pitch);
       } catch (Exception e) {
-        logger.info("error with setting gimbal settings on ps side " + e.getMessage());
+        logger.info("Error with setting gimbal settings on ps side " + e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: gimbal");
       }
       return ok("Gimbal position changed successfully, roll: " + roll + " pitch: " + pitch);
     }
+//    TODO: see if these additional logs are needed when testing
     logger.info("Error: gimbal " + roll + " " + pitch);
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error, invalid roll and pitch values, roll: " + roll + ", pitch: " + pitch);
   }
@@ -120,16 +163,15 @@ public class PlaneSystemController {
   @RequestMapping(value = "/focal-len", method = RequestMethod.POST)
   public ResponseEntity setFocalLength(@RequestHeader("focalLength") Float focalLength) {
     if (focalLength != null && focalLength >= 0) {
-      logger.info("Focal length post request: " + focalLength);
       try {
         sc.setFocalLength(focalLength);
       } catch (Exception e) {
-        logger.info("error with focal length post " + e.getMessage());
+        logger.info("Error with focal length post " + e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: focal length");
       }
       return ok("Focal length updated successfully " + focalLength);
     }
-    logger.info("error with focal length seting");
+    logger.info("Error with focal length setting");
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error, invalid focal length values " + focalLength);
   }
 
@@ -140,16 +182,15 @@ public class PlaneSystemController {
   @RequestMapping(value = "/set-zoom-level", method = RequestMethod.POST)
   public ResponseEntity setZoomLevel (@RequestHeader("level") Integer level) {
     if (level >= 0 && level <= 60) {
-      logger.info("set zoom level post request: " + level);
       try {
         sc.setZoomLevel(level);
       } catch (Exception e) {
-        logger.info("error with setting zoom level " + e.getMessage());
+        logger.info("Error with setting zoom level " + e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: zoom level setting");
       }
       return ok("Zoom level updated successfully " + level);
     }
-    logger.info("error with zoom level");
+    logger.info("Error with zoom level");
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error, invalid zoom level input " + level);
   }
 
@@ -160,16 +201,15 @@ public class PlaneSystemController {
   @RequestMapping(value = "/set-aperture", method = RequestMethod.POST)
   public ResponseEntity setAperture (@RequestHeader("aperture") Integer aperture) {
     if (aperture >= 0) {
-      logger.info("set aperture post request: " + aperture);
       try {
         sc.setAperture(aperture);
       } catch (Exception e) {
-        logger.info("error with setting aperture " + e.getMessage());
+        logger.info("Error with setting aperture " + e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: aperture");
       }
-      return ok("aperture updated successfully " + aperture);
+      return ok("Aperture updated successfully " + aperture);
     }
-    logger.info("error with aperture");
+    logger.info("Error with aperture");
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error, invalid aperture input " + aperture);
   }
 
@@ -180,49 +220,15 @@ public class PlaneSystemController {
   @RequestMapping(value = "/set-shutter-speed", method = RequestMethod.POST)
   public ResponseEntity setShutterSpeed (@RequestHeader("numerator") Integer numerator, @RequestHeader("denominator") Integer denominator) {
     if (numerator >= 0 && denominator > 0) {
-      logger.info("set shutter speed post request: " + numerator + " " + denominator);
       try {
         sc.setShutterSpeed(numerator, denominator);
       } catch (Exception e) {
-        logger.info("error with setting shutter speed " + e.getMessage());
+        logger.info("Error with setting shutter speed " + e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: shutter speed");
       }
-      return ok("shutter speed updated successfully " + numerator + " " + denominator);
+      return ok("Shutter speed updated successfully " + numerator + " " + denominator);
     }
-    logger.info("error with shutter speed");
+    logger.info("Error with shutter speed");
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error, invalid shutter speed input " + numerator + " " + denominator);
-  }
-
-  /**
-   * @return 200 on success, 400 on error
-   * /capture, takes a single image. Don’t call when ps modes are running for now.
-   */
-  @RequestMapping(value = "/capture", method = RequestMethod.POST)
-  public ResponseEntity capture () {
-    // TODO: check if psmodes not running
-    logger.info("capture image request");
-    try {
-      sc.capture();
-    } catch (Exception e) {
-        logger.info("error with capture " + e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: with capture");
-    }
-    return ok("image finished capturing");
-  }
-
-  /**
-   * @return 200 on success, 400 on error
-   * /get-zoom-level, return the zoom level as an integer (0-60)
-   */
-  @RequestMapping(value = "/get-zoom-level", method = RequestMethod.GET)
-  public ResponseEntity getZoomLevel () {
-    logger.info("getting zoom level");
-    try {
-      sc.getZoomLevel();
-    } catch (Exception e) {
-      logger.info("error with getting the zoom level " + e.getMessage());
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: zoom level");
-    }
-    return ok("image finished capturing");
   }
 }

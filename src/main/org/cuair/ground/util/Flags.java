@@ -74,6 +74,7 @@ public class Flags {
   public static String CAPTURE_ROUTE = "/capture";
 
   public static String GET_ZOOM_LEVEL_ROUTE = "/get-zoom-level";
+  public static String GET_STATUS_ROUTE = "/get-status";
 
 
 
