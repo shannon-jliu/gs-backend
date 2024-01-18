@@ -29,20 +29,17 @@ public class SettingsClient<T> {
 
   private final String obcAddress = "http://" + Flags.OBC_IP + ":";
 
-  private final String psModesAddress = "http://" + Flags.PS_MODES_IP + ":";
-
-  private String gimbalCommandsAddress = "http://" + Flags.GIMBAL_COMMANDS_IP + ":";
-
   private final String cameraCommandsAddress = "http://" + Flags.CAMERA_COMMANDS_IP + ":";
   protected String serverPort;
-//  NOTE: Notion specifies which endpoints use psModes vs. gimbalCommands vs. mainCameraCommandsPort
-  private final String psModesPort = Flags.PS_MODES_PORT;
-  private final String gimbalCommandsPort = Flags.GIMBAL_COMMANDS_PORT;
-  private final String mainCameraCommandsPort = Flags.MAIN_CAMERA_COMMANDS_PORT;
+
+  // TODO: combine maybe into one string of address + port bc now all the same
+  // port
+  private final String cameraCommandsPort = Flags.MAIN_CAMERA_COMMANDS_PORT;
   private String setModeRoute;
 
-//  Note: the protected syntax (like for getModeRoute) doesn't really work - is null somehow ?
-//  for now, just use private final String _ = Flags._ instead
+  // Note: the protected syntax (like for getModeRoute) doesn't really work - is
+  // null somehow ?
+  // for now, just use private final String _ = Flags._ instead
   protected String getModeRoute;
   private final String setFocalLengthRoute = Flags.SET_FOCAL_LENGTH_ROUTE;
 
@@ -52,7 +49,9 @@ public class SettingsClient<T> {
 
   private final String setShutterSpeed = Flags.SET_SHUTTER_SPEED_ROUTE;
 
-  private final String setGimbalRoute = Flags.SET_GIMBAL_ROUTE;
+  private final String controlGimbalRoute = Flags.CONTROL_GIMBAL_ROUTE;
+
+  private final String setExposureModeRoute = Flags.SET_EXPOSURE_MODE_ROUTE;
 
   private final String setPanSearchRoute = Flags.SET_PAN_SEARCH_ROUTE;
 
@@ -64,14 +63,13 @@ public class SettingsClient<T> {
 
   private final String setCaptureRoute = Flags.CAPTURE_ROUTE;
 
-  private final String getZoomLevelRoute = Flags.GET_ZOOM_LEVEL_ROUTE;
   private final String getStatusRoute = Flags.GET_STATUS_ROUTE;
 
   /**
    * Command to capture an image
    */
   public ResponseEntity<String> capture() throws Exception {
-    URI settingsURI = URI.create(cameraCommandsAddress + mainCameraCommandsPort + setCaptureRoute);
+    URI settingsURI = URI.create(cameraCommandsAddress + cameraCommandsPort + setCaptureRoute);
     HttpEntity<String> requestEntity = new HttpEntity<String>(RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.GET,
         requestEntity, String.class);
@@ -82,11 +80,12 @@ public class SettingsClient<T> {
 
   /**
    * Gets the status from the plane system
-   * Returns json with ints: “shutter_speed_num” and “shutter_speed_den”, “aperture”, and “iso,”
+   * Returns json with ints: “shutter_speed_num” and “shutter_speed_den”,
+   * “aperture”, and “iso,”
    * and strings: “exposure_mode” and “focus_mode”
    */
   public ResponseEntity<String> getStatus() throws Exception {
-    URI settingsURI = URI.create(cameraCommandsAddress + mainCameraCommandsPort + getStatusRoute);
+    URI settingsURI = URI.create(cameraCommandsAddress + cameraCommandsPort + getStatusRoute);
     HttpEntity<String> requestEntity = new HttpEntity<String>(RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.GET,
         requestEntity, String.class);
@@ -98,7 +97,7 @@ public class SettingsClient<T> {
    * Sets the plane system mode as pan search
    */
   public ResponseEntity<String> setPanSearch() throws Exception {
-    URI settingsURI = URI.create(psModesAddress + psModesPort + setPanSearchRoute);
+    URI settingsURI = URI.create(cameraCommandsAddress + cameraCommandsPort + setPanSearchRoute);
     HttpEntity<String> requestEntity = new HttpEntity<String>(RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.GET,
         requestEntity, String.class);
@@ -110,7 +109,7 @@ public class SettingsClient<T> {
    * Sets the plane system mode as manual search
    */
   public ResponseEntity<String> setManualSearch() throws Exception {
-    URI settingsURI = URI.create(psModesAddress + psModesPort + setManualSearchRoute);
+    URI settingsURI = URI.create(cameraCommandsAddress + cameraCommandsPort + setManualSearchRoute);
     HttpEntity<String> requestEntity = new HttpEntity<String>(RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.GET,
         requestEntity, String.class);
@@ -122,7 +121,7 @@ public class SettingsClient<T> {
    * Sets the plane system mode as distance search
    */
   public ResponseEntity<String> setDistanceSearch() throws Exception {
-    URI settingsURI = URI.create(psModesAddress + psModesPort + setDistanceSearchRoute);
+    URI settingsURI = URI.create(cameraCommandsAddress + cameraCommandsPort + setDistanceSearchRoute);
     HttpEntity<String> requestEntity = new HttpEntity<String>(RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.GET,
         requestEntity, String.class);
@@ -134,10 +133,10 @@ public class SettingsClient<T> {
    * Sets the plane system mode as time search
    *
    * @param inactive integer for period of not taking photos
-   * @param active integer for period of taking photos
+   * @param active   integer for period of taking photos
    */
   public ResponseEntity<String> setTimeSearch(Integer inactive, Integer active) throws Exception {
-    URI settingsURI = URI.create(psModesAddress + psModesPort + setTimeSearchRoute);
+    URI settingsURI = URI.create(cameraCommandsAddress + cameraCommandsPort + setTimeSearchRoute);
     JSONObject json = new JSONObject();
     json.put("inactive", inactive);
     json.put("active", active);
@@ -151,10 +150,11 @@ public class SettingsClient<T> {
   /**
    * Sets the gimbal position - sends roll and pitch to the plane server
    */
-  public ResponseEntity<String> setGimbalPosition(Float roll, Float pitch) throws Exception {
-    URI settingsURI = URI.create(psModesAddress + gimbalCommandsPort + setGimbalRoute);
-//    Creating a new JSON object to send to PS with body {"pitch": _, "roll": }
-//    HTTP request contains this JSON object and default headers with contentType = APPLICATION_JSON
+  public ResponseEntity<String> controlGimbal(Float roll, Float pitch) throws Exception {
+    URI settingsURI = URI.create(cameraCommandsAddress + cameraCommandsPort + controlGimbalRoute);
+    // Creating a new JSON object to send to PS with body {"pitch": _, "roll": }
+    // HTTP request contains this JSON object and default headers with contentType =
+    // APPLICATION_JSON
     JSONObject json = new JSONObject();
     json.put("pitch", pitch);
     json.put("roll", roll);
@@ -170,8 +170,8 @@ public class SettingsClient<T> {
    *
    * @param focalLength the new focal length to change to
    */
-  public ResponseEntity<String> setFocalLength(Float focalLength) throws Exception{
-    URI settingsURI = URI.create(cameraCommandsAddress + mainCameraCommandsPort + setFocalLengthRoute);
+  public ResponseEntity<String> setFocalLength(Float focalLength) throws Exception {
+    URI settingsURI = URI.create(cameraCommandsAddress + cameraCommandsPort + setFocalLengthRoute);
     JSONObject json = new JSONObject();
     json.put("focalLength", focalLength);
     HttpEntity<String> requestEntity = new HttpEntity<>(json.toString(), RequestUtil.getDefaultHeaders());
@@ -188,10 +188,9 @@ public class SettingsClient<T> {
    * @param level the new zoom level to change to
    */
   public ResponseEntity<String> setZoomLevel(Integer level) throws Exception {
-    URI settingsURI = URI.create(cameraCommandsAddress + mainCameraCommandsPort + setZoomLevelRoute);
+    URI settingsURI = URI.create(cameraCommandsAddress + cameraCommandsPort + setZoomLevelRoute);
     Map<String, Integer> json = new HashMap<>();
     json.put("level", level);
-    json.put("focal_length", 0); // TODO: WILL BE CHANGED LATER!
     HttpEntity<Map<String, Integer>> requestEntity = new HttpEntity<>(json, RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.POST,
         requestEntity, String.class);
@@ -207,7 +206,7 @@ public class SettingsClient<T> {
    * @param aperture the new aperture to change to
    */
   public ResponseEntity<String> setAperture(Integer aperture) throws Exception {
-    URI settingsURI = URI.create(cameraCommandsAddress + mainCameraCommandsPort + setApertureRoute);
+    URI settingsURI = URI.create(cameraCommandsAddress + cameraCommandsPort + setApertureRoute);
     JSONObject json = new JSONObject();
     json.put("aperture", aperture);
     HttpEntity<String> requestEntity = new HttpEntity<>(json.toString(), RequestUtil.getDefaultHeaders());
@@ -221,18 +220,35 @@ public class SettingsClient<T> {
   /**
    * Changes the shutter speed of the plane server
    *
-   * @param numerator to pass into plane system (u16)
+   * @param numerator   to pass into plane system (u16)
    * @param denominator to pass into plane system (u16)
    */
   public ResponseEntity<String> setShutterSpeed(Integer numerator, Integer denominator) throws Exception {
     JSONObject json = new JSONObject();
     json.put("numerator", numerator);
     json.put("denominator", denominator);
-    URI settingsURI = URI.create(cameraCommandsAddress + mainCameraCommandsPort + setShutterSpeed);
+    URI settingsURI = URI.create(cameraCommandsAddress + cameraCommandsPort + setShutterSpeed);
     HttpEntity<String> requestEntity = new HttpEntity<>(json.toString(), RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.POST,
         requestEntity, String.class);
     logger.info("Changing shutter speed with numerator = " + numerator + " denominator = " + denominator);
+    RequestUtil.futureCallback(settingsURI, settingsFuture);
+    return settingsFuture.get();
+  }
+
+  /**
+   * Changes the exposure mode of the camera
+   * 
+   * @param mode to pass into plane system
+   */
+  public ResponseEntity<String> setExposureMode(String mode) throws Exception {
+    JSONObject json = new JSONObject();
+    json.put("mode", mode);
+    URI settingsURI = URI.create(cameraCommandsAddress + cameraCommandsPort + setExposureModeRoute);
+    HttpEntity<String> requestEntity = new HttpEntity<>(json.toString(), RequestUtil.getDefaultHeaders());
+    ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.POST,
+        requestEntity, String.class);
+    logger.info("Changing exposure mode to " + mode);
     RequestUtil.futureCallback(settingsURI, settingsFuture);
     return settingsFuture.get();
   }

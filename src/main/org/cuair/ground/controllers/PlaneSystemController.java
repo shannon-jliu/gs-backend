@@ -21,6 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Controller to call endpoints on the plane system to update or get settings.
  */
+// TODO: refactor the endpoint names so that they are consistent from frontend
+// -> backend -> planesystem
+// or don't and just document how the urls work (like where they are stored in
+// Flags and stuff)
 @CrossOrigin
 @RestController
 @RequestMapping(value = "/progress")
@@ -28,13 +32,14 @@ public class PlaneSystemController {
   private static final Logger logger = LoggerFactory.getLogger(ImageController.class);
   private final SettingsClient sc = new SettingsClient();
 
-//  GET REQUESTS:
+  // GET REQUESTS:
   /**
    * @return 200 on success, 400 on error
-   * /capture, takes a single image. Don’t call when ps modes are running for now.
+   *         /capture, takes a single image. Don’t call when ps modes are running
+   *         for now.
    */
   @RequestMapping(value = "/capture", method = RequestMethod.GET)
-  public ResponseEntity capture () {
+  public ResponseEntity capture() {
     // TODO: check that ps modes are not running
     try {
       sc.capture();
@@ -47,34 +52,36 @@ public class PlaneSystemController {
 
   /**
    * @return 200 on success, 400 on error
-   * Returns json with ints: “shutter_speed_num” and “shutter_speed_den”, “aperture”, and “iso,”
-   * and strings: “exposure_mode” and “focus_mode”
+   *         Returns json with ints: “shutter_speed_num” and “shutter_speed_den”,
+   *         “aperture”, and “iso,”
+   *         and strings: “exposure_mode” and “focus_mode”
    */
   @RequestMapping(value = "/get-status", method = RequestMethod.GET)
-  public ResponseEntity getStatus () {
+  public ResponseEntity getStatus() {
     // temp hardcoded json for testing
-    Map<String, Object> map = new HashMap<>();
-    map.put("shutter_speed_num", 1); // int
-    map.put("shutter_speed_den", 2); // int
-    map.put("aperture", 3); // int
-    map.put("iso", 4); // int
-    map.put("exposure_mode", "some exposure mode"); // string
-    map.put("focus_mode", "some focus mode"); // string
+    // Map<String, Object> map = new HashMap<>();
+    // map.put("shutter_speed_num", 1); // int
+    // map.put("shutter_speed_den", 2); // int
+    // map.put("aperture", 3); // int
+    // map.put("iso", 4); // int
+    // map.put("exposure_mode", "some exposure mode"); // string
+    // map.put("focus_mode", "some focus mode"); // string
 
-    return new ResponseEntity<Object>(map, HttpStatus.OK);
+    // return new ResponseEntity<Object>(map, HttpStatus.OK);
 
-//    try {
-//      return sc.getStatus();
-//    } catch (Exception e) {
-//      logger.info("Error with getting the status " + e.getMessage());
-//      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: get status");
-//    }
+    try {
+      return sc.getStatus();
+    } catch (Exception e) {
+      logger.info("Error with getting the status " + e.getMessage());
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: get status");
+    }
   }
 
   /**
    * Starts pan search
+   * 
    * @return 200 on success, 400 on error
-   * TODO: figure out what is returned
+   *         TODO: figure out what is returned
    */
   @RequestMapping(value = "/pan-search", method = RequestMethod.GET)
   public ResponseEntity startPanSearch() {
@@ -89,7 +96,7 @@ public class PlaneSystemController {
 
   /**
    * @return 200 on success, 400 on error
-   * changes the ps mode to manual-search
+   *         changes the ps mode to manual-search
    */
   @RequestMapping(value = "/manual-search", method = RequestMethod.GET)
   public ResponseEntity toggleManualSearch() {
@@ -104,7 +111,7 @@ public class PlaneSystemController {
 
   /**
    * @return 200 on success, 400 on error
-   * changes the ps mode to distance-search
+   *         changes the ps mode to distance-search
    */
   @RequestMapping(value = "/distance-search", method = RequestMethod.GET)
   public ResponseEntity startDistanceSearch() {
@@ -119,10 +126,11 @@ public class PlaneSystemController {
 
   /**
    * @return 200 on success, 400 on error
-   * changes the ps mode to time-search
+   *         changes the ps mode to time-search
    */
   @RequestMapping(value = "/time-search", method = RequestMethod.GET)
-  public ResponseEntity startTimeSearch(@RequestHeader("inactive") Integer inactiveTime, @RequestHeader("active") Integer activeTime) {
+  public ResponseEntity startTimeSearch(@RequestHeader("inactive") Integer inactiveTime,
+      @RequestHeader("active") Integer activeTime) {
     if (activeTime >= 0 && inactiveTime >= 0) {
       try {
         sc.setTimeSearch(inactiveTime, activeTime);
@@ -132,33 +140,36 @@ public class PlaneSystemController {
       }
       return ok("Running time search");
     }
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error, invalid inactive & active times, inactive time: " + inactiveTime + ", active time: " + activeTime);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+        "Error, invalid inactive & active times, inactive time: " + inactiveTime + ", active time: " + activeTime);
   }
 
-//  POST REQUESTS
+  // POST REQUESTS
   /**
    * @return 200 on success, 400 on error
-   * calls plane system with new pitch & roll values, sends request to gimbal to move to new position
+   *         calls plane system with new pitch & roll values, sends request to
+   *         gimbal to move to new position
    */
   @RequestMapping(value = "/set-gimbal", method = RequestMethod.POST)
-  public ResponseEntity setGimbal(@RequestHeader("roll") Float roll, @RequestHeader("pitch") Float pitch) {
+  public ResponseEntity controlGimbal(@RequestHeader("roll") Float roll, @RequestHeader("pitch") Float pitch) {
     if (roll >= 0 && pitch >= 0) {
       try {
-        sc.setGimbalPosition(roll, pitch);
+        sc.controlGimbal(roll, pitch);
       } catch (Exception e) {
         logger.info("Error with setting gimbal settings on ps side " + e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: gimbal");
       }
       return ok("Gimbal position changed successfully, roll: " + roll + " pitch: " + pitch);
     }
-//    TODO: see if these additional logs are needed when testing
+    // TODO: see if these additional logs are needed when testing
     logger.info("Error: gimbal " + roll + " " + pitch);
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error, invalid roll and pitch values, roll: " + roll + ", pitch: " + pitch);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        .body("Error, invalid roll and pitch values, roll: " + roll + ", pitch: " + pitch);
   }
 
   /**
    * @return 200 on success, 400 on error
-   * takes json with f32 field “focal_length”
+   *         takes json with f32 field “focal_length”
    */
   @RequestMapping(value = "/focal-len", method = RequestMethod.POST)
   public ResponseEntity setFocalLength(@RequestHeader("focalLength") Float focalLength) {
@@ -177,10 +188,11 @@ public class PlaneSystemController {
 
   /**
    * @return 200 on success, 400 on error
-   * /set-zoom-level, takes json with u8 field “level” (0-60, any past 30 is digital zoom)
+   *         /set-zoom-level, takes json with u8 field “level” (0-60, any past 30
+   *         is digital zoom)
    */
   @RequestMapping(value = "/set-zoom-level", method = RequestMethod.POST)
-  public ResponseEntity setZoomLevel (@RequestHeader("level") Integer level) {
+  public ResponseEntity setZoomLevel(@RequestHeader("level") Integer level) {
     if (level >= 0 && level <= 60) {
       try {
         sc.setZoomLevel(level);
@@ -196,10 +208,11 @@ public class PlaneSystemController {
 
   /**
    * @return 200 on success, 400 on error
-   * /set-aperture, set the aperture, json with value “aperture”: u16 → pass an int!
+   *         /set-aperture, set the aperture, json with value “aperture”: u16 →
+   *         pass an int!
    */
   @RequestMapping(value = "/set-aperture", method = RequestMethod.POST)
-  public ResponseEntity setAperture (@RequestHeader("aperture") Integer aperture) {
+  public ResponseEntity setAperture(@RequestHeader("aperture") Integer aperture) {
     if (aperture >= 0) {
       try {
         sc.setAperture(aperture);
@@ -215,10 +228,12 @@ public class PlaneSystemController {
 
   /**
    * @return 200 on success, 400 on error
-   * /set-shutter-speed, sets the shutter speed, json with values numerator, denominator, both u16
+   *         /set-shutter-speed, sets the shutter speed, json with values
+   *         numerator, denominator, both u16
    */
   @RequestMapping(value = "/set-shutter-speed", method = RequestMethod.POST)
-  public ResponseEntity setShutterSpeed (@RequestHeader("numerator") Integer numerator, @RequestHeader("denominator") Integer denominator) {
+  public ResponseEntity setShutterSpeed(@RequestHeader("numerator") Integer numerator,
+      @RequestHeader("denominator") Integer denominator) {
     if (numerator >= 0 && denominator > 0) {
       try {
         sc.setShutterSpeed(numerator, denominator);
@@ -229,6 +244,26 @@ public class PlaneSystemController {
       return ok("Shutter speed updated successfully " + numerator + " " + denominator);
     }
     logger.info("Error with shutter speed");
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error, invalid shutter speed input " + numerator + " " + denominator);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        .body("Error, invalid shutter speed input " + numerator + " " + denominator);
+  }
+
+  /**
+   * 
+   * @param mode
+   * @return 200 on success, 400 on error
+   */
+  @RequestMapping(value = "/set-exposure-mode", method = RequestMethod.POST)
+  public ResponseEntity setExposureMode(@RequestHeader("mode") String mode) {
+    // TODO: add string validation
+    // make [] of valid inputs from the notion
+    try {
+      sc.setExposureMode(mode);
+    } catch (Exception e) {
+      logger.info("Errors with setting exposure mode " + e.getMessage());
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: exposure mode");
+    }
+    logger.info("succesffully updated exposure mode");
+    return ok("Exposure mode updated succesffully " + mode);
   }
 }

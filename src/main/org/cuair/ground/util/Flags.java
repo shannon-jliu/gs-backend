@@ -44,39 +44,35 @@ public class Flags {
   /** Plane servers */
   public static boolean PRINT_CLIENT_LOGS = true;
   public static String OBC_IP = "192.168.0.21";
-//  change PS_MODES_IP and CAMERA_COMMANDS_IP
-  public static String PS_MODES_IP = "192.168.1.5;"; //"192.168.1.23";
-  public static String GIMBAL_COMMANDS_IP = "192.168.1.24";
-  public static String CAMERA_COMMANDS_IP = "192.168.1.5"; //"192.168.1.25"
+  // change PS_MODES_IP and CAMERA_COMMANDS_IP
+  // TODO: delete and deprecate later
+  // public static String PS_MODES_IP = "192.168.1.5;"; // "192.168.1.23";
+  // public static String GIMBAL_COMMANDS_IP = "192.168.1.24";
+  public static String CAMERA_COMMANDS_IP = "192.168.1.5"; // "192.168.1.25"
   public static String CAM_GIM_PORT = "5000";
   public static String SET_CAM_GIM_MODE_SETTINGS_ROUTE = "/api/mode";
   public static String SET_AIRDROP_SETTINGS_ROUTE = "/v1/airdrop/setting";
   public static String GET_CAM_GIM_MODE_SETTINGS_ROUTE = "/api/state";
   public static String GET_AIRDROP_SETTINGS_ROUTE = "/v1/airdrop/state";
 
-  public static String PS_COMMANDS_PORT = "8080"; // TODO: deprecate this
-  public static String PS_MODES_PORT = "4201";
-  public static String GIMBAL_COMMANDS_PORT = "4202";
   public static String MAIN_CAMERA_COMMANDS_PORT = "4200";
-  public static String SET_FOCAL_LENGTH_ROUTE = "/set-zoom-focal-length";
-  public static String SET_GIMBAL_ROUTE = "/set-gimbal";
-  public static String SET_ZOOM_LEVEL_ROUTE = "/set-zoom-level";
+  public static String SET_FOCAL_LENGTH_ROUTE = "/camera/set-zoom-focal-length";
+  public static String CONTROL_GIMBAL_ROUTE = "/gimbal/control-gimbal";
+  public static String SET_ZOOM_LEVEL_ROUTE = "/camera/set-zoom-level";
 
-  public static String SET_APERTURE_ROUTE = "/set-aperture";
+  public static String SET_APERTURE_ROUTE = "/camera/set-aperture";
 
-  public static String SET_SHUTTER_SPEED_ROUTE = "/set-shutter-speed";
+  public static String SET_SHUTTER_SPEED_ROUTE = "/camera/set-shutter-speed";
+  public static String SET_EXPOSURE_MODE_ROUTE = "/camera/set-exposure-mode";
 
-  public static String SET_PAN_SEARCH_ROUTE = "/pan-search";
-  public static String SET_MANUAL_SEARCH_ROUTE = "/manual-search";
-  public static String SET_DISTANCE_SEARCH_ROUTE = "/distance-search";
-  public static String SET_TIME_SEARCH_ROUTE = "/time-search";
+  public static String SET_PAN_SEARCH_ROUTE = "/modes/pan-search";
+  public static String SET_MANUAL_SEARCH_ROUTE = "/modes/manual-search";
+  public static String SET_DISTANCE_SEARCH_ROUTE = "/modes/distance-search";
+  public static String SET_TIME_SEARCH_ROUTE = "/modes/time-search";
 
-  public static String CAPTURE_ROUTE = "/capture";
+  public static String CAPTURE_ROUTE = "/camera/capture";
 
-  public static String GET_ZOOM_LEVEL_ROUTE = "/get-zoom-level";
-  public static String GET_STATUS_ROUTE = "/get-status";
-
-
+  public static String GET_STATUS_ROUTE = "/camera/get-status";
 
   /** Streaming */
   public static String STREAM_CLIP_DIR = "src/main/org/cuair/ground/";
