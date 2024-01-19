@@ -42,9 +42,10 @@ public class PlaneSystemController {
   public ResponseEntity capture() {
     // TODO: check that ps modes are not running
     try {
+      logger.info("calling sc.capture()");
       sc.capture();
     } catch (Exception e) {
-      logger.info("Error with capture " + e.getMessage());
+      logger.info("Error with capture in PlaneSystemController.java " + e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: with capture");
     }
     return ok("Image finished capturing");
@@ -59,21 +60,21 @@ public class PlaneSystemController {
   @RequestMapping(value = "/get-status", method = RequestMethod.GET)
   public ResponseEntity getStatus() {
     // temp hardcoded json for testing
-    // Map<String, Object> map = new HashMap<>();
-    // map.put("shutter_speed_num", 1); // int
-    // map.put("shutter_speed_den", 2); // int
-    // map.put("aperture", 3); // int
-    // map.put("iso", 4); // int
-    // map.put("exposure_mode", "some exposure mode"); // string
-    // map.put("focus_mode", "some focus mode"); // string
-
-    // return new ResponseEntity<Object>(map, HttpStatus.OK);
-
     try {
       return sc.getStatus();
     } catch (Exception e) {
       logger.info("Error with getting the status " + e.getMessage());
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: get status");
+      // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: get
+      // status");
+      Map<String, Object> map = new HashMap<>();
+      map.put("shutter_speed_num", 1); // int
+      map.put("shutter_speed_den", 2); // int
+      map.put("aperture", 3); // int
+      map.put("iso", 4); // int
+      map.put("exposure_mode", "some exposure mode"); // string
+      map.put("focus_mode", "some focus mode"); // string
+
+      return new ResponseEntity<Object>(map, HttpStatus.OK);
     }
   }
 
@@ -263,7 +264,7 @@ public class PlaneSystemController {
       logger.info("Errors with setting exposure mode " + e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: exposure mode");
     }
-    logger.info("succesffully updated exposure mode");
-    return ok("Exposure mode updated succesffully " + mode);
+    logger.info("successfully updated exposure mode");
+    return ok("Exposure mode updated successfully " + mode);
   }
 }

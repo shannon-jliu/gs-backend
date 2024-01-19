@@ -70,10 +70,11 @@ public class SettingsClient<T> {
    */
   public ResponseEntity<String> capture() throws Exception {
     URI settingsURI = URI.create(cameraCommandsAddress + cameraCommandsPort + setCaptureRoute);
+    logger.info(settingsURI.toString());
     HttpEntity<String> requestEntity = new HttpEntity<String>(RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.GET,
         requestEntity, String.class);
-    logger.info("Capture command called");
+    logger.info("Capture command called in SettingsClient");
     RequestUtil.futureCallback(settingsURI, settingsFuture);
     return settingsFuture.get();
   }
@@ -188,6 +189,7 @@ public class SettingsClient<T> {
    * @param level the new zoom level to change to
    */
   public ResponseEntity<String> setZoomLevel(Integer level) throws Exception {
+    // can use either map or json object
     URI settingsURI = URI.create(cameraCommandsAddress + cameraCommandsPort + setZoomLevelRoute);
     Map<String, Integer> json = new HashMap<>();
     json.put("level", level);
