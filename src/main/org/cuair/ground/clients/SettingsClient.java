@@ -207,7 +207,7 @@ public class SettingsClient<T> {
    *
    * @param aperture the new aperture to change to
    */
-  public ResponseEntity<String> setAperture(Integer aperture) throws Exception {
+  public ResponseEntity<String> setAperture(Float aperture) throws Exception {
     URI settingsURI = URI.create(cameraCommandsAddress + cameraCommandsPort + setApertureRoute);
     JSONObject json = new JSONObject();
     json.put("aperture", aperture);
@@ -225,15 +225,14 @@ public class SettingsClient<T> {
    * @param numerator   to pass into plane system (u16)
    * @param denominator to pass into plane system (u16)
    */
-  public ResponseEntity<String> setShutterSpeed(Integer numerator, Integer denominator) throws Exception {
+  public ResponseEntity<String> setShutterSpeed(Integer denominator) throws Exception {
     JSONObject json = new JSONObject();
-    json.put("numerator", numerator);
     json.put("denominator", denominator);
     URI settingsURI = URI.create(cameraCommandsAddress + cameraCommandsPort + setShutterSpeed);
     HttpEntity<String> requestEntity = new HttpEntity<>(json.toString(), RequestUtil.getDefaultHeaders());
     ListenableFuture<ResponseEntity<String>> settingsFuture = template.exchange(settingsURI, HttpMethod.POST,
         requestEntity, String.class);
-    logger.info("Changing shutter speed with numerator = " + numerator + " denominator = " + denominator);
+    logger.info("Changing shutter speed 1 / " + denominator);
     RequestUtil.futureCallback(settingsURI, settingsFuture);
     return settingsFuture.get();
   }

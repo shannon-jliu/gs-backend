@@ -213,7 +213,7 @@ public class PlaneSystemController {
    *         pass an int!
    */
   @RequestMapping(value = "/set-aperture", method = RequestMethod.POST)
-  public ResponseEntity setAperture(@RequestHeader("aperture") Integer aperture) {
+  public ResponseEntity setAperture(@RequestHeader("aperture") Float aperture) {
     if (aperture >= 0) {
       try {
         sc.setAperture(aperture);
@@ -233,20 +233,19 @@ public class PlaneSystemController {
    *         numerator, denominator, both u16
    */
   @RequestMapping(value = "/set-shutter-speed", method = RequestMethod.POST)
-  public ResponseEntity setShutterSpeed(@RequestHeader("numerator") Integer numerator,
-      @RequestHeader("denominator") Integer denominator) {
-    if (numerator >= 0 && denominator > 0) {
+  public ResponseEntity setShutterSpeed(@RequestHeader("denominator") Integer denominator) {
+    if (denominator > 0) {
       try {
-        sc.setShutterSpeed(numerator, denominator);
+        sc.setShutterSpeed(denominator);
       } catch (Exception e) {
         logger.info("Error with setting shutter speed " + e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: shutter speed");
       }
-      return ok("Shutter speed updated successfully " + numerator + " " + denominator);
+      return ok("Shutter speed updated successfully 1 / " + denominator);
     }
     logger.info("Error with shutter speed");
     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-        .body("Error, invalid shutter speed input " + numerator + " " + denominator);
+        .body("Error, invalid shutter speed input " + denominator);
   }
 
   /**
