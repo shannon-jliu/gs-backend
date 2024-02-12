@@ -35,7 +35,7 @@ public class Flags {
   public static boolean USERS_ENABLED = true;
 
   /** Autopilot */
-  public static String AUTOPILOT_GROUND_IP = "192.168.0.22";
+  public static String AUTOPILOT_GROUND_IP = "192.168.0.4";
   public static String AUTOPILOT_GROUND_PORT = "8001";
   public static String AUTOPILOT_COVERAGE = "/ground/api/v3/distributed/geotag";
   public static String AUTOPILOT_GROUND_MDLC_ROIS = "/ground/api/v3/distributed/mdlc";
