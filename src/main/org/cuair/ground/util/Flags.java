@@ -21,7 +21,6 @@ public class Flags {
 
   public static String DEFAULT_EMERGENT_TARGET_DESC = "A lost hiker with a water bottle.";
 
-
   public static int MISSION_NUMBER = 2;
 
   /** Default username if no username specified as part of request */
@@ -36,7 +35,7 @@ public class Flags {
   public static boolean USERS_ENABLED = true;
 
   /** Autopilot */
-  public static String AUTOPILOT_GROUND_IP = "192.168.0.22";
+  public static String AUTOPILOT_GROUND_IP = "192.168.1.6";
   public static String AUTOPILOT_GROUND_PORT = "8001";
   public static String AUTOPILOT_COVERAGE = "/ground/api/v3/distributed/geotag";
   public static String AUTOPILOT_GROUND_MDLC_ROIS = "/ground/api/v3/distributed/mdlc";
@@ -45,11 +44,35 @@ public class Flags {
   /** Plane servers */
   public static boolean PRINT_CLIENT_LOGS = true;
   public static String OBC_IP = "192.168.0.21";
+  // change PS_MODES_IP and CAMERA_COMMANDS_IP
+  // TODO: delete and deprecate later
+  // public static String PS_MODES_IP = "192.168.1.5;"; // "192.168.1.23";
+  // public static String GIMBAL_COMMANDS_IP = "192.168.1.24";
+  public static String CAMERA_COMMANDS_IP = "192.168.1.4"; // "192.168.1.25"
   public static String CAM_GIM_PORT = "5000";
   public static String SET_CAM_GIM_MODE_SETTINGS_ROUTE = "/api/mode";
   public static String SET_AIRDROP_SETTINGS_ROUTE = "/v1/airdrop/setting";
   public static String GET_CAM_GIM_MODE_SETTINGS_ROUTE = "/api/state";
   public static String GET_AIRDROP_SETTINGS_ROUTE = "/v1/airdrop/state";
+
+  public static String MAIN_CAMERA_COMMANDS_PORT = "4200";
+  public static String SET_FOCAL_LENGTH_ROUTE = "/camera/set-zoom-focal-length";
+  public static String CONTROL_GIMBAL_ROUTE = "/gimbal/control-gimbal";
+  public static String SET_ZOOM_LEVEL_ROUTE = "/camera/set-zoom-level";
+
+  public static String SET_APERTURE_ROUTE = "/camera/set-aperture";
+
+  public static String SET_SHUTTER_SPEED_ROUTE = "/camera/set-shutter-speed";
+  public static String SET_EXPOSURE_MODE_ROUTE = "/camera/set-exposure-mode";
+
+  public static String SET_PAN_SEARCH_ROUTE = "/modes/pan-search";
+  public static String SET_MANUAL_SEARCH_ROUTE = "/modes/manual-search";
+  public static String SET_DISTANCE_SEARCH_ROUTE = "/modes/distance-search";
+  public static String SET_TIME_SEARCH_ROUTE = "/modes/time-search";
+
+  public static String CAPTURE_ROUTE = "/camera/capture";
+
+  public static String GET_STATUS_ROUTE = "/camera/get-status";
 
   /** Streaming */
   public static String STREAM_CLIP_DIR = "src/main/org/cuair/ground/";
