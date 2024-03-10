@@ -35,7 +35,7 @@ public class Flags {
   public static boolean USERS_ENABLED = true;
 
   /** Autopilot */
-  public static String AUTOPILOT_GROUND_IP = "192.168.0.4";
+  public static String AUTOPILOT_GROUND_IP = "192.168.1.6";
   public static String AUTOPILOT_GROUND_PORT = "8001";
   public static String AUTOPILOT_COVERAGE = "/ground/api/v3/distributed/geotag";
   public static String AUTOPILOT_GROUND_MDLC_ROIS = "/ground/api/v3/distributed/mdlc";
@@ -48,7 +48,7 @@ public class Flags {
   // TODO: delete and deprecate later
   // public static String PS_MODES_IP = "192.168.1.5;"; // "192.168.1.23";
   // public static String GIMBAL_COMMANDS_IP = "192.168.1.24";
-  public static String CAMERA_COMMANDS_IP = "192.168.1.3"; // "192.168.1.25"
+  public static String CAMERA_COMMANDS_IP = "192.168.1.4"; // "192.168.1.25"
   public static String CAM_GIM_PORT = "5000";
   public static String SET_CAM_GIM_MODE_SETTINGS_ROUTE = "/api/mode";
   public static String SET_AIRDROP_SETTINGS_ROUTE = "/v1/airdrop/setting";
