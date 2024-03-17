@@ -76,8 +76,12 @@ class DAOFactory {
         override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
             return TimestampDatabaseAccessor(clazz.asSubclass(TimestampModel::class.java))
         }
-    };
-
+    },
+      LOGS_DATABASE_ACCESSOR {
+          override fun <M : CUAirModel> createInstance(clazz: Class<M>): DatabaseAccessor<*> {
+              return TargetSightingsDatabaseAccessor(clazz.asSubclass(TargetSighting::class.java))
+          }
+      };
     /**
      * Creates an instance of the database accessor for the specified model class
      *
